@@ -1,0 +1,137 @@
+        * { margin:0; padding:0 }
+
+
+        #logo {
+            color:#26BAD4;
+            font-weight : bold;
+            font-size:20px;
+
+            padding:10px;
+            padding-right:20px;
+            margin:0px;
+            display:inline-block;
+        }
+
+        hr {
+            border: 0px;
+            height: 1px;
+            background-color:#808080;
+
+            margin:0px;
+        }
+
+        #nav-bar li {
+            margin:10px;
+        }
+
+        #nav-bar li:hover {
+            color:#26BAD4;
+        }
+
+        #login-and-signup-bar li {
+            margin:5px;
+        }
+
+        #login-and-signup-bar li:hover {
+            color:#26BAD4;
+        }
+
+        #login-and-signup-bar li::before {
+            padding-right:10px;
+            content:"|";
+        }
+        #login-and-signup-bar li:first-child::before {
+            content:"";
+        }
+
+        * {
+            font-family: 'NanumSquareRound';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+            font-weight: lighter;
+            font-style: normal;
+        }
+
+        .footer-menu-items-1 {
+            color:black;
+            font-size:20px;
+            display:inline-block;
+            width:150px;
+        }
+
+        .footer-menu-items-2 {
+            color:black;
+            display:inline-block;
+            margin-bottom:0;
+        }
+
+        .footer-menu-items-3 {
+            color:black;
+            margin-bottom:0;
+        }
+
+
+
+                .dropdown {
+			position: relative;
+			display: inline-block;
+		}
+		.dropdown-content {
+			display: none;
+			position: absolute;
+			right:0%;
+
+
+            margin-top:17px;
+            width:150px;
+            height:250px;
+			border: 1px solid #808080;
+			background-color:white;
+		}
+		.dropdown:hover .dropdown-content { display: block; }
+		.dropdown:active .dropdown-content { display: block; }
+
+        #dropdown-content-icon {
+            width:150px;
+            height:150px;
+        }
+
+        #dropdown-content-button-1,#dropdown-content-button-2 {
+            width:150px;
+            height:50px;
+
+            color:black;
+        }
+
+        #dropdown-content-button-1:hover,#dropdown-content-button-2:hover {
+            color:#26BAD4;
+        }
+
+
+        #icon {
+            position:absolute;
+            top:5%;
+			left:30%;
+        }
+
+        #dropdown-content-icon-text-1 {
+            position:absolute;
+            top:35%;
+            left:20%;
+            font-size:15px;
+            font-weight: bold;
+            color:#26BAD4;
+        }
+
+        #dropdown-content-icon-text-2-1 {
+            position:absolute;
+            top:45%;
+            left:20%;
+            font-size:10px;
+        }
+
+        #dropdown-content-icon-text-2-2 {
+            position:absolute;
+            top:52%;
+            left:20%;
+            font-size:10px;
+        }
