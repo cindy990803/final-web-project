@@ -1,7 +1,7 @@
 package com.project.bokduck.repository;
 
-import domain.Member;
-import domain.Post;
+
+import com.project.bokduck.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

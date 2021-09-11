@@ -1,7 +1,10 @@
 package com.project.bokduck.repository;
 
-import domain.Payment;
-import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.project.bokduck.domain.Payment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 }

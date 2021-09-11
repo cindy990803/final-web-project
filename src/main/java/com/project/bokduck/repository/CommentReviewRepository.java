@@ -1,7 +1,6 @@
 package com.project.bokduck.repository;
 
-import domain.CommentReview;
-import domain.Member;
+import com.project.bokduck.domain.CommentReview;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
