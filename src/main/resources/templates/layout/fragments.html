@@ -20,11 +20,10 @@
                         <a class="nav-link nav-a" th:href="@{/}">문의사항</a>
                     </li>
 
-                        <li class="nav-item" th:classappend="${activeTab == 'login'} ? active" sec:authorize="!isAuthenticated()">
+                        <li class="nav-item">
                             <a class="nav-link nav-a" th:href="@{/login}">로그인</a>
                         </li>
-                        <li class="nav-item"><a class="nav-link nav-a" th:href="@{/signup}"
-                                                th:classappend="${activeTab == 'signup'} ? active">회원가입</a></li>
+                        <li class="nav-item"><a class="nav-link nav-a" th:href="@{/signup}">회원가입</a></li>
 
 
 
