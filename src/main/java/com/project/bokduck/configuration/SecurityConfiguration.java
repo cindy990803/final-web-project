@@ -1,5 +1,6 @@
 package com.project.bokduck.configuration;
 
+import com.project.bokduck.service.CustomOAuth2UserService;
 import com.project.bokduck.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -18,7 +19,7 @@ import javax.sql.DataSource;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final MemberService memberService;
     private final DataSource dataSource;
 
@@ -55,7 +56,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe()
                 .userDetailsService(memberService)
-                .tokenRepository(tokenRepository());
+                .tokenRepository(tokenRepository())
+
+                .and()
+                .oauth2Login()
+                .loginPage("/login")
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService);
 
     }
 

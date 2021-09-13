@@ -19,8 +19,6 @@ public class OAuth2Attributes {
     private final String nameAttributeKey;
     private final String username;
     private final OAuthType oAuthType;
-    private final MemberType memberType;
-    private final String picture;
 
 
 
@@ -45,7 +43,6 @@ public class OAuth2Attributes {
 
         return OAuth2Attributes.builder()
                 .username((String) response.get("email"))
-                .picture((String) response.get("profile_image"))
                 .oAuthType(OAuthType.NAVER)
                 .attributes(response)
                 .nameAttributeKey(id)
