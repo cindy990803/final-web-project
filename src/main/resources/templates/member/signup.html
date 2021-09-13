@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='회원가입'">
+<head>
+
+    <script th:src="@{/js/member/form-validation.js}"></script>
+    <script th:src="@{/js/member/daum-address.js}"></script>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .star {
+            color: tomato;
+        }
+
+        input {
+            margin-top:5px;
+            margin-bottom:5px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <main>
+            <div class="py-5 text-center">
+                <h2>회원 가입</h2>
+                <p class="lead">회원 가입을 해주세요.</p>
+            </div>
+
+
+            <div class="row justify-content-center">
+
+                <form class="needs-validation" th:object="${joinFormVo}" th:action="@{/signup}" method="post" name="joinFormVo"
+                      novalidate>
+
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="username" class="form-label">Email <span class="star">*</span></label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{username}" th:class="form-control"
+                                       th:classappend="${#fields.hasErrors('username') } ? 'is-invalid'" id="username"
+                                       placeholder="you@example.com" required>
+                                <div th:if="${#fields.hasErrors('username')}" th:class="${#fields.hasErrors('username')}? 'invalid-feedback'"
+                                     th:each="err : ${#fields.errors('username')}" th:text="${err}">
+                                    Invalid email
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="password" class="form-label">Password <span class="star">*</span></label>
+                            <div class="input-group">
+                                <input type="password" th:field="*{password}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('password') } ? 'is-invalid'" id="password" required>
+                                <div th:if="${#fields.hasErrors('password')}"
+                                     th:class="${#fields.hasErrors('password')}? 'invalid-feedback'"
+                                     th:each="err : ${#fields.errors('password')}" th:text="${err}">
+                                    Invalid password
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="password" th:field="*{passwordVerify}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('passwordVerify') } ? 'is-invalid'" id="passwordVerify" required>
+                                <div th:if="${#fields.hasErrors('passwordVerify')}"
+                                     th:class="${#fields.hasErrors('passwordVerify')}? 'invalid-feedback'"
+                                     th:each="err : ${#fields.errors('passwordVerify')}" th:text="${err}">
+                                    Invalid password
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="col-12 my-4">
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nickname" class="form-label">Nickname <span class="star">*</span></label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{nickname}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('nickname') } ? 'is-invalid'" id="nickname" required>
+                                <div th:if="${#fields.hasErrors('nickname')}"
+                                     th:class="${#fields.hasErrors('nickname')}? 'invalid-feedback'"
+                                     th:each="err : ${#fields.errors('nickname')}" th:text="${err}">
+                                    Invalid nickname
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-8">
+                            <label for="tel" class="form-label">Tel <span class="star">*</span></label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{tel}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('tel') } ? 'is-invalid'" id="tel" required>
+                                <div th:if="${#fields.hasErrors('tel')}"
+                                     th:class="${#fields.hasErrors('tel')}? 'invalid-feedback'"
+                                     th:each="err : ${#fields.errors('tel')}" th:text="${err}">
+                                    Invalid tel
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <label for="verifyTelBtn" class="form-label">&nbsp;</label>
+                            <button class="w-100 btn btn-dark" type="button" id="verifyTelBtn" onclick="#" style="margin-top:5px; margin-bottom:5px;">인증</button>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-8">
+                            <label for="zipcode" class="form-label">주소 <span class="star">*</span></label>
+                            <div class="input-group">
+                                <input type="text" th:field="*{postcode}" class="form-control" id="zipcode" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <label for="searchBtn" class="form-label">&nbsp;</label>
+                            <button class="w-100 btn btn-dark" type="button" id="searchBtn" onclick="search(joinFormVo)" style="margin-top:5px; margin-bottom:5px;">주소 검색</button>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-7">
+                            <div class="input-group">
+                                <input type="text" th:field="*{baseAddress}" class="form-control" id="city" readonly>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+<!--                                <input type="text" th:field="*{detailAddress}" class="form-control" id="street">-->
+                                <input type="text" th:field="*{detailAddress}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('detailAddress') } ? 'is-invalid'" id="street">
+                                <div th:if="${#fields.hasErrors('detailAddress')}"
+                                     th:class="${#fields.hasErrors('detailAddress')}? 'invalid-feedback'"
+                                     th:each="err : ${#fields.errors('detailAddress')}" th:text="${err}">
+                                    주소를 정확히 기입해주세요.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="col-12 my-4" style="opacity:0">
+
+                    <button class="w-100 btn btn-dark btn-lg" type="submit">회원가입</button>
+
+
+                </form>
+            </div>
+        </main>
+        <footer class="my-5 pt-5">
+
+        </footer>
+    </div>
+</div>
+</body>
+</html>

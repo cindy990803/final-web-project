@@ -12,6 +12,22 @@
             display:inline-block;
         }
 
+        .logo-a {
+            color:#26BAD4;
+        }
+
+        .logo-a:hover {
+                    color:#26BAD4;
+                }
+
+        .nav-a {
+            color:black;
+        }
+
+        .nav-a:hover {
+                    color:#26BAD4;
+        }
+
         hr {
             border: 0px;
             height: 1px;

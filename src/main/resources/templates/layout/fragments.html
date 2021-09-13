@@ -8,22 +8,22 @@
         <nav class="navbar navbar-expand-sm">
 
             <div class="navbar-collapse collapse justify-content-between" id="navbarSupportedContent">
-                <a class="navbar-brand" href="/" th:href="@{/}">복덕복덕</a>
+                <a class="navbar-brand logo-a" href="/" th:href="@{/}">복덕복덕</a>
 
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item" th:classappend="${activeTab == 'review'} ? active" sec:authorize="!isAuthenticated()">
-                        <a class="nav-link" th:href="@{/review/list}">리뷰</a>
+                        <a class="nav-link nav-a" th:href="@{/review/list}">리뷰</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/community/list}"
+                    <li class="nav-item"><a class="nav-link nav-a" th:href="@{/community/list}"
                                             th:classappend="${activeTab == 'signup'} ? active">커뮤니티</a></li>
                     <li class="nav-item" th:classappend="${activeTab == 'items'} ? active">
-                        <a class="nav-link" th:href="@{/}">문의사항</a>
+                        <a class="nav-link nav-a" th:href="@{/}">문의사항</a>
                     </li>
 
                         <li class="nav-item" th:classappend="${activeTab == 'login'} ? active" sec:authorize="!isAuthenticated()">
-                            <a class="nav-link" th:href="@{/login}">로그인</a>
+                            <a class="nav-link nav-a" th:href="@{/login}">로그인</a>
                         </li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/signup}"
+                        <li class="nav-item"><a class="nav-link nav-a" th:href="@{/signup}"
                                                 th:classappend="${activeTab == 'signup'} ? active">회원가입</a></li>
 
 
