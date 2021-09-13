@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="title='회원가입'">
+<head>
+</head>
+
+<body>
+<div layout:fragment="content" class="justify-content-center">
+    <p class="text-center lead" style="margin-top:200px;">복덕복덕 이메일 확인</p>
+
+    <h2 th:if="${result}" class="text-center pb-4" style="margin-bottom:200px;">
+        <span th:text="${nickname}"></span>
+        <span>님, 가입에 감사드립니다.</span>
+
+        <hr class="col-12 my-4" style="opacity:0">
+
+        <button class="btn btn-info" type="button" onclick="location.href='/'">메인페이지로</button>
+    </h2>
+    <p th:if="${!result}" class="alert alert-danger" role="alert" style="margin-bottom:200px;">이메일 확인 링크가 정확하지 않습니다.</p>
+</div>
+</body>
+</html>

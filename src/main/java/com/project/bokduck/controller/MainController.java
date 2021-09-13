@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -62,6 +64,32 @@ public class MainController {
         memberService.processNewMember(joinFormVo);
 
         return "redirect:/";
+    }
+
+    @Transactional
+    @GetMapping("/email-check")
+    public String emailCheck(String username, String token, Model model){
+
+        Optional<Member> optional = memberRepository.findByUsername(username);
+        boolean result;
+
+        if(optional.isEmpty()){
+            result = false;
+        }
+        else if(! optional.get().getEmailCheckToken().equals(token)){
+            result = false;
+        }
+        else {
+            result = true;
+            optional.get().setEmailVerified(true);
+        }
+
+        String nickname = memberRepository.findByUsername(username).get().getNickname();
+
+        model.addAttribute("nickname", nickname);
+        model.addAttribute("result", result);
+
+        return "member/email-check-result";
     }
 
 }

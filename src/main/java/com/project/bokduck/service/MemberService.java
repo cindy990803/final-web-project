@@ -29,6 +29,7 @@ public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
     private final DataSource dataSource;
 
     @PostConstruct  // 임시 계정 만들어 두고 테스트
@@ -65,13 +66,14 @@ public class MemberService implements UserDetailsService {
 
     /**
      * 1. JoinFormVo 객체를 Member DB에 저장
-     * 2. 이메일 보내기 //TODO
+     * 2. 이메일 보내기
      * 3. 로그인 처리해주기
      *
      * @param vo
      */
     public void processNewMember(JoinFormVo vo) {
         Member member = saveNewMember(vo);
+        emailService.sendEmail(member);
         login(member);
     }
 
