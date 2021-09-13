@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='Login'">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <main>
+            <div class="py-5 text-center">
+                <h2>로그인</h2>
+                <p class="lead">등록된 이메일과 패스워드를 입력하세요.</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                    <p>이메일 혹은 패스워드가 정확하지 않습니다.</p>
+                    <p>
+                        <a href="#" th:href="@{/signup}">회원 가입</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-10 justify-content-center">
+
+                <form class="needs-validation" th:action="@{/login}" method="post" name="loginForm" novalidate>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" name="username" class="form-control" id="email" placeholder="you@example.com"
+                                   aria-describedby="email_help_text" required>
+                            <div class="invalid-feedback">필수 사항입니다.</div>
+                            <small id="email_check_text" class="form-text text-muted">
+                                가입 시 사용하신 이메일을 입력하세요.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" id="password"
+                                   aria-describedby="password_help_text" required>
+                            <div class="invalid-feedback">필수 사항입니다.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe"
+                               name = "remember-me" checked/>
+                        <label class="form-check-label" for="rememberMe" aria-describedby="rememberMeHelp">로그인 유지</label>
+                    </div>
+
+                    <div>
+                        <small id="email_help_text" class="form-text text-muted">
+                            이메일이 기억나지 않으세요? <a href="#" th:href="@{/idsearch}">아이디 찾기</a>
+                        </small>
+                        <small id="password_help_text" class="form-text text-muted">
+                            패스워드가 기억나지 않으세요? <a href="#" th:href="@{/password/change}">패스워드 변경 링크 보내기</a>
+                        </small>
+                    </div>
+
+                    <hr class="col-12 my-4">
+                    <div class="row g-3 justify-content-center">
+                        <button class="w-50 btn btn-lg btn-info" type="submit">Login</button>
+                    </div>
+
+                    <hr class="col-12 my-4">
+
+                    <p class="row g-3 justify-content-center">
+                           <a href="/oauth2/authorization/naver" role="button">
+                           <img th:src="@{images/login_naver_logo.png}" width="220" height="50"> </a>
+                    </p>
+                    <p class="row g-3 justify-content-center">
+                        <a href="/oauth2/authorization/kakao" role="button">
+                            <img th:src="@{images/login_kakao_logo.png}" width="220" height="50"> </a>
+                    </p>
+                    <p class="row g-3 justify-content-center">
+                        <a href="/oauth2/authorization/google" role="button">
+                            <img th:src="@{images/login_google_logo.png}" width="220" height="50"> </a>
+                    </p>
+
+
+
+                </form>
+            </div>
+
+        </main>
+<!--        <footer class="my-5 pt-5">-->
+
+<!--        </footer>-->
+    </div>
+</div>
+</body>
+</html>

@@ -11,7 +11,7 @@ import javax.persistence.Embeddable;
 @Builder
 public class UserAddress {
 
-    private int postcode; // 우편번호
+    private String postcode; // 우편번호
 
     private String baseAddress; // 기본주소
 

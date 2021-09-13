@@ -26,7 +26,7 @@ public class Member {
     private String password; // 비밀번호
 
     @Column(nullable = false)
-    private int tel; // 핸드폰 번호
+    private String tel; // 핸드폰 번호
 
     @ColumnDefault("false")
     private boolean telVerified; // 핸드폰 인증 여부
@@ -41,7 +41,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'ROLE_USER'")
-    //private domain.MemberType memberType; // 회원 유형
+    private MemberType memberType; // 회원 유형
 
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Post> write; // 글 쓴 목록
@@ -55,7 +55,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private OAuthType oAuthType; // 제 3인증 타입
 
-    @Column(nullable = false)
+    @Column
     @ColumnDefault("false") // default false
     private boolean emailVerified;  // 이메일 인증 여부
 
