@@ -64,13 +64,11 @@ public class OAuth2Attributes {
                 .build();
     }
     private static OAuth2Attributes ofKakao(String id, Map<String, Object> attributes) {
-        log.info("Kakao 로 로그인!");
-        log.info("userNameAttributeName : {}", id);
-        log.info("attributes : {}", attributes);
-        log.info("attributes.get(\"response\") : {}", attributes.get("response"));
+        // kakao는 kakao_account에 유저정보가 있다. (email)
+        Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
 
         return OAuth2Attributes.builder()
-                .username((String) attributes.get("email"))
+                .username((String) kakaoAccount.get("email"))
                 .oAuthType(OAuthType.KAKAO)
                 .attributes(attributes)
                 .nameAttributeKey(id)
@@ -84,6 +82,7 @@ public class OAuth2Attributes {
                 .emailVerified(true)
                 .password("{noop}")
                 .oAuthType(oAuthType)
+                .tel("00000000000")
                 .build();
     }
 }

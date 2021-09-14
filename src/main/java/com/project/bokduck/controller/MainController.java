@@ -7,6 +7,7 @@ import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,7 @@ public class MainController {
 
     @RequestMapping("/")
     public String index(Model model, @CurrentMember Member member) {
+        log.info("로그인 유저 : {}", member.getUsername());
         return "index";
     }
 

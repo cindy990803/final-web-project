@@ -23,7 +23,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final MemberService memberService;
     private final DataSource dataSource;
-    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
