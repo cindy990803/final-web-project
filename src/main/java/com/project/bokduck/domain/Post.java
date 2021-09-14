@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
 @Getter @Setter @ToString @EqualsAndHashCode
 @NoArgsConstructor @AllArgsConstructor
 @SuperBuilder
 @DynamicUpdate @DynamicInsert
 public class Post {
+
     @Id @GeneratedValue
     private Long id;
 
