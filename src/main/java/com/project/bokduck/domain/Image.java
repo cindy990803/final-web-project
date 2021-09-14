@@ -17,7 +17,6 @@ public class Image {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @Column(nullable = false)
     private Post imageName;
 
     @Column(nullable = false)

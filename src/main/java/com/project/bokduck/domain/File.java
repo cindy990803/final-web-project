@@ -17,7 +17,6 @@ public class File {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @Column(nullable = false)
     private Post fileName;
 
     @Column(nullable = false)
