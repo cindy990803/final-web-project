@@ -12,14 +12,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class File {
+public class Image {
     @Id @GeneratedValue
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @Column(nullable = false)
-    private Post fileName;
+    private Post imageName;
 
     @Column(nullable = false)
-    private String filePath;
+    private String imagePath;
 }

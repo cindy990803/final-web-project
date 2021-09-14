@@ -45,11 +45,15 @@ public class Post {
     private List<Tag> tags; // 태그
 
     @OneToMany(mappedBy = "fileName", cascade = CascadeType.ALL)
-    private List<File> upload; // 파일
+    private List<File> uploadFile; // 업로드한 파일 - 계약서
+
+    @OneToMany(mappedBy = "imageName", cascade = CascadeType.ALL)
+    private List<Image> uploadImage; // 업로드한 이미지
 
     @PostLoad
     public void createList() {
         if (tags == null) tags = new ArrayList<>();
-        if (upload == null) upload = new ArrayList<>();
+        if (uploadFile == null) uploadFile = new ArrayList<>();
+        if (uploadImage == null) uploadImage = new ArrayList<>();
     }
 }
