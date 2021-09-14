@@ -110,7 +110,7 @@ public class MainController {
 
         } else {
             message = "임시 비밀번호가 발송되었습니다. 이메일을 확인해주세요.";
-            passEmailService.sendEmail(optional.orElseThrow());
+            passEmailService.sendPassEmail(optional.orElseThrow());
         }
         model.addAttribute("message", message);
         return "member/password";

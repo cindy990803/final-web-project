@@ -1,6 +1,7 @@
 package com.project.bokduck.service;
 
 import com.project.bokduck.domain.Member;
+import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -52,4 +53,6 @@ public class EmailService {
                 mailMessage.getText(),
                 mailMessage.getFrom());
     }
+
+
 }

@@ -23,7 +23,7 @@ public class PassEmailService {
 
 
     @Transactional
-    public void sendEmail(Member member) {
+    public void sendPassEmail(Member member) {
         sendHtmlMailMessage(member);
 
     }

@@ -29,7 +29,7 @@ public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final DataSource dataSource;
+    private final EmailService emailService;
 
     @PostConstruct  // 임시 계정 만들어 두고 테스트
     public void createTestMember() {
@@ -70,8 +70,10 @@ public class MemberService implements UserDetailsService {
      *
      * @param vo
      */
+
     public void processNewMember(JoinFormVo vo) {
         Member member = saveNewMember(vo);
+        emailService.sendEmail(member);
         login(member);
     }
 
