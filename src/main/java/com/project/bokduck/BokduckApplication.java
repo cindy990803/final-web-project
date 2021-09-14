@@ -11,8 +11,8 @@ public class BokduckApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BokduckApplication.class, args);
-	}
 
+		}
 	@Bean
 	public PasswordEncoder passwordEncoder(){
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();

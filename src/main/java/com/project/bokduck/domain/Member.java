@@ -66,4 +66,5 @@ public class Member {
         if (likes == null) likes = new ArrayList<>();
         if (write == null) write = new ArrayList<>();
     }
+
 }

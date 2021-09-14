@@ -3,7 +3,9 @@ package com.project.bokduck.controller;
 import com.project.bokduck.domain.Member;
 import com.project.bokduck.repository.MemberRepository;
 import com.project.bokduck.service.MemberService;
+import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.util.CurrentMember;
+import com.project.bokduck.util.PasswordMallSender;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class MainController {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final PassEmailService passEmailService;
 
     @InitBinder("joinFormVo")
     protected void initBinder(WebDataBinder dataBinder){
@@ -38,7 +41,6 @@ public class MainController {
 
     @RequestMapping("/")
     public String index(Model model, @CurrentMember Member member) {
-        log.info("로그인 유저 : {}", member.getUsername());
         return "index";
     }
 
@@ -94,4 +96,23 @@ public class MainController {
         return "member/email-check-result";
     }
 
+    @GetMapping("/password")
+    public String password(){
+        return "member/password";
+    }
+
+    @PostMapping("/password")
+    public String passwordSubmit(String username, Model model) {
+        String message = "아이디 : ";
+        Optional<Member> optional = memberRepository.findByUsername(username);
+        if (optional.isEmpty()) {
+            message = "아이디가 없습니다. 다시 한번 시도하세요.";
+
+        } else {
+            message = "임시 비밀번호가 발송되었습니다. 이메일을 확인해주세요.";
+            passEmailService.sendEmail(optional.orElseThrow());
+        }
+        model.addAttribute("message", message);
+        return "member/password";
+    }
 }

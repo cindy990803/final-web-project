@@ -13,12 +13,11 @@ public class MemberUser extends User {
     private final Member member;
 
     public MemberUser(Member member){
-        super(
-                member.getUsername(),
+        super(member.getUsername(),
                 member.getPassword(),
-                List.of(new SimpleGrantedAuthority(member.getMemberType().name()))
+                List.of(new SimpleGrantedAuthority(member.getMemberType().name())) //권한!!
         );
-        this.member = member;
+        this.member=member;
     }
 
 

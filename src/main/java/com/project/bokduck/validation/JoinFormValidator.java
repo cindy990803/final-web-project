@@ -2,6 +2,7 @@ package com.project.bokduck.validation;
 
 import com.project.bokduck.domain.Member;
 import com.project.bokduck.repository.MemberRepository;
+import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -39,4 +40,3 @@ public class JoinFormValidator implements Validator {
         }
     }
 }
-
