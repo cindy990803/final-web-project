@@ -7,6 +7,7 @@ import com.project.bokduck.domain.UserAddress;
 import com.project.bokduck.repository.MemberRepository;
 import com.project.bokduck.util.MemberUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -51,6 +53,9 @@ public class MemberService implements UserDetailsService {
                 .joinedAt(LocalDateTime.now())
                 .build()
         );
+
+        List<Member> memberList = memberRepository.findAll();
+        log.info("멤버서비스 - 멤버레파지토리 잘 불러오니? {}", memberList.get(0).getUsername());
     }
 
     @Override

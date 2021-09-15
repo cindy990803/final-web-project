@@ -2,6 +2,7 @@ package com.project.bokduck.domain;
 
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@DiscriminatorValue("COMMUNITY")
+@SuperBuilder
 public class Community extends Post{
     @Id
     private Long id;

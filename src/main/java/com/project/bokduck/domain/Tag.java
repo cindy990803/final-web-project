@@ -17,12 +17,14 @@ public class Tag {
     @Id @GeneratedValue
     private Long id;
 
+    private String tagName; // 태그명
+
     @ManyToMany(cascade = CascadeType.ALL)
-    @Column(nullable = false)
-    private List<Post> tagName; // 태그명
+//    @Column(nullable = false) // ????!!!
+    private List<Post> tagToPost; // 태그한 게시물
 
     @PostLoad
     public void createList() {
-        if (tagName == null) tagName = new ArrayList<>();
+        if (tagToPost == null) tagToPost = new ArrayList<>();
     }
 }

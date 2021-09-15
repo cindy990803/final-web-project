@@ -33,16 +33,16 @@ public class Post {
 
     private LocalDateTime updateDate; // 수정일자
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Member writer; // 작성자
 
-    @ManyToMany(mappedBy = "likes",cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "likes", cascade = CascadeType.ALL)
     private List<Member> likers; // 좋아요 누른 사람들
 
     @ColumnDefault("0")
     private int hit; // 조회수
 
-    @ManyToMany(mappedBy = "tagName",cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "tagToPost", cascade = CascadeType.ALL)
     private List<Tag> tags; // 태그
 
     @OneToMany(mappedBy = "fileName", cascade = CascadeType.ALL)
@@ -53,6 +53,7 @@ public class Post {
 
     @PostLoad
     public void createList() {
+        if (likers == null) likers = new ArrayList<>();
         if (tags == null) tags = new ArrayList<>();
         if (uploadFile == null) uploadFile = new ArrayList<>();
         if (uploadImage == null) uploadImage = new ArrayList<>();

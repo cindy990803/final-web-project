@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='복덕복덕 : Review'">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1> 리뷰 리스트</h1>
+        <form action="/webservlet 주소" method="get" id="searchForm">
+                <div id="check_option">
+                    <details>
+                        <summary>
+                            <input type="radio" name="line_up" checked> 최신순
+                            <input type="radio" name="line_up"> 별점순
+                            <input type="radio" name="line_up"> 좋아요순
+                       </summary>
+
+                        <ul>
+                        <li id="check_roomsize">
+                            <span> 방 형태 : </span>
+                            <input type="checkbox" id="r1" name="roomsize" value="1001" /><label for="r1"> 원룸 </label>
+                            <input type="checkbox" id="r2" name="roomsize" value="1002" /><label for="r2"> 투룸 </label>
+                            <input type="checkbox" id="r3" name="roomsize" value="1003" /><label for="r3"> 쓰리룸이상 </label>
+                        </li>
+
+                        <li id="check_structure">
+                            <span> 주거 형태 : </span>
+                            <input type="checkbox" id="st1" name="structure" value="1001" /><label for="st1"> 빌라 </label>
+                            <input type="checkbox" id="st2" name="structure" value="1002" /><label for="st2"> 오피스텔 </label>
+                            <input type="checkbox" id="st3" name="structure" value="1003" /><label for="st3"> 아파트 </label>
+                        </li>
+
+                        <li id="check_payment">
+                            <span> 주거 형태 : </span>
+                            <input type="checkbox" id="p1" name="payment" value="1001" /><label for="p1"> 월세 </label>
+                            <input type="checkbox" id="p2" name="payment" value="1002" /><label for="p2"> 반전세 </label>
+                            <input type="checkbox" id="p3" name="payment" value="1003" /><label for="p3"> 전세 </label>
+                            <input type="checkbox" id="p4" name="payment" value="1003" /><label for="p4"> 매매 </label>
+                        </li>
+
+                        <li id="check_traffic">
+                            <span> 가까운 교통편 : </span>
+                            <input type="checkbox" id="t1" name="traffic" value="1001" /><label for="t1"> 버스 </label>
+                            <input type="checkbox" id="t2" name="traffic" value="1002" /><label for="t2"> 지하철 </label>
+                        </li>
+
+                        <li id="check_electronicDevices">
+                            <span> 가구 옵션 : </span>
+                            <input type="checkbox" id="e1" name="electronicDevices" value="1001" /><label for="e1"> 침대 </label>
+                            <input type="checkbox" id="e2" name="electronicDevices" value="1002" /><label for="e2"> 에어컨 </label>
+                            <input type="checkbox" id="e3" name="electronicDevices" value="1003" /><label for="e3"> 세탁기 </label>
+                            <input type="checkbox" id="e4" name="electronicDevices" value="1003" /><label for="e4"> 냉장고 </label>
+                        </li>
+
+                        <li id="check_welfare">
+                            <span> 건물 시설 : </span>
+                            <input type="checkbox" id="w1" name="welfare" value="1001" /><label for="w1"> 주차장 </label>
+                            <input type="checkbox" id="w2" name="welfare" value="1002" /><label for="w2"> 무인택배함 </label>
+                            <input type="checkbox" id="w3" name="welfare" value="1003" /><label for="w3"> CCTV </label>
+                        </li>
+
+                        <li id="check_convenient">
+                            <span> 편의 시설 : </span>
+                            <input type="checkbox" id="c1" name="convenient" value="1001" /><label for="c1"> 편의점 </label>
+                            <input type="checkbox" id="c2" name="convenient" value="1002" /><label for="c2"> 병원 </label>
+                            <input type="checkbox" id="c3" name="convenient" value="1003" /><label for="c3"> 코인빨래방 </label>
+                        </li>
+                    </ul>
+                    </details>
+                </div>
+
+        </form>
+</div>
+</body>
+</html>

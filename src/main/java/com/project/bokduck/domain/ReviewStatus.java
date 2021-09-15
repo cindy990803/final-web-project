@@ -5,7 +5,7 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 public enum ReviewStatus{
-    Complete,Wait
+    COMPLETE, WAIT, REFUSAL
 
 
 }

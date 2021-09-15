@@ -2,6 +2,8 @@ package com.project.bokduck.domain;
 
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -16,14 +18,14 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@DiscriminatorValue("REVIEW")
+@SuperBuilder
 public class Review extends Post{
 
     @Id@GeneratedValue
     private Long id;
 
     @Column(nullable = false)
-    private String comment;
+    private String comment; // 한줄 코멘트
 
     @Column(nullable = false)
     private int star;
