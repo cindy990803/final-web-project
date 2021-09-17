@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 @SuperBuilder
 @DynamicUpdate @DynamicInsert
-public class Post {
+public abstract class Post {
 
     @Id @GeneratedValue
     private Long id;
@@ -26,14 +26,14 @@ public class Post {
     @Column(nullable = false)
     private String postName; // 게시물 제목
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String postContent; // 게시글 내용
 
     private LocalDateTime regdate; // 작성일자
 
     private LocalDateTime updateDate; // 수정일자
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Member writer; // 작성자
 
     @ManyToMany(mappedBy = "likes", cascade = CascadeType.ALL)

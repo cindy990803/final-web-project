@@ -20,7 +20,6 @@ public class Tag {
     private String tagName; // 태그명
 
     @ManyToMany(cascade = CascadeType.ALL)
-//    @Column(nullable = false) // ????!!!
     private List<Post> tagToPost; // 태그한 게시물
 
     @PostLoad

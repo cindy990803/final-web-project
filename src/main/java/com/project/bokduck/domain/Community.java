@@ -19,11 +19,6 @@ import java.util.List;
 @DynamicUpdate
 @SuperBuilder
 public class Community extends Post{
-    @Id
-    private Long id;
-
-    @ManyToOne
-    private Member communityWriter;
 
     @Enumerated()
     private CommunityCategory communityCategory;

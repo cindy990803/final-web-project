@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,9 +21,6 @@ import java.util.List;
 @DynamicUpdate
 @SuperBuilder
 public class Review extends Post{
-
-    @Id@GeneratedValue
-    private Long id;
 
     @Column(nullable = false)
     private String comment; // 한줄 코멘트
@@ -41,4 +39,16 @@ public class Review extends Post{
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
    private List<CommentReview> commentReviews;
+
+    @OneToMany(mappedBy = "fileName", cascade = CascadeType.ALL)
+    private List<File> uploadFile; // 업로드한 파일 - 계약서
+
+    @OneToMany(mappedBy = "imageName", cascade = CascadeType.ALL)
+    private List<Image> uploadImage; // 업로드한 이미지
+
+    @PostLoad
+    public void createList() {
+        if (uploadFile == null) uploadFile = new ArrayList<>();
+        if (uploadImage == null) uploadImage = new ArrayList<>();
+    }
 }

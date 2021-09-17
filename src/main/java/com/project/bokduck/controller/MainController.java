@@ -1,9 +1,17 @@
 package com.project.bokduck.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.project.bokduck.domain.Community;
+import com.project.bokduck.domain.CommunityCategory;
 import com.project.bokduck.domain.Member;
+import com.project.bokduck.domain.Tag;
+import com.project.bokduck.repository.CommunityRepository;
 import com.project.bokduck.repository.MemberRepository;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
+import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
@@ -20,6 +28,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -28,6 +39,7 @@ import java.util.Optional;
 public class MainController {
 
     private final MemberRepository memberRepository;
+    private final CommunityRepository communityRepository;
     private final MemberService memberService;
     private final PassEmailService passEmailService;
 
@@ -117,4 +129,70 @@ public class MainController {
     public String reviewList(){
         return "post/review/list";
     }
+
+    @GetMapping("/community/write")
+    public String communityWriteForm(Model model) {
+        model.addAttribute("vo", new CommunityFormVo());
+        return "post/community/write";
+    }
+
+    @PostMapping("/community/write")
+    public String communityWriteSubmit(@CurrentMember Member member, CommunityFormVo vo, Model model) {
+
+        //DB에 저장할 List<Tag>형 변수 설정
+        List<Tag> tagList = new ArrayList<>();
+
+        if (!vo.getTags().isEmpty()) {
+            JsonArray tagsJsonArray = new Gson().fromJson(vo.getTags(), JsonArray.class);
+
+            for(int i=0; i<tagsJsonArray.size(); ++i) {
+                JsonObject object = tagsJsonArray.get(i).getAsJsonObject();
+                String tagValue = object.get("value").getAsString();
+
+                Tag tag = Tag.builder()
+                        .tagName(tagValue)
+                        .build();
+
+                tagList.add(tag);
+            }
+        }
+
+
+
+        //DB에 저장할 CommunityCategory형 변수 설정
+        CommunityCategory category = CommunityCategory.TIP;
+
+        switch (vo.getCommunityCategory()) {
+            case 0:
+                category = CommunityCategory.TIP;
+                break;
+            case 1:
+                category = CommunityCategory.INTERIOR;
+                break;
+            case 2:
+                category = CommunityCategory.EAT;
+                break;
+            case 3:
+                category = CommunityCategory.BOARD;
+                break;
+            default:
+        }
+
+
+        //데이터를 DB에 저장
+        Community community = Community.builder()
+                .postName(vo.getPostName())
+                .postContent(vo.getPostContent())
+                .regdate(LocalDateTime.now())
+                .writer(member)
+                .tags(tagList)
+                .communityCategory(category)
+                .build();
+
+        communityRepository.save(community);
+
+        return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
+    }
+
+
 }
