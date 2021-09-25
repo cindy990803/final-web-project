@@ -19,6 +19,6 @@ public class Image {
     @ManyToOne(cascade = CascadeType.ALL)
     private Post imageName;
 
-    @Column(nullable = false)
+    @Column//(nullable = false)
     private String imagePath;
 }

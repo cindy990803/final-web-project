@@ -64,6 +64,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService);
 
+
+        http.cors().and();
+        http.csrf().disable();
+
     }
 
     @Bean
@@ -74,6 +78,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         jdbcTokenRepository.setDataSource(dataSource);
         return jdbcTokenRepository;
     }
+
+
 
 
 }

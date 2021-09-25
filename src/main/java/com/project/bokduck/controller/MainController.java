@@ -3,16 +3,15 @@ package com.project.bokduck.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.project.bokduck.domain.Community;
-import com.project.bokduck.domain.CommunityCategory;
-import com.project.bokduck.domain.Member;
-import com.project.bokduck.domain.Tag;
+import com.project.bokduck.domain.*;
 import com.project.bokduck.repository.CommunityRepository;
 import com.project.bokduck.repository.MemberRepository;
+import com.project.bokduck.repository.ReviewRepository;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
+import com.project.bokduck.util.WriteReviewVO;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -37,14 +33,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class MainController {
-
     private final MemberRepository memberRepository;
     private final CommunityRepository communityRepository;
     private final MemberService memberService;
     private final PassEmailService passEmailService;
 
+
     @InitBinder("joinFormVo")
-    protected void initBinder(WebDataBinder dataBinder){
+    protected void initBinder(WebDataBinder dataBinder) {
         dataBinder.addValidators(new JoinFormValidator(memberRepository));
     }
 
@@ -54,20 +50,21 @@ public class MainController {
     }
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "member/login";
     }
 
     @GetMapping("/signup")
-    public String signupForm(Model model){
+    public String signupForm(Model model) {
         model.addAttribute("joinFormVo", new JoinFormVo());
         return "/member/signup";
     }
 
+
     @PostMapping("/signup")
-    public String signupSubmit(@Valid JoinFormVo joinFormVo, Errors errors){
+    public String signupSubmit(@Valid JoinFormVo joinFormVo, Errors errors) {
         log.info("joinFormVo : {}", joinFormVo);
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             log.info("회원가입 에러 : {}", errors.getAllErrors());
             return "/member/signup";
         }
@@ -81,18 +78,16 @@ public class MainController {
 
     @Transactional
     @GetMapping("/email-check")
-    public String emailCheck(String username, String token, Model model){
+    public String emailCheck(String username, String token, Model model) {
 
         Optional<Member> optional = memberRepository.findByUsername(username);
         boolean result;
 
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             result = false;
-        }
-        else if(! optional.get().getEmailCheckToken().equals(token)){
+        } else if (!optional.get().getEmailCheckToken().equals(token)) {
             result = false;
-        }
-        else {
+        } else {
             result = true;
             optional.get().setEmailVerified(true);
         }
@@ -106,7 +101,7 @@ public class MainController {
     }
 
     @GetMapping("/password")
-    public String password(){
+    public String password() {
         return "member/password";
     }
 
@@ -126,8 +121,13 @@ public class MainController {
     }
 
     @GetMapping("/review/list")
-    public String reviewList(){
+    public String reviewList() {
         return "post/review/list";
+    }
+
+    @GetMapping("/member/Test")
+    public String Test() {
+        return "member/Test";
     }
 
     @GetMapping("/community/write")
@@ -145,7 +145,7 @@ public class MainController {
         if (!vo.getTags().isEmpty()) {
             JsonArray tagsJsonArray = new Gson().fromJson(vo.getTags(), JsonArray.class);
 
-            for(int i=0; i<tagsJsonArray.size(); ++i) {
+            for (int i = 0; i < tagsJsonArray.size(); ++i) {
                 JsonObject object = tagsJsonArray.get(i).getAsJsonObject();
                 String tagValue = object.get("value").getAsString();
 
@@ -156,7 +156,6 @@ public class MainController {
                 tagList.add(tag);
             }
         }
-
 
 
         //DB에 저장할 CommunityCategory형 변수 설정
@@ -193,6 +192,6 @@ public class MainController {
 
         return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
     }
-
-
 }
+
+

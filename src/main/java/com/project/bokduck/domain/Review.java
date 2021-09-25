@@ -3,16 +3,17 @@ package com.project.bokduck.domain;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -20,7 +21,7 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 @SuperBuilder
-public class Review extends Post{
+public class Review extends Post {
 
     @Column(nullable = false)
     private String comment; // 한줄 코멘트
@@ -31,22 +32,31 @@ public class Review extends Post{
     @Enumerated(EnumType.STRING)
     private ReviewStatus reviewStatus;
 
-    @OneToOne
-    private Address address;
+    private String address;
 
-    @OneToMany(mappedBy = "name", cascade = CascadeType.ALL)
-   private List<ReviewCategory> reviewCategories;
+    private String detailAddress;
+
+    //우편번호
+    private String postCode;
+    // (동)
+    private String extraAddress;
+
+    @ToString.Exclude
+    @OneToOne(optional = false)
+    private ReviewCategory reviewCategory;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-   private List<CommentReview> commentReviews;
+    @ToString.Exclude
+    private List<CommentReview> commentReviews;
 
     @OneToMany(mappedBy = "fileName", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<File> uploadFile; // 업로드한 파일 - 계약서
 
     @OneToMany(mappedBy = "imageName", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Image> uploadImage; // 업로드한 이미지
 
-    @PostLoad
     public void createList() {
         if (uploadFile == null) uploadFile = new ArrayList<>();
         if (uploadImage == null) uploadImage = new ArrayList<>();

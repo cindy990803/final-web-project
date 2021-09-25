@@ -19,6 +19,6 @@ public class File {
     @ManyToOne(cascade = CascadeType.ALL)
     private Post fileName;
 
-    @Column(nullable = false)
+    @Column//(nullable = false)
     private String filePath;
 }

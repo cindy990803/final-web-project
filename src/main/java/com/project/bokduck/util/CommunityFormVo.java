@@ -12,4 +12,5 @@ public class CommunityFormVo {
     private String tags;
 
     private int communityCategory;
+
 }

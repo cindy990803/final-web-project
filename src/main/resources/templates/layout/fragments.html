@@ -25,6 +25,9 @@
                         </li>
                         <li class="nav-item"><a class="nav-link nav-a" th:href="@{/signup}">회원가입</a></li>
 
+                    <li class="nav-item" th:classappend="${activeTab == 'review'} ? active" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link nav-a" th:href="@{/review/writeReview}">리뷰쓰기</a>
+
 
 
 
