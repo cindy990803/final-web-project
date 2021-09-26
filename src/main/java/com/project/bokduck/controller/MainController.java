@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.project.bokduck.domain.*;
-import com.project.bokduck.repository.CommunityRepository;
-import com.project.bokduck.repository.MemberRepository;
-import com.project.bokduck.repository.ReviewRepository;
+import com.project.bokduck.repository.*;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.util.CommunityFormVo;
@@ -39,7 +37,8 @@ public class MainController {
     private final CommunityRepository communityRepository;
     private final MemberService memberService;
     private final PassEmailService passEmailService;
-
+    private final TagRepository tagRepository;
+    private final PostRepository postRepository;
 
     //왜 오류가 날까...
 //    @PostConstruct
@@ -171,6 +170,7 @@ public class MainController {
     }
 
     @PostMapping("/community/write")
+    @Transactional
     public String communityWriteSubmit(@CurrentMember Member member, CommunityFormVo vo, Model model) {
 
         //DB에 저장할 List<Tag>형 변수 설정
@@ -223,6 +223,14 @@ public class MainController {
                 .build();
 
         communityRepository.save(community);
+
+        //TAG_TAG_TO_POST 테이블에 데이터 넣기
+        for(Tag t : tagList){
+            if (t.getTagToPost()==null) {
+                t.setTagToPost(new ArrayList<Post>());
+            }
+            t.getTagToPost().add(community);
+        }
 
         return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
     }
