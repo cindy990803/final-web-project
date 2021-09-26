@@ -18,18 +18,6 @@
             display:inline-block;
         }
 
-        .logo-a {
-            color:#26BAD4;
-        }
-
-        .nav-a {
-            color:black;
-        }
-
-        .logo-a:hover .nav-a:hover {
-                    color:#26BAD4;
-                }
-
         #nav-bar li {
             margin:10px;
         }
@@ -88,27 +76,26 @@
 
             margin-top:17px;
             width:150px;
-            height:250px;
+            height:280px;
 			border: 1px solid #808080;
 			background-color:white;
 		}
 
-		.mypage-dropdown:hover .mypage-dropdown-content { display: block; }
-		.mypage-dropdown:active .mypage-dropdown-content { display: block; }
+
 
         #mypage-dropdown-content-icon {
             width:150px;
             height:150px;
         }
 
-        #mypage-dropdown-content-button-1,#mypage-dropdown-content-button-2 {
+        #mypage-dropdown-content-button-1 #mypage-dropdown-content-button-2 {
             width:150px;
             height:50px;
 
             color:black;
         }
 
-        #mypage-dropdown-content-button-1:hover,#mypage-dropdown-content-button-2:hover {
+        #mypage-dropdown-content-button-1:hover #mypage-dropdown-content-button-2:hover {
             color:#26BAD4;
         }
 
@@ -140,4 +127,25 @@
             top:52%;
             left:20%;
             font-size:10px;
+        }
+
+        .logo-a {
+             color:#26BAD4;
+        }
+
+        .logo-a:hover {
+             color:#26BAD4;
+        }
+
+        .menu-a {
+            color:black;
+        }
+
+        .menu-a:hover {
+            color:#26BAD4;
+            text-decoration: none;
+        }
+
+        .menu-a:visited {
+            text-decoration: none;
         }

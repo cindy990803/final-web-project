@@ -16,6 +16,7 @@ import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +40,38 @@ public class MainController {
     private final MemberService memberService;
     private final PassEmailService passEmailService;
 
+
+    //왜 오류가 날까...
+//    @PostConstruct
+//    @DependsOn("communityRepository")
+//    @Transactional
+//    public void createTestCommunity() {
+//
+//        List<Community> communityList = new ArrayList<>();
+//
+//        Long[] array = {1l, 2l};
+//
+//        for (int i = 0; i < 50; ++i) {
+//
+//            List<Member> likers = new ArrayList<>();
+//            for (int j=0; j<(int)(Math.random() * 50); ++j) {
+//                likers.add(new Member());
+//            }
+//
+//            Member member = memberRepository
+//                    .findById(array[(int) (Math.random() * array.length)]).orElseThrow();
+//
+//            Community community = Community.builder()
+//                    .postName((i + 1) + "번 커뮤니티 게시물")
+//                    .hit((int) (Math.random() * 10))
+//                    .likers(likers)
+//                    .build();
+//            communityList.add(community);
+//
+//
+//        }
+//        communityRepository.saveAll(communityList);
+//    }
 
     @InitBinder("joinFormVo")
     protected void initBinder(WebDataBinder dataBinder) {
@@ -192,6 +226,8 @@ public class MainController {
 
         return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
     }
+
+
 }
 
 
