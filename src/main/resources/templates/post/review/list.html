@@ -204,13 +204,13 @@
                         <tr>
 
                             <td rowspan="4" style="width: 400px; height: 200px">
-                                <div th:if="${#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
+                                <div th:if="*{#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
                                     <div style="display: table-cell; text-align: center; vertical-align: middle; ">
                                         <img th:src="@{/images/no_photo.svg}" style="width: 350px; height: 200px;"
                                              class="photo_image"/>
                                     </div>
                                 </div>
-                                <div th:unless="${#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
+                                <div th:unless="*{#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
                                     <div style="display: table-cell; text-align: center; vertical-align: middle; ">
                                         <img th:src="@{uploadImage[0].imagePath}" style="width: 350px; height: 200px;"
                                              class="photo_image"/>
@@ -294,13 +294,14 @@
                         </tr>
                         <tr>
                             <td colspan="2">
-                            <span th:if="*{tags} == null" >
-                                <span th:text="등록된 태그가 없습니다" style="background-color: #eeeeee"></span>
-                            </span>
 
-                                <span th:if="*{tags} != null" th:each="t:*{tags}">
-                    <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
-                </span>
+                                <span th:if="*{tags != null}" th:each="t:*{tags}">
+                                    <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
+                                </span>
+                                <span th:if="*{tags == null}" >
+                                <span th:text="등록된 태그가 없습니다"></span>
+                                </span>
+
                             </td>
                         </tr>
                     </table>

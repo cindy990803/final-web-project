@@ -319,6 +319,12 @@ public class ReviewController {
             }
         }
 
+
+        int startPage = Math.max(1, reviewList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(reviewList.getTotalPages(), reviewList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         model.addAttribute("reviewList", reviewList);
         return "post/review/list";
     }
