@@ -16,7 +16,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
@@ -39,38 +43,136 @@ public class MainController {
     private final PassEmailService passEmailService;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewCategoryRepository reviewCategoryRepository;
+    private final PlatformTransactionManager transactionManager;
 
-    //왜 오류가 날까...
-//    @PostConstruct
-//    @DependsOn("communityRepository")
-//    @Transactional
-//    public void createTestCommunity() {
-//
-//        List<Community> communityList = new ArrayList<>();
-//
-//        Long[] array = {1l, 2l};
-//
-//        for (int i = 0; i < 50; ++i) {
-//
-//            List<Member> likers = new ArrayList<>();
-//            for (int j=0; j<(int)(Math.random() * 50); ++j) {
-//                likers.add(new Member());
-//            }
-//
-//            Member member = memberRepository
-//                    .findById(array[(int) (Math.random() * array.length)]).orElseThrow();
-//
-//            Community community = Community.builder()
-//                    .postName((i + 1) + "번 커뮤니티 게시물")
-//                    .hit((int) (Math.random() * 10))
-//                    .likers(likers)
-//                    .build();
-//            communityList.add(community);
-//
-//
-//        }
-//        communityRepository.saveAll(communityList);
-//    }
+    @PostConstruct
+    @DependsOn("memberRepository")
+    @Transactional
+    public void createReviewsAndCommunities() {
+        //리뷰글 생성
+        TransactionTemplate tmpl = new TransactionTemplate(transactionManager);
+        tmpl.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                Long[] array = {1l,2l};
+
+                // 태그 만들어두기
+                List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
+                String[] tagNameList = {"넓음", "깨끗함", "벌레없음"};
+
+                for(int i = 0; i < tagNameList.length; ++i){
+                    Tag tag = new Tag();
+                    tag.setTagName(tagNameList[i]);
+                    tagList.add(tag);
+                }
+
+                tagRepository.saveAll(tagList);
+
+
+                // 리뷰게시글을 만들어보자
+                List<Review> reviewList = new ArrayList<>();
+                ReviewCategory category = null;
+
+                for(int i = 0; i < 50; ++i){
+                    category = new ReviewCategory();
+                    if (i<=24){
+                        category.setRoomSize(RoomSize.ONEROOM);
+                        category.setStructure(Structure.VILLA);
+                    }else {
+                        category.setRoomSize(RoomSize.TWOROOM);
+                        log.info("????");
+                    }
+                    category = reviewCategoryRepository.save(category);
+
+                    Member member = memberRepository
+                            .findById(array[(int) (Math.random() * array.length)]).orElseThrow();
+
+                    Review review = Review.builder()
+                            .postName((i + 1) + "번 게시물")
+                            .postContent("어쩌구저쩌구")
+                            .writer(member)
+                            .comment("무난하다")
+                            .regdate(LocalDateTime.now())
+                            .hit((int) (Math.random() * 10))
+                            .star((int) (Math.random() * 5) + 1)
+                            .address("서울시 마포구 연희동 1-1")
+                            .detailAddress("XX빌라")
+                            .extraAddress("연희동")
+                            .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
+//                            .reviewCategory(category)
+                            .build();
+                    review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
+                    reviewList.add(review);
+
+                }
+                reviewRepository.saveAll(reviewList);
+
+                // 태그 포스트에 넣기
+                List<Tag> tag1 = tagRepository.findAll();
+                List<Post> tagPostList= postRepository.findAll();
+                for(Tag t : tag1){
+                    t.setTagToPost(tagPostList);
+                }
+
+                // 멤버 like 만들기
+                Member member = memberRepository.findById(1l).orElseThrow();
+                List<Post> likePostList = new ArrayList<>();
+                Post post = postRepository.findById(103l).orElseThrow();
+                likePostList.add(post);
+                member.setLikes(likePostList);
+
+                member = memberRepository.findById(2l).orElseThrow();
+                likePostList = postRepository.findAll();
+                member.setLikes(likePostList);
+            }
+        });
+
+        //커뮤니티글 생성
+        TransactionTemplate tmpl2 = new TransactionTemplate(transactionManager);
+        tmpl2.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                Long[] arry = {1L, 2L};
+                CommunityCategory[] categories = {CommunityCategory.TIP, CommunityCategory.EAT
+                        , CommunityCategory.INTERIOR, CommunityCategory.BOARD};
+                List<Community> communityList = new ArrayList<>();
+                LocalDateTime localDateTime = LocalDateTime.now();
+
+                List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
+                String[] tagNameList = {"태그1", "태그2", "태그3"};
+
+                for(int i = 0; i < tagNameList.length; ++i){
+                    Tag tag = new Tag();
+                    tag.setTagName(tagNameList[i]);
+                    tagList.add(tag);
+                }
+                tagRepository.saveAll(tagList);
+
+
+                for (int i = 0; i < 300; i++) {
+                    Member member = memberRepository.findById(arry[(int) (Math.random() * arry.length)]).orElseThrow();
+                    communityList.add(Community.builder()
+                            .postName(i + "번 제목입니다.")
+                            .postContent(i + "번 내용입니다.")
+                            .writer(member)
+                            .hit((int) ((Math.random()*50)+1))
+                            .regdate(localDateTime)
+                            .communityCategory(categories[(int) (Math.random() * categories.length)])
+                            .build());
+                }
+                communityRepository.saveAll(communityList);
+
+                List<Tag> tag2 = tagRepository.findAll();
+                List<Post> tagPostList2= postRepository.findAll();
+                for(Tag t : tag2){
+                    t.setTagToPost(tagPostList2);
+                }
+            }
+        });
+
+    }
 
     @InitBinder("joinFormVo")
     protected void initBinder(WebDataBinder dataBinder) {
@@ -151,16 +253,6 @@ public class MainController {
         }
         model.addAttribute("message", message);
         return "member/password";
-    }
-
-    @GetMapping("/review/list")
-    public String reviewList() {
-        return "post/review/list";
-    }
-
-    @GetMapping("/member/Test")
-    public String Test() {
-        return "member/Test";
     }
 
     @GetMapping("/community/write")

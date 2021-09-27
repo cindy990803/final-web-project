@@ -36,10 +36,9 @@ public class Review extends Post {
 
     private String detailAddress;
 
-    //우편번호
-    private String postCode;
-    // (동)
-    private String extraAddress;
+    private String postCode; //우편번호
+
+    private String extraAddress; // (동)
 
     @ToString.Exclude
     @OneToOne(optional = false)

@@ -17,6 +17,7 @@ public class Tag {
     @Id @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String tagName; // 태그명
 
     @ManyToMany(cascade = CascadeType.ALL)

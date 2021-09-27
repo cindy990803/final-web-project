@@ -40,6 +40,9 @@ public abstract class Post {
     private List<Member> likers; // 좋아요 누른 사람들
 
     @ColumnDefault("0")
+    private int likeCount;
+
+    @ColumnDefault("0")
     private int hit; // 조회수
 
     @ManyToMany(mappedBy = "tagToPost", cascade = CascadeType.ALL)

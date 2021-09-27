@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='복덕복덕 : 로그인'">
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='login', title='복덕복덕 : 로그인'">
 <head>
 </head>
 <body>
@@ -71,6 +71,10 @@
                     <hr class="col-12 my-4">
 
                     <p class="row g-3 justify-content-center">
+                        <a href="/oauth2/authorization/google" role="button">
+                            <img th:src="@{images/login_google_logo.png}" width="220" height="50"> </a>
+                    </p>
+                    <p class="row g-3 justify-content-center">
                            <a href="/oauth2/authorization/naver" role="button">
                            <img th:src="@{images/login_naver_logo.png}" width="220" height="50"> </a>
                     </p>
@@ -78,10 +82,7 @@
                         <a href="/oauth2/authorization/kakao" role="button">
                             <img th:src="@{images/login_kakao_logo.png}" width="220" height="50"> </a>
                     </p>
-                    <p class="row g-3 justify-content-center">
-                        <a href="/oauth2/authorization/google" role="button">
-                            <img th:src="@{images/login_google_logo.png}" width="220" height="50"> </a>
-                    </p>
+
 
 
 
