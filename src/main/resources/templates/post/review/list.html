@@ -5,14 +5,14 @@
       layout:decorate="~{layout/main-layout}" th:with="activeTab='review', title='복덕복덕 : Review'">
 <head>
 
-<style>
-    #like:hover{
-        border:0; outline: 0;
-    }
-    .photo_image{
-        filter: invert(69%) sepia(25%) saturate(146%) hue-rotate(159deg) brightness(95%) contrast(92%);
-    }
-</style>
+    <style>
+        #like:hover{
+            border:0; outline: 0;
+        }
+        .photo_image{
+            filter: invert(69%) sepia(25%) saturate(146%) hue-rotate(159deg) brightness(95%) contrast(92%);
+        }
+    </style>
 
     <script th:inline="javascript">
         $(document).ready(function (){
@@ -57,7 +57,8 @@
                 <!-- 검색창 -->
                 <div class="form-group d-flex justify-content-center row">
                     <input type="text" class="form-control form-control-lg col-6" id="searchText" name="searchText"
-                    placeholder="키워드 및 태그 검색">
+                           placeholder="키워드 및 태그 검색" value=""
+                           th:value="${param.searchText == null} ? '' : ${param.searchText}">
                     <button type="submit" class="btn btn-info col-1">검색</button>
                 </div>
 
@@ -70,21 +71,21 @@
                             <span> 지역 : </span>
                             <input type="text" class="form-control" id = "address"
                                    name="address" placeholder="동을 입력하세요. 예) 연희동"
-                                    th:value="${param.address}">
+                                   th:value="${param.address == null} ? '' : ${param.address}" value="">
                         </p>
 
                         <p id="check_roomsize" th:name="checkbox">
                             <span> 방 형태 : </span>
                             <input class="form-check-input" type="checkbox" id="r1" name="roomSize" value="ONEROOM"
-                                   />
+                            />
                             <label class="form-check-label" for="r1"> 원룸 </label>
 
                             <input class="form-check-input" type="checkbox" id="r2" name="roomSize" value="TWOROOM"
-                                   />
+                            />
                             <label class="form-check-label" for="r2"> 투룸 </label>
 
                             <input class="form-check-input" type="checkbox" id="r3" name="roomSize" value="THREEMORE"
-                                   />
+                            />
                             <label class="form-check-label" for="r3"> 쓰리룸이상 </label>
                         </p>
 
@@ -179,26 +180,26 @@
 
 
 
-            <!-- 글쓰기 -->
-            <div id="review_write" class="container justify-content-end">
-                <a class="btn btn-outline-info" th:href="@{/review/writeReview}">글쓰기</a>
-            </div>
+                <!-- 글쓰기 -->
+                <div id="review_write" class="container justify-content-end">
+                    <a class="btn btn-outline-info" th:href="@{/review/writeReview}">글쓰기</a>
+                </div>
 
 
-            <!-- 리뷰 리스트 -->
+                <!-- 리뷰 리스트 -->
                 <p class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"> </p>
 
                 <div th:if="${reviewList.isEmpty()}" style="text-align: center;">
-                   <h2>검색결과가 없습니다.</h2>
+                    <h2>검색결과가 없습니다.</h2>
                 </div>
 
-            <div class="table" id="review_table" th:each="review : ${reviewList}" th:object="${review}">
+                <div class="table" id="review_table" th:each="review : ${reviewList}" th:object="${review}">
 
 
                     <table class="table table-borderless wd-100" >
-                            <tr>
-                        <td colspan="5" th:text="*{address} + '  '+ *{detailAddress}" > 주소 </td>
-                    </tr>
+                        <tr>
+                            <td colspan="5" th:text="*{address} + '  '+ *{detailAddress}" > 주소 </td>
+                        </tr>
 
                         <tr>
 
@@ -215,7 +216,7 @@
                                              class="photo_image"/>
                                     </div>
                                 </div>
-                        </td>
+                            </td>
 
 
 
@@ -227,111 +228,118 @@
                                 </td>
                             </a>
 
-                        <td rowspan="4">
-                            <div style="text-align: center">
-                                <p th:text="*{hit}" style="font-size : 40px; " />
-                                조회
-                            </div>
-                        </td>
-                        <td rowspan="4" >
-                            <div style="text-align: center" id="like_div">
-                                <button type="button" class="like" style="border:0px; outline:0px;background-color:transparent;"
-                                        th:id="like" th:value="*{id}" >
-                                    <img th:src="@{ ${member?.likes?.contains(review)} ? '/images/like_red.svg' : '/images/like.svg'}"
-                                         th:id="*{id}" width="50px" height="75px" ></button>
-                                <p th:text="'좋아요 '+ *{likers.size}" th:id="likeNum + *{id}"/>
+                            <td rowspan="4">
+                                <div style="text-align: center">
+                                    <p th:text="*{hit}" style="font-size : 40px; " />
+                                    조회
+                                </div>
+                            </td>
+                            <td rowspan="4" >
+                                <div style="text-align: center" id="like_div">
+                                    <button type="button" class="like" style="border:0px; outline:0px;background-color:transparent;"
+                                            th:id="like" th:value="*{id}" >
+                                        <img th:src="@{ ${member?.likes?.contains(review)} ? '/images/like_red.svg' : '/images/like.svg'}"
+                                             th:id="*{id}" width="50px" height="75px" ></button>
+                                    <p th:text="'좋아요 '+ *{likers.size}" th:id="likeNum + *{id}"/>
 
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" th:if="*{star} == 1">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                        </td>
-                        <td colspan="2" th:if="*{star} == 2">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                        </td>
-                        <td colspan="2" th:if="*{star} == 3">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                        </td>
-                        <td colspan="2" th:if="*{star} == 4">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star.svg}" width="20px" height="20px">
-                        </td>
-                        <td colspan="2" th:if="*{star} == 5">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                            <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" th:text="*{comment}"> 코멘트</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" th:if="*{star} == 0">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 1">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 2">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 3">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 4">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 5">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" th:text="*{comment}"> 코멘트</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
                             <span th:if="*{tags} == null" >
                                 <span th:text="등록된 태그가 없습니다" style="background-color: #eeeeee"></span>
                             </span>
 
-                <span th:if="*{tags} != null" th:each="t:*{tags}">
+                                <span th:if="*{tags} != null" th:each="t:*{tags}">
                     <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
                 </span>
-                        </td>
-                    </tr>
-                </table>
+                            </td>
+                        </tr>
+                    </table>
 
 
-                <hr class="col-12 my-4">
-            </div>
-            </div>
+                    <hr class="col-12 my-4">
+                </div>
+    </div>
 
-            </form>
+    </form>
 
     <!-- 페이징 -->
     <div th:unless="${reviewList.isEmpty()}">
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${1 == reviewList.pageable.pageNumber + 1} ? 'disabled'">
-                <a class="page-link" href="#"
-                   th:href="@{/review/list(page=${reviewList.pageable.pageNumber - 1},searchText=${param.searchText})}"
-                   tabindex="-1" aria-disabled="true"> &lt; </a>
-            </li>
-            <li class="page-item" th:classappend="${i == reviewList.pageable.pageNumber+1} ? 'active'"
-                th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                <a class="page-link" href="#" th:href="@{/review/list(page=${i - 1},searchText=${param.searchText})}" th:text="${i}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
-                <a class="page-link" href="#"
-                   th:href="@{/review/list(page=${reviewList.pageable.pageNumber + 1},searchText=${param.searchText})}"> &gt; </a>
-            </li>
-        </ul>
-    </nav>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${1 == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                    <a class="page-link" href="#"
+                       th:href="@{/review/list(page=${reviewList.pageable.pageNumber - 1},searchText=${param.searchText})}"
+                       tabindex="-1" aria-disabled="true"> &lt; </a>
+                </li>
+                <li class="page-item" th:classappend="${i == reviewList.pageable.pageNumber+1} ? 'active'"
+                    th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                    <a class="page-link" href="#" th:href="@{/review/list(page=${i - 1},searchText=${param.searchText})}" th:text="${i}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                    <a class="page-link" href="#"
+                       th:href="@{/review/list(page=${reviewList.pageable.pageNumber + 1},searchText=${param.searchText})}"> &gt; </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
-            <!-- 무한 스크롤 -->
-            <div id="add_scroll">
+    <!-- 무한 스크롤 -->
+    <div id="add_scroll">
 
-            </div>
-
-        </main>
     </div>
+
+    </main>
+</div>
 </div>
 
 </body>
