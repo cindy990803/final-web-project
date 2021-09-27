@@ -5,16 +5,23 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.project.bokduck.domain.*;
 import com.project.bokduck.repository.*;
+import com.project.bokduck.service.CommunityService;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
-import com.project.bokduck.util.WriteReviewVO;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -46,6 +53,11 @@ public class MainController {
     private final ReviewRepository reviewRepository;
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final PlatformTransactionManager transactionManager;
+    private final CommunityService communityService;
+
+    /**
+     * 임의의 리뷰글 및 커뮤니티글 생성
+     */
 
     @PostConstruct
     @DependsOn("memberRepository")
@@ -56,13 +68,13 @@ public class MainController {
         tmpl.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                Long[] array = {1l,2l};
+                Long[] array = {1l, 2l};
 
                 // 태그 만들어두기
                 List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
                 String[] tagNameList = {"넓음", "깨끗함", "벌레없음"};
 
-                for(int i = 0; i < tagNameList.length; ++i){
+                for (int i = 0; i < tagNameList.length; ++i) {
                     Tag tag = new Tag();
                     tag.setTagName(tagNameList[i]);
                     tagList.add(tag);
@@ -74,13 +86,12 @@ public class MainController {
                 // 리뷰게시글을 만들어보자
                 List<Review> reviewList = new ArrayList<>();
                 ReviewCategory category = null;
-
-                for(int i = 0; i < 50; ++i){
+                for (int i = 0; i < 50; ++i) {
                     category = new ReviewCategory();
-                    if (i<=24){
+                    if (i <= 24) {
                         category.setRoomSize(RoomSize.ONEROOM);
                         category.setStructure(Structure.VILLA);
-                    }else {
+                    } else {
                         category.setRoomSize(RoomSize.TWOROOM);
                         log.info("????");
                     }
@@ -88,7 +99,6 @@ public class MainController {
 
                     Member member = memberRepository
                             .findById(array[(int) (Math.random() * array.length)]).orElseThrow();
-
                     Review review = Review.builder()
                             .postName((i + 1) + "번 게시물")
                             .postContent("어쩌구저쩌구")
@@ -97,35 +107,23 @@ public class MainController {
                             .regdate(LocalDateTime.now())
                             .hit((int) (Math.random() * 10))
                             .star((int) (Math.random() * 5) + 1)
-                            .address("서울시 마포구 연희동 1-1")
-                            .detailAddress("XX빌라")
-                            .extraAddress("연희동")
-                            .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
-//                            .reviewCategory(category)
+                            .reviewStatus(i > 24 ? ReviewStatus.COMPLETE : ReviewStatus.WAIT)
+//                          .reviewCategory(category)
                             .build();
-                    review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
+                    review.setReviewCategory(reviewCategoryRepository.findById((long) (i + 6)).get());
                     reviewList.add(review);
+
 
                 }
                 reviewRepository.saveAll(reviewList);
 
-                // 태그 포스트에 넣기
+                // 태그 포스트에 넣기기
                 List<Tag> tag1 = tagRepository.findAll();
-                List<Post> tagPostList= postRepository.findAll();
-                for(Tag t : tag1){
+                List<Post> tagPostList = postRepository.findAll();
+                for (Tag t : tag1) {
                     t.setTagToPost(tagPostList);
                 }
 
-                // 멤버 like 만들기
-                Member member = memberRepository.findById(1l).orElseThrow();
-                List<Post> likePostList = new ArrayList<>();
-                Post post = postRepository.findById(103l).orElseThrow();
-                likePostList.add(post);
-                member.setLikes(likePostList);
-
-                member = memberRepository.findById(2l).orElseThrow();
-                likePostList = postRepository.findAll();
-                member.setLikes(likePostList);
             }
         });
 
@@ -143,7 +141,7 @@ public class MainController {
                 List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
                 String[] tagNameList = {"태그1", "태그2", "태그3"};
 
-                for(int i = 0; i < tagNameList.length; ++i){
+                for (int i = 0; i < tagNameList.length; ++i) {
                     Tag tag = new Tag();
                     tag.setTagName(tagNameList[i]);
                     tagList.add(tag);
@@ -157,7 +155,7 @@ public class MainController {
                             .postName(i + "번 제목입니다.")
                             .postContent(i + "번 내용입니다.")
                             .writer(member)
-                            .hit((int) ((Math.random()*50)+1))
+                            .hit((int) ((Math.random() * 50) + 1))
                             .regdate(localDateTime)
                             .communityCategory(categories[(int) (Math.random() * categories.length)])
                             .build());
@@ -165,14 +163,15 @@ public class MainController {
                 communityRepository.saveAll(communityList);
 
                 List<Tag> tag2 = tagRepository.findAll();
-                List<Post> tagPostList2= postRepository.findAll();
-                for(Tag t : tag2){
+                List<Post> tagPostList2 = postRepository.findAll();
+                for (Tag t : tag2) {
                     t.setTagToPost(tagPostList2);
                 }
             }
         });
-
     }
+
+
 
     @InitBinder("joinFormVo")
     protected void initBinder(WebDataBinder dataBinder) {
@@ -328,6 +327,118 @@ public class MainController {
     }
 
 
+    @GetMapping("/community/list")
+    public String community( @PageableDefault(size = 10,sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                             @CurrentMember Member member, Model model) {
+        Page<Community> communityList = communityService.findPage(pageable);
+        if (member!=null){
+            member = memberRepository.getById(member.getId());
+            model.addAttribute("member", member);
+        }
+        int startPage = Math.max(1, communityList.getPageable().getPageNumber() - 4);
+        int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 4);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        String state="all";
+        model.addAttribute("state",state);
+        model.addAttribute("communityList", communityList);
+        return "post/community/list";
+    }
+
+    @GetMapping("/community/list/{value}") //커뮤니티 카테고리
+    public String communityList(@PageableDefault(page =0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                Model model,@PathVariable String value, @CurrentMember Member member) {
+
+        String state="all";
+        Page<Community> communityList = null;
+        switch (value) {
+            case "all":
+                communityList = communityService.findPage(pageable);
+                state = "all";
+                model.addAttribute("state",state);
+                model.addAttribute("communityList", communityList);
+                break;
+            case "tip":
+                communityList = communityService.findCommunityCategoryPage(CommunityCategory.TIP,pageable);
+                state = "tip";
+                model.addAttribute("state",state);
+                model.addAttribute("communityList", communityList);
+                break;
+            case "interior":
+               communityList = communityService.findCommunityCategoryPage(CommunityCategory.INTERIOR,pageable);
+                state = "interior";
+                model.addAttribute("state",state);
+                model.addAttribute("communityList", communityList);
+                break;
+            case "eat":
+                communityList = communityService.findCommunityCategoryPage(CommunityCategory.EAT,pageable);
+                state = "eat";
+                model.addAttribute("state",state);
+                model.addAttribute("communityList", communityList);
+                break;
+            case "board":
+               communityList = communityService.findCommunityCategoryPage(CommunityCategory.BOARD,pageable);
+                state = "board";
+                model.addAttribute("state",state);
+                model.addAttribute("communityList", communityList);
+                break;
+        }
+
+        if (member !=null){
+            member = memberRepository.getById(member.getId());
+            model.addAttribute("member", member);
+        }
+
+        int startPage = Math.max(1, communityList.getPageable().getPageNumber() - 4);
+        int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 4);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        model.addAttribute("member",member);
+        return "post/community/list";
+    }
+
+
+
+    @GetMapping("/community/list/like") //카테고리 리스트 좋아요
+    @ResponseBody
+    public String like(Long id, @CurrentMember Member member, Model model){
+        String resultCode="";
+        String message="";
+
+        int likeCheck=communityService.findCommunityId(id).getLikers().size();// 좋아요 개수
+
+        switch (communityService.addLike(member,id)){
+            case ERROR_AUTH:
+                resultCode="error.auth";
+                message = "로그인이 필요한 서비스 입니다.";
+                break;
+            case ERROR_INVALID:
+                resultCode = "error.invalid";
+                message = "없는 게시글 입니다.";
+                break;
+            case ERROR_DUPLICATE:
+                resultCode = "error.duplicate";
+                message = "좋아요를 삭제하였습니다.";
+                likeCheck-=1;
+                break;
+            case OK:
+                resultCode = "ok";
+                message = "좋아요를 추가하였습니다.";
+                likeCheck +=1;
+                break;
+        }
+        JSONObject jsonObject = new JSONObject();
+        try{
+            jsonObject.put("resultCode",resultCode);
+            jsonObject.put("message", message);
+            jsonObject.put("likeCheck", likeCheck);
+        }catch (JSONException e){
+            log.error(e.getMessage());
+        }
+        return jsonObject.toString();
+
+    }
+
 }
-
-

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='community'"
+      xmlns:td="http://www.w3.org/1999/html">
+<head>
+    <style>
+        .pagination {
+            justify-content: center;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        $(document).ready(function () { //좋아요
+            $('button').click(function () {
+                let data = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/community/list/like',
+                    data: {"id": data},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                        } else if (result.resultCode == "error.invalid") {
+                            alert(result.message);
+                        } else if (result.resultCode == "ok") {
+                            $("#" + data).attr("src", "/images/like_red.svg");
+                            $('#likeNum' + data).html(result.likeCheck);
+                        } else if (result.resultCode == "error.duplicate") {
+                            $("#" + data).attr("src", "/images/like.svg");
+                            $('#likeNum' + data).text(result.likeCheck);
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container">
+        <main>
+            <div class="py-5 text-center">
+                <h2>커뮤니티 리스트</h2>
+            </div>
+
+                <!-- 검색창 -->
+                <div class="form-group d-flex justify-content-center row">
+                    <input type="text" class="form-control form-control-lg col-6" id="searchText" name="searchText">
+                    <button type="submit" class="btn btn-info col-1">검색</button>
+                </div>
+
+
+                <!-- 글쓰기 -->
+                <div id="review_write" class="container justify-content-end">
+                    <a class="btn btn-outline-info" th:href="@{/community/write}">글쓰기</a>
+                </div>
+
+                <!-- 카테고리-->
+                <ul class="nav nav-tabs">
+
+                    <li class="nav-item" th:value="all">
+                        <a th:class="${state.toString.equals('all')? 'nav-link active' : 'nav-link'}"  href="/community/list/all">전체 글</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a th:class="${state.toString.equals('tip')? 'nav-link active' : 'nav-link'}" href="/community/list/tip">자취방 꿀팁</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link'}" href="/community/list/interior">자취방 인테리어</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a th:class="${state.toString.equals('eat')? 'nav-link active' : 'nav-link'}" href="/community/list/eat">동네 맛집</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a th:class="${state.toString.equals('board')? 'nav-link active' : 'nav-link'}" href="/community/list/board">자유 게시판</a>
+                    </li>
+                </ul>
+
+
+                <!--리스트 -->
+                <div class="table" id="community_table">
+                    <table class="table table-borderless wd-250" th:each="product : ${communityList}"
+                           style="table-layout: fixed">
+                        <tr>
+                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('EAT')}">동네 맛집</td>
+                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('TIP')}">자취방 꿀팁</td>
+                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('INTERIOR')}">자취방
+                                인테리어
+                            </td>
+                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('BOARD')}">자유</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <span th:text="${product.postName} + '&nbsp;&nbsp;'" style="font-size: 23px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"/>
+                                <span th:text="${#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')}"
+                                      style="font-size: 15px; color: grey"/>
+                            </td>
+                            <td th:colspan="1">조회 <span th:text="${product.hit}"> </span></td>
+
+                            <td th:colspan="1">
+                                <button type="button"
+                                        th:style="'border-color : transparent; background-color:transparent'"
+                                        th:id="like" th:value="${product.id}">
+                                    <img th:src="@{ ${member?.likes?.contains(product)} ?  '/images/like_red.svg' : '/images/like.svg'}"
+                                         th:id="${product.id}" th:width="25" th:height="25"></button>
+                                <span th:text="${product.likers.size}" th:id="likeNum+${product.id}"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6" width="1500" height="64"
+                                th:utext="${product.postContent.toString().replaceAll('<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>',' ')
+                                .replaceAll('<\/?(span|font)[^>]*>',' ')
+                                .replaceAll('<img style=',' ')
+                                }"
+                                style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"></td>
+
+                        </tr>
+                        <tr>
+                            <td th:colspan="6">
+                                <span  th:each="t: ${product.tags}">
+                 <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
+                </span>
+                            </td>
+                        </tr>
+                        <hr class="col-12 my-4">
+                    </table>
+
+                </div>
+
+
+
+            <!-- 페이징 -->
+            <div th:unless="${communityList.isEmpty()}">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item"
+                            th:classappend="${1 == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                            <a class="page-link" href="#"
+                               th:href="@{/community/list(page=${communityList.pageable.pageNumber - 1})}"
+                               tabindex="-1" aria-disabled="true"> &lt; </a>
+                        </li>
+                        <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                            th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                            <a class="page-link" href="#" th:href="@{/community/list(page=${i - 1})}"
+                               th:text="${i}">1</a>
+                        </li>
+                        <li class="page-item"
+                            th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                            <a class="page-link" href="#"
+                               th:href="@{/community/list(page=${communityList.pageable.pageNumber + 1})}"> &gt; </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>
