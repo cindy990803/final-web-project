@@ -24,13 +24,11 @@ public class ReviewSpecs {
         };
     }
 
-    public static Specification<Review> searchPhotoReview(List<Image> images){
+    public static Specification<Review> searchPhotoReview(){
         return (root, query, criteriaBuilder) -> {
 
                 List<Predicate> predicates = new ArrayList<>();
-                for (Image e : images) {
-                    predicates.add(criteriaBuilder.isMember(images, root.get("uploadImage")));
-                }
+                    predicates.add(criteriaBuilder.isNotEmpty(root.get("uploadImage")));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
 
         };

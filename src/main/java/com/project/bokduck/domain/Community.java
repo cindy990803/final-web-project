@@ -17,11 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
-@DynamicUpdate
 @SuperBuilder
+@DynamicUpdate
+@DiscriminatorValue("COMMUNITY")
 public class Community extends Post{
 
-    @Enumerated()
+
+
+    @Enumerated(EnumType.STRING)
     private CommunityCategory communityCategory;
 
     @JsonIgnore

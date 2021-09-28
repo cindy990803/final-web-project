@@ -141,7 +141,7 @@ public class ReviewController {
                 .uploadImage(imageList)
                 .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
-                .reviewStatus(ReviewStatus.WAIT)
+                .reviewStatus(ReviewStatus.COMPLETE) // todo wait으로 바꾸기
                 .star(0)
 
 
@@ -172,8 +172,8 @@ public class ReviewController {
         }
         model.addAttribute("member", member);
 
-        int startPage = Math.max(1, reviewList.getPageable().getPageNumber() - 4);
-        int endPage = Math.min(reviewList.getTotalPages(), reviewList.getPageable().getPageNumber() + 4);
+        int startPage = Math.max(1, reviewList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(reviewList.getTotalPages(), reviewList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
@@ -190,6 +190,8 @@ public class ReviewController {
 
         log.info("vo 페이지 : {}", vo.getPage());
         log.info("vo 포토리뷰 : {}", vo.getPhotoReview());
+        log.info("vo searchText : {}", vo.getSearchText());
+        log.info("vo address : {}", vo.getAddress());
 
         reviewService.createLikeCount();
 
@@ -211,24 +213,24 @@ public class ReviewController {
             map.put("structure", vo.getStructure());
         }
 
-        if (vo.getStructure() != null) {
-            map.put("structure", vo.getStructure());
+        if (vo.getPayment() != null) {
+            map.put("payment", vo.getPayment());
         }
 
-        if (vo.getStructure() != null) {
-            map.put("structure", vo.getStructure());
+        if (vo.getTraffic() != null) {
+            map.put("traffic", vo.getTraffic());
         }
 
-        if (vo.getStructure() != null) {
-            map.put("structure", vo.getStructure());
+        if (vo.getConvenient() != null) {
+            map.put("convenient", vo.getConvenient());
         }
 
-        if (vo.getStructure() != null) {
-            map.put("structure", vo.getStructure());
+        if (vo.getWelfare() != null) {
+            map.put("welfare", vo.getWelfare());
         }
 
-        if (vo.getStructure() != null) {
-            map.put("structure", vo.getStructure());
+        if (vo.getElectronicDevice() != null) {
+            map.put("electronicDevice", vo.getElectronicDevice());
         }
 
         categorySpec = ReviewSpecs.searchCategoryDetails(map);
@@ -239,16 +241,16 @@ public class ReviewController {
          if (!vo.getAddress().isEmpty()){
              // 지역 검색했을 때
              String[] search = {"address","detailAddress","postCode","extraAddress"};
-             Specification<Review> searchSpec = null;
+             Specification<Review> addressSpec = null;
 
              for (String s : search) {
                  Map<String, Object> searchMap = new HashMap<>();
-                 searchMap.put(s, vo.getSearchText());
-                 searchSpec =
-                         searchSpec == null ? ReviewSpecs.searchText(searchMap)
-                                 : searchSpec.or(ReviewSpecs.searchText(searchMap));
+                 searchMap.put(s, vo.getAddress());
+                 addressSpec =
+                         addressSpec == null ? ReviewSpecs.searchText(searchMap)
+                                 : addressSpec.or(ReviewSpecs.searchText(searchMap));
              }
-             spec = spec.and(searchSpec);
+             spec = spec.and(addressSpec);
 
              reviewList = reviewRepository.findAll(spec, pageable);
 
@@ -282,20 +284,10 @@ public class ReviewController {
 
         if (vo.getPhotoReview() != null) {
             // 포토리뷰 체크했을때
-            List<Image> imageList = imageRepository.findAll();
-
-            Image image = new Image();
-            image.setImagePath("포토리뷰 없을때 체크용");
-            List<Image> nullList = new ArrayList<>();
-            nullList.add(image);
-            imageRepository.saveAll(nullList);
-
-            imageList = imageList.isEmpty() ? nullList : imageList ;
-
-
-            spec = spec.and(ReviewSpecs.searchPhotoReview(imageList));
+            spec = spec.and(ReviewSpecs.searchPhotoReview());
             reviewList = reviewRepository.findAll(spec, pageable);
         }
+
 
         if (vo.getLineUp() != null) {
             // 라인업 체크했을때
@@ -316,6 +308,12 @@ public class ReviewController {
                     break;
             }
         }
+
+
+        int startPage = Math.max(1, reviewList.getPageable().getPageNumber() - 5);
+        int endPage = Math.min(reviewList.getTotalPages(), reviewList.getPageable().getPageNumber() + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
         model.addAttribute("reviewList", reviewList);
         return "post/review/list";
@@ -366,6 +364,7 @@ public class ReviewController {
 
         return jsonObject.toString();
     }
+
 
 
 

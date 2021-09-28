@@ -1,6 +1,7 @@
 package com.project.bokduck.domain;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @DynamicInsert @DynamicUpdate
+@Slf4j
 public class Member {
     @Id @GeneratedValue
     private Long id;
@@ -64,11 +66,13 @@ public class Member {
 
     @PostLoad
     public void createList() {
+        log.info("PostLoad");
         if (likes == null) likes = new ArrayList<>();
         if (write == null) write = new ArrayList<>();
     }
 
-    public String getEmail() {
-        return this.getEmail();
+    public void addLikeCommunity(Community community) {
+        likes.add(community);
     }
+
 }
