@@ -284,20 +284,10 @@ public class ReviewController {
 
         if (vo.getPhotoReview() != null) {
             // 포토리뷰 체크했을때
-            List<Image> imageList = imageRepository.findAll();
-
-            Image image = new Image();
-            image.setImagePath("포토리뷰 없을때 체크용");
-            List<Image> nullList = new ArrayList<>();
-            nullList.add(image);
-            imageRepository.saveAll(nullList);
-
-            imageList = imageList.isEmpty() ? nullList : imageList ;
-
-
-            spec = spec.and(ReviewSpecs.searchPhotoReview(imageList));
+            spec = spec.and(ReviewSpecs.searchPhotoReview());
             reviewList = reviewRepository.findAll(spec, pageable);
         }
+
 
         if (vo.getLineUp() != null) {
             // 라인업 체크했을때
@@ -376,25 +366,7 @@ public class ReviewController {
     }
 
 
-    @PostMapping ("/list/checkbox")
-    @ResponseBody
-    public Page<Review> reviewListCheckBox(ReviewListVo vo,
-                                           @PageableDefault(size = 5) Pageable pageable) {
-        log.info("vo 불러와지니? {}", vo);
-        Specification<Review> spec = ReviewSpecs.searchReviewStatus(ReviewStatus.COMPLETE);
-        Page<Review> reviewList = null;
 
-//        Specification<ReviewCategory> categorySpec = null;
-//        Map<String, List<?>> map = new HashMap<>();
-//
-//
-//        categorySpec = ReviewSpecs.searchCategoryDetails(map);
-//        List<ReviewCategory> categoryList = reviewCategoryRepository.findAll(categorySpec);
-//        spec = spec.and(ReviewSpecs.searchCategory(categoryList));
-//        reviewList = reviewRepository.findAll(spec, pageable);
-
-        return reviewList;
-    }
 
 
 }

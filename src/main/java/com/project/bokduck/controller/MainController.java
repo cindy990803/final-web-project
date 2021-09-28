@@ -18,7 +18,6 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -124,7 +123,7 @@ public class MainController {
                 }
                 reviewRepository.saveAll(reviewList);
 
-                // 태그 포스트에 넣기기
+                // 태그 포스트에 넣기
                 List<Tag> tag1 = tagRepository.findAll();
                 List<Post> tagPostList= postRepository.findAll();
                 for(Tag t : tag1){
