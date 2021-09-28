@@ -1,6 +1,7 @@
 package com.project.bokduck.domain;
 
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,7 +27,8 @@ public class CommentCommunity {
     @Column(nullable = false)
     private String nickname; // 댓글 쓴 사람
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private Community community; // 커뮤니티 게시판에씀? 이건뭐임..?
 
     @ManyToOne

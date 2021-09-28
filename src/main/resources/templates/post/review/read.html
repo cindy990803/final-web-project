@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='Login'">
+<head>
+<!--    <script>-->
+<!--        $(document).ready(function(){-->
+<!--            getCommentList();-->
+<!--        });-->
+<!--        function getCommentList() {-->
+<!--            var replyurl = "$"-->
+
+<!--            $.ajax({-->
+<!--                type: "POST",-->
+<!--                dataType: 'json',-->
+<!--                url: "/review/read/comment",-->
+<!--                success: function (res) {-->
+<!--                    var comments = "";-->
+<!--                    if(result.length < 1) {-->
+<!--                        comments = "등록된 댓글이 없습니다."-->
+<!--                    } else {-->
+<!--                        $(result).each(function() {-->
+<!--                            comments +='<br/>';-->
+<!--                            comments +='<strong>';-->
+<!--                            comments +='작성자 : ' + this.comment_writer;-->
+<!--                            comments +='</strong>&nbsp;&nbsp;&nbsp;';-->
+<!--                            comments +='작성 날짜 :' + this.reply_regdate;-->
+<!--                            comments +='<br/> <p>';-->
+<!--                            comments +='<br/>';-->
+<!--                            comments +='<br/>';-->
+<!--                            comments +='<br/>';-->
+<!--                            comments +='<br/>';-->
+<!--                        })-->
+
+<!--                    }-->
+<!--                }-->
+<!--            });-->
+<!--        }-->
+
+
+<!--    </script>-->
+<!--    <script>-->
+<!--        $('#addComment').click(function () {-->
+<!--            let saveContent = $('#saveContent').val();-->
+
+<!--            $.ajax({-->
+<!--                type: "POST",-->
+<!--                dataType: 'json',-->
+<!--                url: "/review/read/comment",-->
+<!--                data: {-->
+<!--                    "modifyText": Content-->
+<!--                },-->
+<!--                success: function (res) {-->
+<!--                    alert(res.message);-->
+<!--                    showCommentList();-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
+<!--    <script>-->
+<!--        $('#modifyComment').click(function () {-->
+<!--            let modifyContent = $('#editContent').val();-->
+
+<!--            $.ajax({-->
+<!--                type: "POST",-->
+<!--                dataType: 'json',-->
+<!--                url: "modifyComment",-->
+<!--                data: {-->
+<!--                    "modifyText": modifyContent-->
+<!--                },-->
+<!--                success: function (res) {-->
+<!--                    alert(res.message);-->
+<!--                    showCommentList();-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
+<!--    <script>-->
+<!--        $('#deleteComment').click(function () {-->
+
+<!--            $.ajax({-->
+<!--                type: "POST",-->
+<!--                dataType: 'json',-->
+<!--                url: "/review/read/comment/delete",-->
+<!--                data: { },-->
+<!--                success: function (res) {-->
+<!--                    alert(res.message);-->
+<!--                    showCommentList();-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
+</head>
+
+<body>
+    <div layout:fragment="content" th:object="${review}">
+
+
+      <section class="read-upper">
+<!--  address 정해지면 가져오기  -->
+            <div class="title-main">
+                <span th:text="*{postName}"></span>
+                <span th:text="*{regdate}"></span>
+                <span th:text="*{writer.nickname}"></span>
+            </div>
+            <div class="title-sub">
+
+            </div>
+        </section>
+
+        <section class="image">
+            <div th:each="img: *{uploadImage}">
+                <img th:src="${img.imagePath}" alt="image">
+            </div>
+        </section>
+
+        <section class="information">
+            <div class="container">
+                <div class="roomsize">
+                    <span>크기 | </span>
+                </div>
+                <div class="structure">
+                    <span>집구조 | </span>
+                </div>
+                <div class="payment">
+                    <span>계약형식 | </span>
+                </div>
+                <div class="traffic">
+                    <span>교통 | </span>
+                </div>
+                <div class="convenient">
+                    <span>편의시설 | </span>
+                </div>
+                <div class=" welfare">
+                    <span>편의시설 | </span>
+                </div>
+                <div class="convenient">
+                    <span>편의시설 | </span>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div th:text="*{postContent}"></div>
+        </section>
+
+        <section class="review-map">
+            <div id="map" style="width:400px;height:400px;"></div>
+        </section>
+
+<!--        <section class="comment">-->
+<!--            <div class="wirteComment" th:object="${currentMember}>-->
+<!--               <p>-->
+<!--                    <span th:text="*{nickname}" >댓글 작성자</span>-->
+<!--               </p>-->
+<!--                <p>-->
+<!--                    <textarea rows="5" cols="50" name="content" id="saveContent"></textarea>-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    <button type="submit" id="saveComment">댓글 작성</button>-->
+<!--                </p>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; 댓글 목록 &ndash;&gt;-->
+<!--            <div id="commentList"></div>-->
+<!--        </section>-->
+
+    </div>
+
+<!--    <script>-->
+<!--        var mapOptions = {-->
+<!--            center: new naver.maps.LatLng(37.3595704, 127.105399),-->
+<!--            zoom: 10-->
+<!--        };-->
+
+<!--        var map = new naver.maps.Map('map', mapOptions);-->
+<!--    </script>-->
+
+</body>
+</html>

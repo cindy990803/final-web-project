@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="title='로그인'">
+<head>
+    <script>
+        $('#getCertifiedNum').click(function () {
+            let phoneNumber = $('#inputPhoneNumber').val();
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: "/id/search",
+                data: {
+                    "tel": phoneNumber
+                },
+                success: function (res) {
+                    alert(res.message);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" >
+<!--        <form th:action="@{/id-search-result}" method="post">-->
+            <div id="inPutName">
+                이름 : <input type="text" name="name">
+            </div>
+
+            <div>
+                휴대전화: <input id="inPutPhoneNumber" type="text" placeholder="핸드폰 전화번호" name="tel">
+                <button id="getCertifiedNum">인증번호 받기</button>
+
+            </div>
+            <div>
+                <input type="text" placeholder="인증번호 6자리 숫자 입력" name="num">
+
+            </div>
+
+            <button type="submit">다음</button>
+<!--        </form>-->
+    </div>
+</div>
+
+</body>
+</html>

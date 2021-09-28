@@ -218,8 +218,8 @@
                         </td>
 
 
-
-                            <a th:href="@{/review/read}" th:value="*{id}" id="review_read"
+<!--   잠깐 주석처리 th:value="*{id}"-->
+                            <a th:href="@{/review/read(reviewId=*{id})}" id="review_read"
                                style="text-decoration-line: none; color:black;">
                                 <td colspan="2">
                                     <span th:text="*{postName} + '&nbsp;&nbsp;'" style="font-size: 23px;"/>

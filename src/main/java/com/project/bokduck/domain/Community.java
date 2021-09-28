@@ -3,6 +3,7 @@ package com.project.bokduck.domain;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -23,7 +24,8 @@ public class Community extends Post{
     @Enumerated()
     private CommunityCategory communityCategory;
 
-    @OneToMany(mappedBy = "community" , cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
     private List<CommentCommunity> commentCommunity;
 
 }

@@ -8,13 +8,27 @@ import com.project.bokduck.repository.*;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.util.CommunityFormVo;
+
+import com.project.bokduck.domain.Member;
+import com.project.bokduck.domain.Review;
+import com.project.bokduck.repository.MemberRepository;
+import com.project.bokduck.service.MemberService;
+import com.project.bokduck.service.PassEmailService;
+import com.project.bokduck.service.ReviewService;
+import com.project.bokduck.service.SmsService;
+
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.util.WriteReviewVO;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.DependsOn;
+
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -31,17 +45,27 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 public class MainController {
+
+
+    private final MemberService memberService;
+    private final SmsService smsService;
+    private final ReviewService reviewService;
     private final MemberRepository memberRepository;
     private final CommunityRepository communityRepository;
-    private final MemberService memberService;
     private final PassEmailService passEmailService;
     private final TagRepository tagRepository;
+    private final ImageRepository imageRepository;
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewCategoryRepository reviewCategoryRepository;
@@ -57,6 +81,20 @@ public class MainController {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 Long[] array = {1l,2l};
+
+                // 임시 이미지 만들어주기
+                List<Image> imageList = new ArrayList<>();
+                String[] imgUrlList = {"https://postfiles.pstatic.net/MjAyMDEyMTNfMjky/MDAxNjA3ODYwOTk5Mzc0.aCwwUIuc05kh6ceHxTPfmNf6lKYvr6faPrQChc0XUOgg.uw9cTnUBkJz9RVrKQzB7nXWU8DOTJjciJmc7eXwMwjYg.JPEG.yujoo215/1607860353211.jpg?type=w773",
+                        "https://postfiles.pstatic.net/MjAyMDEyMTNfNDUg/MDAxNjA3ODYwOTEzMDE2.Sn84rrRG4762s_wId0qZPpwOnEwBkVcAh5TKuELUyukg.-xDyC8Aeji3gjaK4lhtn_zTXW5n6YuXogQAR0-2t69cg.JPEG.yujoo215/1607860394134.jpg?type=w773",
+                        "https://postfiles.pstatic.net/MjAyMDEyMTNfMjU0/MDAxNjA3ODYwOTM4NTI0.ThtknKgJrsQQNcWoiukB6CnirvlO2kxr2ZwrYzSpcjkg.ox-6mVkUI9Pm7YmgWeECci4ZOqOQ6TaSe-0d5dy9ddAg.JPEG.yujoo215/1607860392362.jpg?type=w773"};
+
+                for(int i = 0; i < imgUrlList.length; ++i) {
+                    Image image = new Image();
+                    image.setImagePath(imgUrlList[i]);
+                    imageList.add(image);
+                }
+                imageRepository.saveAll(imageList);
+
 
                 // 태그 만들어두기
                 List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
@@ -103,6 +141,12 @@ public class MainController {
                             .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
 //                            .reviewCategory(category)
                             .build();
+//이미지
+                    for(Image image  : imageList) {
+                        image.setImageName(review);
+                    }
+                    review.setUploadImage(imageList);
+
                     review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
                     reviewList.add(review);
 
@@ -181,6 +225,9 @@ public class MainController {
 
     @RequestMapping("/")
     public String index(Model model, @CurrentMember Member member) {
+        List<Review> reviewList = reviewService.getReviewList();
+        model.addAttribute("reviewList", reviewList);
+        log.info("reviewList : {}", reviewList);
         return "index";
     }
 
@@ -210,6 +257,77 @@ public class MainController {
 
         return "redirect:/";
     }
+    @GetMapping("/id-search")
+    public String idCheck() {
+
+        return "member/id-search";
+    }
+
+    @PostMapping("/id/search")
+    @ResponseBody
+    public String sendSms(@RequestParam String tel, HttpServletRequest request) {
+        // 인증번호 발송하고
+        // "인증번호가 발송되었습니다." 를 response
+        Member member = memberRepository.findByTel(tel).get();
+        String message;
+        if(member == null){
+            message = "미등록..";
+        }
+        else {
+            Random rand = new Random();
+            String cerNum = "";
+            for (int i = 0; i < 6; i++) {
+                if (i == 0) {
+                    String ran = Integer.toString(rand.nextInt(9) + 1);
+                    cerNum += ran;
+                    continue;
+                }
+                String ran = Integer.toString(rand.nextInt(10));
+                cerNum += ran;
+            }
+
+            System.out.println("수신자 번호 : " + tel);
+            System.out.println("인증번호 : " + cerNum);
+            smsService.certifiedPhoneNumber(tel, cerNum);
+
+            // 인증번호를 세션객체에 담는다.
+            request.getSession().setAttribute("cerNum", cerNum);
+
+            message = "성공.....";
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("message", message);
+        return jsonObject.toString();
+    }
+
+    @PostMapping("/id-search-result")
+    public String checkSms(@RequestParam String name, @RequestParam String tel,
+                           @RequestParam String num, HttpServletRequest request, Model model){
+        // 진짜 인증번호와 num 파라미터 비교
+        String message;
+        String realCerNum =(String)request.getSession().getAttribute("cerNum");
+
+        // 맞으면 ==>
+        if(num.equals(realCerNum)) {
+
+            //    가입된 연락처면  ==> model.addAttribute("message", "aaa@a.a") 로 회원 이메일 담음
+           if(memberService.containsTel(tel)) {
+               message = memberService.getEmail(tel);
+           } else {
+               message = "복덕복덕에 가입한 번호가 아닙니다.";
+           }
+        } else {
+
+            // 틀리면 ==>model.addAttribute("message", "인증번호가 잘못되었습니다.") 로 회원 이메일 담음
+            message = "인증번호가 잘못 되었습니다.";
+            model.addAttribute("message", message);
+        }
+
+
+        //    가입된 연락처면  ==> model.addAttribute("message", "aaa@a.a") 로 회원 이메일 담음
+        // 틀리면 ==>model.addAttribute("message", "인증번호가 잘못되었습니다.") 로 회원 이메일 담음
+        return "member/id-search-result";
+    }
 
     @Transactional
     @GetMapping("/email-check")
@@ -234,6 +352,7 @@ public class MainController {
 
         return "member/email-check-result";
     }
+
 
     @GetMapping("/password")
     public String password() {
@@ -326,8 +445,25 @@ public class MainController {
 
         return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
     }
+// 리뷰 컨트롤러
+
+    @GetMapping("/review/read")
+    public String read(Model model,@RequestParam(name = "reviewId") Long id, @CurrentMember Member member){
+        Review review = reviewService.getReview(id);
+
+        model.addAttribute("review",review);
+        model.addAttribute("currentMember", member);
+
+        return "post/review/read";
+    }
+
 
 
 }
+
+
+
+
+
 
 

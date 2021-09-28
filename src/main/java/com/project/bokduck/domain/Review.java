@@ -5,6 +5,11 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.*;
 
+import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -18,9 +23,9 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @DynamicInsert
 @DynamicUpdate
-@SuperBuilder
 public class Review extends Post {
 
     @Column(nullable = false)
@@ -44,6 +49,7 @@ public class Review extends Post {
     @OneToOne(optional = false)
     private ReviewCategory reviewCategory;
 
+
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<CommentReview> commentReviews;
@@ -60,4 +66,9 @@ public class Review extends Post {
         if (uploadFile == null) uploadFile = new ArrayList<>();
         if (uploadImage == null) uploadImage = new ArrayList<>();
     }
+
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
+//    private List<CommentReview> commentReviews;
+
 }

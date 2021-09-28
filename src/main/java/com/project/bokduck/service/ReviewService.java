@@ -36,95 +36,13 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
+    private final CommentReviewRepository commentReviewRepository;
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final PlatformTransactionManager transactionManager;
 
 
 
-//    @PostConstruct
-//    @DependsOn("memberRepository")
-//    @Transactional
-//    public void createTestReview(){ // 임시 리뷰글 만들기
-//
-//        TransactionTemplate tmpl = new TransactionTemplate(transactionManager);
-//        tmpl.execute(new TransactionCallbackWithoutResult() {
-//            @Override
-//            protected void doInTransactionWithoutResult(TransactionStatus status) {
-//
-//                Long[] array = {1l,2l};
-//
-//                // 태그 만들어두기
-//                List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
-//                String[] tagNameList = {"넓음", "깨끗함", "벌레없음"};
-//
-//                for(int i = 0; i < tagNameList.length; ++i){
-//                    Tag tag = new Tag();
-//                    tag.setTagName(tagNameList[i]);
-//                    tagList.add(tag);
-//                }
-//
-//                tagRepository.saveAll(tagList);
-//
-//
-//                // 리뷰게시글을 만들어보자
-//                List<Review> reviewList = new ArrayList<>();
-//                ReviewCategory category = null;
-//
-//                for(int i = 0; i < 50; ++i){
-//                    category = new ReviewCategory();
-//                    if (i<=24){
-//                        category.setRoomSize(RoomSize.ONEROOM);
-//                        category.setStructure(Structure.VILLA);
-//                    }else {
-//                        category.setRoomSize(RoomSize.TWOROOM);
-//                        log.info("????");
-//                    }
-//                    category = reviewCategoryRepository.save(category);
-//
-//                    Member member = memberRepository
-//                            .findById(array[(int) (Math.random() * array.length)]).orElseThrow();
-//
-//                    Review review = Review.builder()
-//                            .postName((i + 1) + "번 게시물")
-//                            .postContent("어쩌구저쩌구")
-//                            .writer(member)
-//                            .comment("무난하다")
-//                            .regdate(LocalDateTime.now())
-//                            .hit((int) (Math.random() * 10))
-//                            .star((int) (Math.random() * 5) + 1)
-//                            .address("서울시 마포구 연희동 1-1")
-//                            .detailAddress("XX빌라")
-//                            .extraAddress("연희동")
-//                            .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
-////                            .reviewCategory(category)
-//                            .build();
-//                    review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
-//                    reviewList.add(review);
-//
-//                }
-//                reviewRepository.saveAll(reviewList);
-//
-//                // 태그 포스트에 넣기기
-//                List<Tag> tag1 = tagRepository.findAll();
-//                List<Post> tagPostList= postRepository.findAll();
-//                for(Tag t : tag1){
-//                    t.setTagToPost(tagPostList);
-//                }
-//
-//                // 멤버 like 만들기
-//                Member member = memberRepository.findById(1l).orElseThrow();
-//                List<Post> likePostList = new ArrayList<>();
-//                Post post = postRepository.findById(103l).orElseThrow();
-//                likePostList.add(post);
-//                member.setLikes(likePostList);
-//
-//                member = memberRepository.findById(2l).orElseThrow();
-//                likePostList = postRepository.findAll();
-//                member.setLikes(likePostList);
-//            }
-//        });
-//
-//    }
+
 
 
     public void createLikeCount(){
@@ -176,4 +94,74 @@ public class ReviewService {
     public enum FlagLike {
         ERROR_AUTH, ERROR_INVALID, DUPLICATE, OK
     }
+
+//    댓글
+    public Review getReview(Long id) { return reviewRepository.findById(id).orElseThrow(); }
+
+
+    public List<Review> getReviewList() {
+        return reviewRepository.findAll();
+    }
+
+    public boolean deleteComment(Member member, Long commentReviewId) {
+        Optional<CommentReview> commentReviewOptional;
+        CommentReview commentReview;
+
+        if(commentReviewId == null || member == null){
+            return false;
+        }
+
+        commentReviewOptional = commentReviewRepository.findById(commentReviewId);
+        if (commentReviewOptional.isEmpty()){
+            return false;
+        }
+
+        commentReview = commentReviewOptional.get();
+        if(commentReview.getWriter() != member){
+            return false;
+        }
+
+        commentReviewRepository.deleteById(commentReviewId);
+        return true;
+    }
+
+    public boolean modifyComment(Member member, Long commentReviewId) {
+        Optional<CommentReview> commentReviewOptional;
+        CommentReview commentReview;
+
+        if(commentReviewId == null || member == null){
+            return false;
+        }
+
+        commentReviewOptional = commentReviewRepository.findById(commentReviewId);
+        if (commentReviewOptional.isEmpty()){
+            return false;
+        }
+
+        commentReview = commentReviewOptional.get();
+        if(commentReview.getWriter() != member){
+            return false;
+        }
+
+//        commentReviewRepository.modifyById(commentReviewId);
+        return true;
+    }
+
+    public boolean saveComment(Member member, String content, Long reviewId) {
+        CommentReview commentReview = new CommentReview();
+        if(reviewId == null || member == null) {
+            return false;
+        }
+        Review review = reviewRepository.findById(reviewId).orElseThrow();
+
+        commentReview.setReview(review);
+        commentReview.setText(content);
+        commentReview.setWriter(member);
+
+        commentReviewRepository.save(commentReview);
+        return true;
+    }
 }
+
+
+

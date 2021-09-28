@@ -10,6 +10,7 @@
 </head>
 <body>
 <div layout:fragment="content">
+
 <!--    <div style="padding-top:250px;padding-bottom:250px;padding-left:30px;">메인 페이지(임시)</div>-->
 <!--    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1170&q=80">-->
 
@@ -189,6 +190,13 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+
+    <div style="padding-top:250px;padding-bottom:250px;padding-left:30px;">
+         <div th:each="vo : ${reviewList}" th:object="${vo}">
+         <a th:href="@{/review/read(reviewId=*{id})}" class="btn btn-dark">리뷰상세보기</a>
+         </div>
     </div>
 
 </div>

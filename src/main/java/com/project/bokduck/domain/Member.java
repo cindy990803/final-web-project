@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,4 +68,7 @@ public class Member {
         if (write == null) write = new ArrayList<>();
     }
 
+    public String getEmail() {
+        return this.getEmail();
+    }
 }

@@ -123,4 +123,25 @@ public class MemberService implements UserDetailsService {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(token);
     }
+
+    public boolean containsTel(String tel) {
+        boolean result;
+
+        Optional<Member> member = memberRepository.findByTel(tel);
+        if(member.get() != null) {
+            result = true;
+        } else {
+            result = false;
+        }
+
+        return result;
+    }
+
+    public String getEmail(String tel) {
+        Optional<Member> member = memberRepository.findByTel(tel);
+        String email = member.get().getEmail();
+
+        return  email;
+    }
+
 }
