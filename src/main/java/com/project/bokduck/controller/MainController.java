@@ -54,6 +54,7 @@ public class MainController {
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final PlatformTransactionManager transactionManager;
     private final CommunityService communityService;
+    private final ImageRepository imageRepository;
 
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
@@ -87,6 +88,7 @@ public class MainController {
                 // 리뷰게시글을 만들어보자
                 List<Review> reviewList = new ArrayList<>();
                 ReviewCategory category = null;
+
 
                 for(int i = 0; i < 50; ++i){
                     category = new ReviewCategory();
@@ -129,11 +131,32 @@ public class MainController {
                     t.setTagToPost(tagPostList);
                 }
 
+                // 포토리뷰 만들어두기
+                List<Image> imageList = new ArrayList<>();
+                String[] imageNameList = {"photo_1.jpg", "photo_2.jpg"};
+                String[] imagePathList = {"/images/photo_1.jpg", "/images/photo_2.jpg"};
+
+                for(int i = 0; i < 2; ++i){
+                    Image image = new Image();
+                    image.setImageName(imageNameList[i]);
+                    image.setImagePath(imagePathList[i]);
+                    imageList.add(image);
+                }
+
+                imageRepository.saveAll(imageList);
+
+                // 포토리뷰 포스트에 넣기
+                List<Image> image1 = imageRepository.findAll();
+                Post post = postRepository.findById(105l).orElseThrow();
+                for(Image i : image1){
+                    i.setImageToPost(post);
+                }
+
                 // 멤버 like 만들기
                 Member member = memberRepository.findById(1l).orElseThrow();
                 List<Post> likePostList = new ArrayList<>();
-                Post post = postRepository.findById(103l).orElseThrow();
-                likePostList.add(post);
+                Post post1 = postRepository.findById(103l).orElseThrow();
+                likePostList.add(post1);
                 member.setLikes(likePostList);
 
                 member = memberRepository.findById(2l).orElseThrow();

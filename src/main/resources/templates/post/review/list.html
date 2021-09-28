@@ -165,6 +165,7 @@
                         </p>
                     </details>
                 </div>
+
                 <!-- 정렬 -->
                 <div class="form-group d-flex justify-content-end" id="line_option" style="float: right">
 
@@ -178,8 +179,6 @@
                     </select>
                 </div>
 
-
-
                 <!-- 글쓰기 -->
                 <div id="review_write" class="container justify-content-end">
                     <a class="btn btn-outline-info" th:href="@{/review/writeReview}">글쓰기</a>
@@ -187,7 +186,7 @@
 
 
                 <!-- 리뷰 리스트 -->
-                <p class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"> </p>
+                <div class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"> </div>
 
                 <div th:if="${reviewList.isEmpty()}" style="text-align: center;">
                     <h2>검색결과가 없습니다.</h2>
@@ -205,28 +204,35 @@
 
                             <td rowspan="4" style="width: 400px; height: 200px">
                                 <div th:if="*{#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
+                                    <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                       style="text-decoration-line: none; color:black;">
                                     <div style="display: table-cell; text-align: center; vertical-align: middle; ">
                                         <img th:src="@{/images/no_photo.svg}" style="width: 350px; height: 200px;"
                                              class="photo_image"/>
                                     </div>
+                                    </a>
                                 </div>
                                 <div th:unless="*{#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
+                                    <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                       style="text-decoration-line: none; color:black;">
                                     <div style="display: table-cell; text-align: center; vertical-align: middle; ">
-                                        <img th:src="@{uploadImage[0].imagePath}" style="width: 350px; height: 200px;"
+                                        <img th:src="@{*{uploadImage[0].imagePath}}" style="width: 350px; height: 200px;"
                                              class="photo_image"/>
                                     </div>
+                                    </a>
                                 </div>
                             </td>
 
 
 
-                            <a th:href="@{/review/read}" th:value="*{id}" id="review_read"
-                               style="text-decoration-line: none; color:black;">
-                                <td colspan="2">
+                            <td colspan="2">
+                                    <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                       style="text-decoration-line: none; color:black;">
                                     <span th:text="*{postName} + '&nbsp;&nbsp;'" style="font-size: 23px;"/>
                                     <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}" style="font-size: 15px; color: grey"/>
+                                    </a>
                                 </td>
-                            </a>
+
 
                             <td rowspan="4">
                                 <div style="text-align: center">

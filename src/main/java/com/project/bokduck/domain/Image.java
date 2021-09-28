@@ -3,6 +3,7 @@ package com.project.bokduck.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,9 +17,11 @@ public class Image {
     @Id @GeneratedValue
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Post imageName;
+    private String imageName;
 
     @Column//(nullable = false)
     private String imagePath;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Post imageToPost; // 태그한 게시물
 }

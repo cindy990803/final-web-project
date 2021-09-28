@@ -51,7 +51,7 @@ public abstract class Post {
     @OneToMany(mappedBy = "fileName", cascade = CascadeType.ALL)
     private List<File> uploadFile; // 업로드한 파일 - 계약서
 
-    @OneToMany(mappedBy = "imageName", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "imageToPost", cascade = CascadeType.ALL)
     private List<Image> uploadImage; // 업로드한 이미지
 
     @PostLoad
