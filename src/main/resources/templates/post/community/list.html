@@ -14,7 +14,7 @@
 
     <script th:inline="javascript">
         $(document).ready(function () { //좋아요
-            $('button').click(function () {
+            $(".like").click(function () {
                 let data = $(this).val();
                 $.ajax({
                     type: 'GET',
@@ -49,9 +49,12 @@
                 <h2>커뮤니티 리스트</h2>
             </div>
 
+            <form class="justify-content-center" method="get" th:action="@{/community/search}">
+
                 <!-- 검색창 -->
                 <div class="form-group d-flex justify-content-center row">
-                    <input type="text" class="form-control form-control-lg col-6" id="searchText" name="searchText">
+                    <input type="text" class="form-control form-control-lg col-6" th:value="${searchText}"
+                           id="searchText" name="searchText">
                     <button type="submit" class="btn btn-info col-1">검색</button>
                 </div>
 
@@ -62,27 +65,47 @@
                 </div>
 
                 <!-- 카테고리-->
-                <ul class="nav nav-tabs">
 
-                    <li class="nav-item" th:value="all">
-                        <a th:class="${state.toString.equals('all')? 'nav-link active' : 'nav-link'}"  href="/community/list/all">전체 글</a>
-                    </li>
-                    <li class="nav-item" >
-                        <a th:class="${state.toString.equals('tip')? 'nav-link active' : 'nav-link'}" href="/community/list/tip">자취방 꿀팁</a>
-                    </li>
-                    <li class="nav-item" >
-                        <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link'}" href="/community/list/interior">자취방 인테리어</a>
-                    </li>
-                    <li class="nav-item" >
-                        <a th:class="${state.toString.equals('eat')? 'nav-link active' : 'nav-link'}" href="/community/list/eat">동네 맛집</a>
-                    </li>
-                    <li class="nav-item" >
-                        <a th:class="${state.toString.equals('board')? 'nav-link active' : 'nav-link'}" href="/community/list/board">자유 게시판</a>
-                    </li>
-                </ul>
+                <!--검색 했을때 -->
+                <div th:if="${state.toString.equals('search')}">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/community/list/all" th:value="search">검색 결과</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--검색 안 했을때 -->
+                <div th:unless="${state.toString.equals('search')}">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a th:class="${state.toString.equals('all')? 'nav-link active' : 'nav-link'}"
+                               href="/community/list/all">전체 글</a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:class="${state.toString.equals('tip')? 'nav-link active' : 'nav-link'}"
+                               href="/community/list/tip">자취방 꿀팁</a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link'}"
+                               href="/community/list/interior">자취방 인테리어</a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:class="${state.toString.equals('eat')? 'nav-link active' : 'nav-link'}"
+                               href="/community/list/eat">동네 맛집</a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:class="${state.toString.equals('board')? 'nav-link active' : 'nav-link'}"
+                               href="/community/list/board">자유 게시판</a>
+                        </li>
+                    </ul>
+                </div>
 
 
                 <!--리스트 -->
+                <div th:if="${communityList.isEmpty()}" style="text-align: center;">
+                    <h2>검색결과가 없습니다.</h2>
+                </div>
+
                 <div class="table" id="community_table">
                     <table class="table table-borderless wd-250" th:each="product : ${communityList}"
                            style="table-layout: fixed">
@@ -97,34 +120,41 @@
 
                         <tr>
                             <td colspan="4">
-                                <span th:text="${product.postName} + '&nbsp;&nbsp;'" style="font-size: 23px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"/>
-                                <span th:text="${#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')}"
-                                      style="font-size: 15px; color: grey"/>
+                                <a th:href="@{/community/read(id=${product.id})}" th:value="${product.id}"
+                                   class="review_read"
+                                   style="text-decoration-line: none; color:black;">
+                                    <span th:text="${product.postName} + '&nbsp;&nbsp;'"
+                                          style="font-size: 23px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width: 100"/>
+                                    <span th:text="${#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')}"
+                                          style="font-size: 15px; color: grey"/>
+                                </a>
                             </td>
                             <td th:colspan="1">조회 <span th:text="${product.hit}"> </span></td>
 
                             <td th:colspan="1">
-                                <button type="button"
-                                        th:style="'border-color : transparent; background-color:transparent'"
+                                <button type="button" class="like"
+                                        style="border:0px; outline:0px;background-color:transparent;"
                                         th:id="like" th:value="${product.id}">
                                     <img th:src="@{ ${member?.likes?.contains(product)} ?  '/images/like_red.svg' : '/images/like.svg'}"
                                          th:id="${product.id}" th:width="25" th:height="25"></button>
                                 <span th:text="${product.likers.size}" th:id="likeNum+${product.id}"></span>
                             </td>
+
+
                         </tr>
 
                         <tr>
                             <td colspan="6" width="1500" height="64"
                                 th:utext="${product.postContent.toString().replaceAll('<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>',' ')
                                 .replaceAll('<\/?(span|font)[^>]*>',' ')
-                                .replaceAll('<img style=',' ')
+                                .replaceAll('<img',' ')
                                 }"
                                 style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"></td>
 
                         </tr>
                         <tr>
                             <td th:colspan="6">
-                                <span  th:each="t: ${product.tags}">
+                                <span th:each="t: ${product.tags}">
                  <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
                 </span>
                             </td>
@@ -134,7 +164,7 @@
 
                 </div>
 
-
+            </form>
 
             <!-- 페이징 -->
             <div th:unless="${communityList.isEmpty()}">
