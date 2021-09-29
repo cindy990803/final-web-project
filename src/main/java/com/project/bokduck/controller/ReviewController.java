@@ -238,25 +238,25 @@ public class ReviewController {
         spec = spec.and(ReviewSpecs.searchCategory(categoryList));
         reviewList = reviewRepository.findAll(spec, pageable);
 
-         if (!vo.getAddress().isEmpty()){
-             // 지역 검색했을 때
-             String[] search = {"address","detailAddress","postCode","extraAddress"};
-             Specification<Review> addressSpec = null;
+        if (!vo.getAddress().isEmpty()){
+            // 지역 검색했을 때
+            String[] search = {"address","detailAddress","postCode","extraAddress"};
+            Specification<Review> addressSpec = null;
 
-             for (String s : search) {
-                 Map<String, Object> searchMap = new HashMap<>();
-                 searchMap.put(s, vo.getAddress());
-                 addressSpec =
-                         addressSpec == null ? ReviewSpecs.searchText(searchMap)
-                                 : addressSpec.or(ReviewSpecs.searchText(searchMap));
-             }
-             spec = spec.and(addressSpec);
+            for (String s : search) {
+                Map<String, Object> searchMap = new HashMap<>();
+                searchMap.put(s, vo.getAddress());
+                addressSpec =
+                        addressSpec == null ? ReviewSpecs.searchText(searchMap)
+                                : addressSpec.or(ReviewSpecs.searchText(searchMap));
+            }
+            spec = spec.and(addressSpec);
 
-             reviewList = reviewRepository.findAll(spec, pageable);
+            reviewList = reviewRepository.findAll(spec, pageable);
 
-         }
+        }
 
-         if (!vo.getSearchText().isEmpty()) {
+        if (!vo.getSearchText().isEmpty()) {
             // 검색창 사용 - 주소, 제목, 내용, 코멘트
 
             String[] search = {"postName", "postContent", "comment","address", "detailAddress","postCode","extraAddress"};
@@ -271,12 +271,12 @@ public class ReviewController {
                                 : searchSpec.or(ReviewSpecs.searchText(searchMap));
             }
 
-             // 태그 검색하기
+            // 태그 검색하기
 
-             Specification<Tag> tagSpec = ReviewSpecs.searchTagDetails(vo.getSearchText());
-             List<Tag> tagList = tagRepository.findAll(tagSpec);
-             searchSpec = searchSpec.or(ReviewSpecs.searchTag(tagList));
-             spec = spec.and(searchSpec);
+            Specification<Tag> tagSpec = ReviewSpecs.searchTagDetails(vo.getSearchText());
+            List<Tag> tagList = tagRepository.findAll(tagSpec);
+            searchSpec = searchSpec.or(ReviewSpecs.searchTag(tagList));
+            spec = spec.and(searchSpec);
 
             reviewList = reviewRepository.findAll(spec, pageable);
 

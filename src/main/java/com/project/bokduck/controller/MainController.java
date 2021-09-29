@@ -10,20 +10,19 @@ import com.project.bokduck.service.MainpageService;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.util.CommunityFormVo;
-import com.project.bokduck.util.CommunityViewVo;
 import com.project.bokduck.util.CurrentMember;
-import com.project.bokduck.util.WriteReviewVO;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -52,15 +51,17 @@ public class MainController {
     private final PassEmailService passEmailService;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
-    private final PlatformTransactionManager transactionManager;
-    private final ReviewCategoryRepository reviewCategoryRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewCategoryRepository reviewCategoryRepository;
+    private final PlatformTransactionManager transactionManager;
     private final CommunityService communityService;
     private final ImageRepository imageRepository;
     private final MainpageService mainpageService;
+
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
      */
+
     @PostConstruct
     @DependsOn("memberRepository")
     @Transactional
@@ -77,7 +78,7 @@ public class MainController {
                 List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
                 String[] tagNameList = {"넓음", "깨끗함", "벌레없음"};
 
-                for (int i = 0; i < tagNameList.length; ++i) {
+                for(int i = 0; i < tagNameList.length; ++i){
                     Tag tag = new Tag();
                     tag.setTagName(tagNameList[i]);
                     tagList.add(tag);
@@ -89,12 +90,14 @@ public class MainController {
                 // 리뷰게시글을 만들어보자
                 List<Review> reviewList = new ArrayList<>();
                 ReviewCategory category = null;
-                for (int i = 0; i < 50; ++i) {
+
+
+                for(int i = 0; i < 50; ++i){
                     category = new ReviewCategory();
-                    if (i <= 24) {
+                    if (i<=24){
                         category.setRoomSize(RoomSize.ONEROOM);
                         category.setStructure(Structure.VILLA);
-                    } else {
+                    }else {
                         category.setRoomSize(RoomSize.TWOROOM);
                         log.info("????");
                     }
@@ -102,6 +105,7 @@ public class MainController {
 
                     Member member = memberRepository
                             .findById(array[(int) (Math.random() * array.length)]).orElseThrow();
+
                     Review review = Review.builder()
                             .postName((i + 1) + "번 게시물")
                             .postContent("어쩌구저쩌구")
@@ -109,7 +113,7 @@ public class MainController {
                             .comment("무난하다")
                             .regdate(LocalDateTime.now())
                             .hit((int) (Math.random() * 10))
-                            .star((int) (Math.random() * 6))
+                            .star((int) (Math.random() * 5) + 1)
                             .likeCount((int) (Math.random() * 100))
                             .address("서울시 마포구 연희동 1-1")
                             .detailAddress("XX빌라")
@@ -117,19 +121,50 @@ public class MainController {
                             .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
 //                            .reviewCategory(category)
                             .build();
-                    review.setReviewCategory(reviewCategoryRepository.findById((long) (i + 6)).get());
+                    review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
                     reviewList.add(review);
 
                 }
                 reviewRepository.saveAll(reviewList);
 
-                // 태그 포스트에 넣기기
+                // 태그 포스트에 넣기
                 List<Tag> tag1 = tagRepository.findAll();
-                List<Post> tagPostList = postRepository.findAll();
-                for (Tag t : tag1) {
+                List<Post> tagPostList= postRepository.findAll();
+                for(Tag t : tag1){
                     t.setTagToPost(tagPostList);
                 }
 
+                // 포토리뷰 만들어두기
+                List<Image> imageList = new ArrayList<>();
+                String[] imageNameList = {"photo_1.jpg", "photo_2.jpg"};
+                String[] imagePathList = {"/images/photo_1.jpg", "/images/photo_2.jpg"};
+
+                for(int i = 0; i < 2; ++i){
+                    Image image = new Image();
+                    image.setImageName(imageNameList[i]);
+                    image.setImagePath(imagePathList[i]);
+                    imageList.add(image);
+                }
+
+                imageRepository.saveAll(imageList);
+
+                // 포토리뷰 포스트에 넣기
+                List<Image> image1 = imageRepository.findAll();
+                Post post = postRepository.findById(105l).orElseThrow();
+                for(Image i : image1){
+                    i.setImageToPost(post);
+                }
+
+                // 멤버 like 만들기
+                Member member = memberRepository.findById(1l).orElseThrow();
+                List<Post> likePostList = new ArrayList<>();
+                Post post1 = postRepository.findById(103l).orElseThrow();
+                likePostList.add(post1);
+                member.setLikes(likePostList);
+
+                member = memberRepository.findById(2l).orElseThrow();
+                likePostList = postRepository.findAll();
+                member.setLikes(likePostList);
             }
         });
 
@@ -147,7 +182,7 @@ public class MainController {
                 List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
                 String[] tagNameList = {"태그1", "태그2", "태그3"};
 
-                for(int i = 0; i < tagNameList.length; ++i){
+                for (int i = 0; i < tagNameList.length; ++i) {
                     Tag tag = new Tag();
                     tag.setTagName(tagNameList[i]);
                     tagList.add(tag);
@@ -170,14 +205,15 @@ public class MainController {
                 communityRepository.saveAll(communityList);
 
                 List<Tag> tag2 = tagRepository.findAll();
-                List<Post> tagPostList2= postRepository.findAll();
-                for(Tag t : tag2){
+                List<Post> tagPostList2 = postRepository.findAll();
+                for (Tag t : tag2) {
                     t.setTagToPost(tagPostList2);
                 }
             }
         });
-
     }
+
+
 
     @InitBinder("joinFormVo")
     protected void initBinder(WebDataBinder dataBinder) {
@@ -277,16 +313,6 @@ public class MainController {
         return "member/password";
     }
 
-    @GetMapping("/review/list")
-    public String reviewList() {
-        return "post/review/list";
-    }
-
-    @GetMapping("/member/Test")
-    public String Test() {
-        return "member/Test";
-    }
-
     @GetMapping("/community/write")
     public String communityWriteForm(Model model) {
         model.addAttribute("vo", new CommunityFormVo());
@@ -358,27 +384,6 @@ public class MainController {
 
         return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @GetMapping("/community/list")
@@ -501,7 +506,7 @@ public class MainController {
         jsonObject.addProperty("likeCheck", likeCheck);
 
         return jsonObject.toString();
+
     }
 
 }
-

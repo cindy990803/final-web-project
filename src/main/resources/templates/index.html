@@ -393,7 +393,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="community : ${communityList}">
-                    <td><a class="title-a" th:text="${community.postName}" href="#"></a></td>
+                    <td><a class="title-a" th:text="${community.postName}" style="display:inline-block; width:300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" href="#"></a></td>
                     <td th:text="${community.hit}"></td>
                     <td th:text="${community.likeCount}"></td>
                 </tr>
@@ -414,7 +414,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="tip : ${communityTipList}">
-                    <td><a class="title-a" th:text="${tip.postName}" href="#"></a></td>
+                    <td><a class="title-a" th:text="${tip.postName}" style="display:inline-block; width:300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" href="#"></a></td>
                     <td th:text="${tip.hit}"></td>
                     <td th:text="${tip.likeCount}"></td>
                 </tr>
