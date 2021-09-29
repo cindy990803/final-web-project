@@ -41,8 +41,8 @@ public class ReviewService {
 
 
 
-//    @PostConstruct
-//    @DependsOn("memberRepository")
+ //   @PostConstruct
+ //  @DependsOn("memberRepository")
 //    @Transactional
 //    public void createTestReview(){ // 임시 리뷰글 만들기
 //
@@ -177,3 +177,4 @@ public class ReviewService {
         ERROR_AUTH, ERROR_INVALID, DUPLICATE, OK
     }
 }
+

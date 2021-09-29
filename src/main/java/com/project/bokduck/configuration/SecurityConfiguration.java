@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.sql.DataSource;
 
 @Configuration
@@ -31,6 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 );
 
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

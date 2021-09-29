@@ -3,6 +3,10 @@ package com.project.bokduck.controller;
 import com.project.bokduck.domain.*;
 import com.project.bokduck.repository.*;
 import com.project.bokduck.service.ReviewService;
+import com.project.bokduck.repository.FileRepository;
+import com.project.bokduck.repository.ImageRepository;
+import com.project.bokduck.repository.ReviewCategoryRepository;
+import com.project.bokduck.repository.ReviewRepository;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.util.WriteReviewVO;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.google.gson.JsonObject;
 import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.ReviewListVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +24,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,19 +51,52 @@ public class ReviewController {
     private final ImageRepository imageRepository;
     private final TagRepository tagRepository;
 
+
+    FileRepository fileRepository;
+
+    /*@RequestMapping(value = {"/upload"}, method = {RequestMethod.POST}, consumes = MediaType.MULTIPART_FOR_DATA_VALUE)*/
+
+
     @GetMapping("/writeReview")
-    public String writeReview(Model model){
-        model.addAttribute("WriteReviewVO",new WriteReviewVO());
+    public String writeReview(Model model) {
+        model.addAttribute("WriteReviewVO", new WriteReviewVO());
 
         return "post/review/writeReview";
     }
 
+
     @PostMapping("/writeReview")
-    public String saveReview(@CurrentMember Member member, @ModelAttribute WriteReviewVO writeReviewVO){
+    public String saveReview(@RequestParam("file")MultipartFile file ,@CurrentMember Member member, @ModelAttribute WriteReviewVO writeReviewVO,RedirectAttributes redirectAttribute){
+
+        if(file != null) {
+            try (
+                    // 맥일 경우
+                    //FileOutputStream fos = new FileOutputStream("/tmp/" + file.getOriginalFilename());
+                    // 윈도우일 경우
+                    FileOutputStream fos = new FileOutputStream("D:\\final-web-project\\src\\main\\resources\\static\\saveImage" + file.getOriginalFilename());
+                    InputStream is = file.getInputStream();
+            ) {
+                int readCount = 0;
+                byte[] buffer = new byte[1024];
+                while ((readCount = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, readCount);
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException("file Save Error");
+            }
+
+
+            if (writeReviewVO.getFile() != null) {
+                List<Image> imageList = new ArrayList<>();
+                Image image = Image.builder()
+                        .build();
+                imageRepository.save(image);
+            }
+        }
 
 
 
-        switch (writeReviewVO.getRoomSize()){
+        switch (writeReviewVO.getRoomSize()) {
             case "oneRoom":
                 reviewCategory.setRoomSize(RoomSize.ONEROOM);
             case "twoRoom":
@@ -64,7 +107,7 @@ public class ReviewController {
             default:
         }
 
-        switch (writeReviewVO.getStructure()){
+        switch (writeReviewVO.getStructure()) {
             case "villa":
                 reviewCategory.setStructure(Structure.VILLA);
             case "office":
@@ -75,60 +118,12 @@ public class ReviewController {
             default:
         }
 
-        switch (writeReviewVO.getPayment()){
-            case "monthly":
-                reviewCategory.setPayment(Payment.MONTHLY);
-            case "charter":
-                reviewCategory.setPayment(Payment.CHARTER);
-            case "dealing":
-                reviewCategory.setPayment(Payment.DEALING);
-                break;
-            default:
-        }
 
-        switch (writeReviewVO.getElectronicDevice()){
-            case "bed":
-                reviewCategory.setElectronicDevice(ElectronicDevices.BED);
-            case "airConditioner":
-                reviewCategory.setElectronicDevice(ElectronicDevices.AIRCONDITIONER);
-            case "washingMachine":
-                reviewCategory.setElectronicDevice(ElectronicDevices.WASHINGMACHINE);
-            case "refrigerator":
-                reviewCategory.setElectronicDevice(ElectronicDevices.REFRIGERATOR);
-                break;
-            default:
-        }
-
-        switch (writeReviewVO.getWelfare()){
-            case "parking":
-                reviewCategory.setWelfare(Welfare.PARKING);
-            case "deliveryBox":
-                reviewCategory.setWelfare(Welfare.DELIVERYBOX);
-            case "cctv":
-                reviewCategory.setWelfare(Welfare.CCTV);
-                break;
-            default:
-        }
-
-        switch (writeReviewVO.getConvenient()){
-            case "store":
-                reviewCategory.setConvenient(Convenient.STORE);
-            case "hospital":
-                reviewCategory.setConvenient(Convenient.HOSPITAL);
-            case "coinLaunder":
-                reviewCategory.setConvenient(Convenient.COINLAUNDRY);
-                break;
-            default:
-        }
-        reviewCategoryRepository.save(reviewCategory);
-
-        List<Image> imageList = new ArrayList<>();
-        Image image = Image.builder()
-                .imagePath(writeReviewVO.getFileImg())
-                .build();
-
-
-        imageRepository.save(image);
+       //reviewCategory.setConvenient(convenientList);
+        reviewCategory.setTraffic(writeReviewVO.getTraffic());
+        reviewCategory.setPayment(writeReviewVO.getPayment());
+        reviewCategory.setWelfare(writeReviewVO.getWelfare());
+        reviewCategory.setConvenient(writeReviewVO.getConvenient());
 
 
         Review review = Review.builder()
@@ -138,20 +133,17 @@ public class ReviewController {
                 .detailAddress(writeReviewVO.getDetailAddress())
                 .postCode(writeReviewVO.getPostCode())
                 .extraAddress(writeReviewVO.getExtraAddress())
-                .uploadImage(imageList)
-                .comment(writeReviewVO.getShortComment())
+                .comment(writeReviewVO.getConvenient())
                 .reviewCategory(reviewCategory)
                 .reviewStatus(ReviewStatus.COMPLETE) // todo wait으로 바꾸기
                 .star(0)
-
-
                 .postName(writeReviewVO.getTitle())
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
+        reviewCategoryRepository.save(reviewCategory);
+
         reviewRepository.save(review);
-
-
         return "index";
     }
 
@@ -314,8 +306,8 @@ public class ReviewController {
         int endPage = Math.min(reviewList.getTotalPages(), reviewList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-
         model.addAttribute("reviewList", reviewList);
+
         return "post/review/list";
     }
 
