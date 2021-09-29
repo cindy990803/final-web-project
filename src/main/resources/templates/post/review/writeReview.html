@@ -18,7 +18,7 @@
 
 
         <div id='image_preview'>
-            <input type='file' id='file' multiple='multiple'/>
+            <input type='file' id='file'name="file" value="file" multiple='multiple'/>
             <div id='att_zone'
                  data-placeholder='파일을 첨부 하려면 파일 선택 버튼을 클릭하거나 파일을 드래그앤드롭 하세요'></div>
         </div>
@@ -228,8 +228,9 @@ function valideImageType(image) {
         <input type="checkbox" name="structure" value="apart">아파트<br>
 
         <a>계약형식</a>
-        <input type="checkbox" name="payment" value="MONTHLY">월세
-        <input type="checkbox" name="payment" value="CHARTER">전세
+        <input type="checkbox" name="payment" value="monthly">월세
+        <input type="checkbox" name="payment" value="charter">전세
+        <input type="checkbox" name="payment" value="halfCharter">반전세
         <input type="checkbox" name="payment" value="DEALING">매매
         <br>
 

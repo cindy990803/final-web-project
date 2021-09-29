@@ -118,10 +118,19 @@ public class ReviewController {
             default:
         }
 
+        switch (writeReviewVO.getPayment()){
+            case "monthly":
+                reviewCategory.setPayment(Payment.MONTHLY);
+            case "charter":
+                reviewCategory.setPayment(Payment.CHARTER);
+            case "dealing":
+                reviewCategory.setPayment(Payment.DEALING);
+                break;
+            default:
+        }
 
-       //reviewCategory.setConvenient(convenientList);
+
         reviewCategory.setTraffic(writeReviewVO.getTraffic());
-        reviewCategory.setPayment(writeReviewVO.getPayment());
         reviewCategory.setWelfare(writeReviewVO.getWelfare());
         reviewCategory.setConvenient(writeReviewVO.getConvenient());
 

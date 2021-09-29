@@ -31,19 +31,14 @@ public class ReviewCategory {
     private Structure structure;
 
     @Enumerated(EnumType.STRING)
-    private String payment;
+    private Payment payment;
 
-    @Enumerated(EnumType.STRING)
     private String traffic;
 
-   // @Enumerated(EnumType.STRING)
-   // private Convenient convenient;
     private String convenient;
 
-    @Enumerated(EnumType.STRING)
     private String welfare;
 
-    @Enumerated(EnumType.STRING)
     private String electronicDevice;
 
 }
