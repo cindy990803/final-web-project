@@ -43,5 +43,7 @@ public class WriteReviewVO  {
 
     private MultipartFile file;
 
+    private String Tags;
+
 
 }

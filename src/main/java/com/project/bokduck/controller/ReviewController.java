@@ -1,5 +1,7 @@
 package com.project.bokduck.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.project.bokduck.domain.*;
 import com.project.bokduck.repository.*;
 import com.project.bokduck.service.ReviewService;
@@ -66,9 +68,9 @@ public class ReviewController {
 
 
     @PostMapping("/writeReview")
-    public String saveReview(@RequestParam("file")MultipartFile file ,@CurrentMember Member member, @ModelAttribute WriteReviewVO writeReviewVO,RedirectAttributes redirectAttribute){
+    public String saveReview(@RequestParam("file") MultipartFile file, @CurrentMember Member member, @ModelAttribute WriteReviewVO writeReviewVO, RedirectAttributes redirectAttribute) {
 
-        if(file != null) {
+        if (file != null) {
             try (
                     // 맥일 경우
                     //FileOutputStream fos = new FileOutputStream("/tmp/" + file.getOriginalFilename());
@@ -85,15 +87,7 @@ public class ReviewController {
                 throw new RuntimeException("file Save Error");
             }
 
-
-            if (writeReviewVO.getFile() != null) {
-                List<Image> imageList = new ArrayList<>();
-                Image image = Image.builder()
-                        .build();
-                imageRepository.save(image);
-            }
         }
-
 
 
         switch (writeReviewVO.getRoomSize()) {
@@ -118,22 +112,41 @@ public class ReviewController {
             default:
         }
 
-        switch (writeReviewVO.getPayment()){
+        switch (writeReviewVO.getPayment()) {
             case "monthly":
                 reviewCategory.setPayment(Payment.MONTHLY);
             case "charter":
                 reviewCategory.setPayment(Payment.CHARTER);
             case "dealing":
                 reviewCategory.setPayment(Payment.DEALING);
+            case "halfCharter":
+                reviewCategory.setPayment(Payment.HALFCHARTER);
                 break;
             default:
         }
 
+        List<Tag> tagList = new ArrayList<>();
+
+        if (writeReviewVO.getTags().isEmpty()) {
+            JsonArray tagsJsonArray = new Gson().fromJson(writeReviewVO.getTags(), JsonArray.class);
+
+            for (int i = 0; i < tagsJsonArray.size(); ++i) {
+
+                JsonObject object = tagsJsonArray.get(i).getAsJsonObject();
+
+                String tagValue = object.get("value").getAsString();
+
+                Tag tag = Tag.builder()
+                        .tagName(tagValue)
+                        .build();
+
+                tagList.add(tag);
+            }
+        }
 
         reviewCategory.setTraffic(writeReviewVO.getTraffic());
         reviewCategory.setWelfare(writeReviewVO.getWelfare());
         reviewCategory.setConvenient(writeReviewVO.getConvenient());
-
 
         Review review = Review.builder()
                 .writer(member)
@@ -147,15 +160,24 @@ public class ReviewController {
                 .reviewStatus(ReviewStatus.COMPLETE) // todo wait으로 바꾸기
                 .star(0)
                 .postName(writeReviewVO.getTitle())
+                .tags(tagList)
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
         reviewCategoryRepository.save(reviewCategory);
 
         reviewRepository.save(review);
+
+        for (Tag t : tagList) {
+            if (t.getTagToPost() == null) {
+                t.setTagToPost(new ArrayList<Post>());
+            }
+            t.getTagToPost().add(review);
+        }
+
+
         return "index";
     }
-
 
     @GetMapping("/list")
     public String reviewList(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -168,7 +190,7 @@ public class ReviewController {
         Page<Review> reviewList = reviewRepository.findAll(spec, pageable);
         model.addAttribute("reviewList", reviewList);
 
-        if(member!=null){
+        if (member != null) {
             member = memberRepository.findById(member.getId()).orElseThrow();
         }
         model.addAttribute("member", member);
@@ -183,7 +205,7 @@ public class ReviewController {
     }
 
 
-    @GetMapping ("/search")
+    @GetMapping("/search")
     public String reviewSearch(@PageableDefault(size = 5) Pageable pageable,
                                Model model,
                                ReviewListVo vo,
@@ -196,7 +218,7 @@ public class ReviewController {
 
         reviewService.createLikeCount();
 
-        if(member!=null){
+        if (member != null) {
             member = memberRepository.findById(member.getId()).orElseThrow();
         }
         model.addAttribute("member", member);
@@ -239,9 +261,9 @@ public class ReviewController {
         spec = spec.and(ReviewSpecs.searchCategory(categoryList));
         reviewList = reviewRepository.findAll(spec, pageable);
 
-        if (!vo.getAddress().isEmpty()){
+        if (!vo.getAddress().isEmpty()) {
             // 지역 검색했을 때
-            String[] search = {"address","detailAddress","postCode","extraAddress"};
+            String[] search = {"address", "detailAddress", "postCode", "extraAddress"};
             Specification<Review> addressSpec = null;
 
             for (String s : search) {
@@ -260,7 +282,7 @@ public class ReviewController {
         if (!vo.getSearchText().isEmpty()) {
             // 검색창 사용 - 주소, 제목, 내용, 코멘트
 
-            String[] search = {"postName", "postContent", "comment","address", "detailAddress","postCode","extraAddress"};
+            String[] search = {"postName", "postContent", "comment", "address", "detailAddress", "postCode", "extraAddress"};
             Specification<Review> searchSpec = null;
 
 
@@ -296,16 +318,16 @@ public class ReviewController {
                 case "star": // 별점순
                     Sort sort = Sort.by(Sort.Direction.DESC, "star")
                             .and(Sort.by(Sort.Direction.DESC, "id"));
-                    pageable = PageRequest.of(0,5,Sort.by("star").descending().and(Sort.by("id").descending()));
-                    reviewList = reviewRepository.findAll(spec,pageable);
+                    pageable = PageRequest.of(0, 5, Sort.by("star").descending().and(Sort.by("id").descending()));
+                    reviewList = reviewRepository.findAll(spec, pageable);
                     break;
                 case "like": // 좋아요순
-                    pageable = PageRequest.of(0,5,Sort.by("likeCount").descending().and(Sort.by("id").descending()));
-                    reviewList = reviewRepository.findAll(spec,pageable);
+                    pageable = PageRequest.of(0, 5, Sort.by("likeCount").descending().and(Sort.by("id").descending()));
+                    reviewList = reviewRepository.findAll(spec, pageable);
                     break;
                 default: // 최신순
-                    pageable = PageRequest.of(0,5,Sort.by("id").descending());
-                    reviewList = reviewRepository.findAll(spec,pageable);
+                    pageable = PageRequest.of(0, 5, Sort.by("id").descending());
+                    reviewList = reviewRepository.findAll(spec, pageable);
                     break;
             }
         }
@@ -319,7 +341,6 @@ public class ReviewController {
 
         return "post/review/list";
     }
-
 
 
     @GetMapping("/list/like")
@@ -347,12 +368,12 @@ public class ReviewController {
             case DUPLICATE:
                 resultCode = "duplicate";
                 message = "좋아요 취소 완료!";
-                likeCheck-=1;
+                likeCheck -= 1;
                 break;
             case OK:
                 resultCode = "ok";
                 message = "좋아요 완료!";
-                likeCheck+=1;
+                likeCheck += 1;
                 break;
         }
 
