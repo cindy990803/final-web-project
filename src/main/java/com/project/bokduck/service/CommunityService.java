@@ -69,6 +69,14 @@ public class CommunityService {
         return FlagLike.OK;
     }
 
+    public void createLikeCount(){
+        List<Community> communityList = communityRepository.findAll();
+        for (Community c : communityList){
+            c.setLikeCount(c.getLikers().size());
+        }
+        communityRepository.saveAll(communityList);
+    }
+
     public Page<Community> findPage(Pageable pageable) {
         return communityRepository.findAll(pageable);
     }
