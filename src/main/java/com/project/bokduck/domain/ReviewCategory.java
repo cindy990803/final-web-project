@@ -33,16 +33,12 @@ public class ReviewCategory {
     @Enumerated(EnumType.STRING)
     private Payment payment;
 
-    @Enumerated(EnumType.STRING)
-    private Traffic traffic;
+    private String traffic;
 
-    @Enumerated(EnumType.STRING)
-    private Convenient convenient;
+    private String convenient;
 
-    @Enumerated(EnumType.STRING)
-    private Welfare welfare;
+    private String welfare;
 
-    @Enumerated(EnumType.STRING)
-    private ElectronicDevices electronicDevice;
+    private String electronicDevice;
 
 }

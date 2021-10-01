@@ -6,8 +6,11 @@ import com.google.gson.JsonObject;
 import com.project.bokduck.domain.*;
 import com.project.bokduck.repository.*;
 import com.project.bokduck.service.CommunityService;
+import com.project.bokduck.service.MainpageService;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
+import com.project.bokduck.specification.CommunitySpecs;
+import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.CommunityFormVo;
 
 import com.project.bokduck.domain.Member;
@@ -30,8 +33,10 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -75,6 +80,7 @@ public class MainController {
     private final PlatformTransactionManager transactionManager;
     private final CommunityService communityService;
     private final ImageRepository imageRepository;
+    private final MainpageService mainpageService;
 
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
@@ -90,7 +96,7 @@ public class MainController {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
 
-               Long[] array = {1l,2l};
+                Long[] array = {1l,2l};
 
                 // 임시 이미지 만들어주기
                 List<Image> imageList = new ArrayList<>();
@@ -146,6 +152,7 @@ public class MainController {
                             .regdate(LocalDateTime.now())
                             .hit((int) (Math.random() * 10))
                             .star((int) (Math.random() * 5) + 1)
+                            .likeCount((int) (Math.random() * 100))
                             .address("서울시 마포구 연희동 1-1")
                             .detailAddress("XX빌라")
                             .extraAddress("연희동")
@@ -234,6 +241,7 @@ public class MainController {
                             .postContent(i + "번 내용입니다.")
                             .writer(member)
                             .hit((int) ((Math.random() * 50) + 1))
+                            .likeCount((int) (Math.random() * 100))
                             .regdate(localDateTime)
                             .communityCategory(categories[(int) (Math.random() * categories.length)])
                             .build());
@@ -257,10 +265,31 @@ public class MainController {
     }
 
     @RequestMapping("/")
+<<<<<<< HEAD
     public String index(Model model, @CurrentMember Member member) {
         List<Review> reviewList = reviewService.getReviewList();
         model.addAttribute("reviewList", reviewList);
         log.info("reviewList : {}", reviewList);
+=======
+    public String index(Model model) {
+
+        //리뷰 인기게시글 불러오기
+        Page<Review> reviewList1 = mainpageService.getReviewList(PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "likeCount")));
+        model.addAttribute("reviewList1", reviewList1);
+        Page<Review> reviewList2 = mainpageService.getReviewList(PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "likeCount")));
+        model.addAttribute("reviewList2", reviewList2);
+        Page<Review> reviewList3 = mainpageService.getReviewList(PageRequest.of(2, 3, Sort.by(Sort.Direction.DESC, "likeCount")));
+        model.addAttribute("reviewList3", reviewList3);
+
+        //커뮤니티 인기게시글(좋아요순) 불러오기
+        Page<Community> communityList = mainpageService.getCommunityList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "likeCount")));
+        model.addAttribute("communityList", communityList);
+
+        //자취방꿀팁(일단 좋아요순으로 통일함) 불러오기
+        Page<Community> communityTipList = mainpageService.getCommunityTipList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id")));
+        model.addAttribute("communityTipList", communityTipList);
+
+>>>>>>> f3d124591d5b3eb9d9a6dc9681f4da2ac26cef2a
         return "index";
     }
 
@@ -495,11 +524,16 @@ public class MainController {
     @GetMapping("/community/list")
     public String community( @PageableDefault(size = 10,sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                              @CurrentMember Member member, Model model) {
+
+//        pageable = PageRequest.of(0,10, Sort.by(Sort.Direction.DESC,"likers"));
         Page<Community> communityList = communityService.findPage(pageable);
+
         if (member!=null){
             member = memberRepository.getById(member.getId());
             model.addAttribute("member", member);
         }
+
+
         int startPage = Math.max(1, communityList.getPageable().getPageNumber() - 4);
         int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 4);
         model.addAttribute("startPage", startPage);
@@ -508,6 +542,7 @@ public class MainController {
         String state="all";
         model.addAttribute("state",state);
         model.addAttribute("communityList", communityList);
+        model.addAttribute("searchText"," ");
         return "post/community/list";
     }
 
@@ -531,7 +566,7 @@ public class MainController {
                 model.addAttribute("communityList", communityList);
                 break;
             case "interior":
-               communityList = communityService.findCommunityCategoryPage(CommunityCategory.INTERIOR,pageable);
+                communityList = communityService.findCommunityCategoryPage(CommunityCategory.INTERIOR,pageable);
                 state = "interior";
                 model.addAttribute("state",state);
                 model.addAttribute("communityList", communityList);
@@ -543,7 +578,7 @@ public class MainController {
                 model.addAttribute("communityList", communityList);
                 break;
             case "board":
-               communityList = communityService.findCommunityCategoryPage(CommunityCategory.BOARD,pageable);
+                communityList = communityService.findCommunityCategoryPage(CommunityCategory.BOARD,pageable);
                 state = "board";
                 model.addAttribute("state",state);
                 model.addAttribute("communityList", communityList);
@@ -594,16 +629,50 @@ public class MainController {
                 likeCheck +=1;
                 break;
         }
-        JSONObject jsonObject = new JSONObject();
-        try{
-            jsonObject.put("resultCode",resultCode);
-            jsonObject.put("message", message);
-            jsonObject.put("likeCheck", likeCheck);
-        }catch (JSONException e){
-            log.error(e.getMessage());
-        }
+
+        //gson의존성으로 수정
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("resultCode",resultCode);
+        jsonObject.addProperty("message", message);
+        jsonObject.addProperty("likeCheck", likeCheck);
+
         return jsonObject.toString();
 
+    }
+
+
+    @GetMapping("/community/search") //검색 결과 나오는 것
+    public String communitySearch(String searchText, Model model
+            ,@PageableDefault(page =0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+        Page<Community> communityList =null;
+        String[] search = {"postName", "postContent"};
+        Specification<Community> searchSpec = null;
+
+        //제목 내용 검색
+        for (String s : search) {
+            Map<String, Object> searchMap = new HashMap<>();
+            searchMap.put(s, searchText);
+            searchSpec =
+                    searchSpec == null ? CommunitySpecs.searchText(searchMap)
+                            : searchSpec.or(CommunitySpecs.searchText(searchMap));
+        }
+
+        //태그 검색
+        Specification<Tag> tagSpec = CommunitySpecs.searchTagDetails(searchText);
+        List<Tag> tagList = tagRepository.findAll(tagSpec);
+        searchSpec = searchSpec.or(CommunitySpecs.searchTag(tagList));
+        communityList = communityRepository.findAll(searchSpec, pageable);
+
+        int startPage = Math.max(1, communityList.getPageable().getPageNumber() - 4);
+        int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 4);
+
+        model.addAttribute("startPage",startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("communityList",communityList);
+        model.addAttribute("state", "search");
+        model.addAttribute("searchText",searchText);
+
+        return "post/community/list";
     }
 
 }

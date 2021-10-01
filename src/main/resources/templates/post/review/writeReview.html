@@ -7,27 +7,135 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- include summernote css/js -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <!-- tagify css/js 적용 -->
+    <script src="https://unpkg.com/@yaireo/tagify"></script>
+    <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div layout:fragment="content">
-
-    <form commandName="WriteReviewVO" action="/review/writeReview" method="post">
-        <!--<form th:object="${WriteReviewVO}" th:action="@{/review/writeReview}" method="post" name="WriteReviewVO">-->
+    <div style="width:70%; left:15%">
+    <form commandName="WriteReviewVO" action="/review/writeReview" method="post" enctype="multipart/form-data">
         <p>제목</p>
         <input type="text" name="title" value="title">
 
-        <p>사진</p>
-            <input type="file" name="fileImg" value="fileImg">
+        <div id='image_preview'>
+            <input type='file' id='file'name="file" value="file" multiple='multiple'/>
+            <div id='att_zone'
+                 data-placeholder='파일을 첨부 하려면 파일 선택 버튼을 클릭하거나 파일을 드래그앤드롭 하세요'></div>
+        </div>
+        <script>
+(
+ /* att_zone : 이미지들이 들어갈 위치 id, btn : file tag id */
+  imageView = function imageView(att_zone, btn){
 
+    var attZone = document.getElementById(att_zone);
+    var file = document.getElementById(btn)
+    var sel_files = [];
+
+    // 이미지와 체크 박스를 감싸고 있는 div 속성
+    var div_style = 'display:inline-block;position:relative;'
+                  + 'width:150px;height:120px;margin:5px;border:1px solid #00f;z-index:1';
+    // 미리보기 이미지 속성
+    var img_style = 'width:100%;height:100%;z-index:none';
+    // 이미지안에 표시되는 체크박스의 속성
+    var chk_style = 'width:30px;height:30px;position:absolute;font-size:24px;'
+                  + 'right:0px;bottom:0px;z-index:999;background-color:rgba(255,255,255,0.1);color:#f00';
+
+    file.onchange = function(e){
+      var files = e.target.files;
+      var fileArr = Array.prototype.slice.call(files)
+      for(f of fileArr){
+        imageLoader(f);
+      }
+    }
+
+    // 탐색기에서 드래그앤 드롭 사용
+    attZone.addEventListener('dragenter', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    }, false)
+
+    attZone.addEventListener('dragover', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+
+    }, false)
+
+    attZone.addEventListener('drop', function(e){
+      var files = {};
+      e.preventDefault();
+      e.stopPropagation();
+      var dt = e.dataTransfer;
+      files = dt.files;
+      for(f of files){
+        imageLoader(f);
+      }
+
+    }, false)
+
+    /*첨부된 이미리즐을 배열에 넣고 미리보기 */
+    imageLoader = function(file){
+      sel_files.push(file);
+      var reader = new FileReader();
+      reader.onload = function(ee){
+        let img = document.createElement('img')
+        img.setAttribute('style', img_style)
+        img.src = ee.target.result;
+        attZone.appendChild(makeDiv(img, file));
+      }
+
+      reader.readAsDataURL(file);
+    }
+
+    /*첨부된 파일이 있는 경우 checkbox와 함께 attZone에 추가할 div를 만들어 반환 */
+    makeDiv = function(img, file){
+      var div = document.createElement('div')
+      div.setAttribute('style', div_style)
+
+      var btn = document.createElement('input')
+      btn.setAttribute('type', 'button')
+      btn.setAttribute('value', 'x')
+      btn.setAttribute('delFile', file.name);
+      btn.setAttribute('style', chk_style);
+      btn.onclick = function(ev){
+        var ele = ev.srcElement;
+        var delFile = ele.getAttribute('delFile');
+        for(var i=0 ;i<sel_files.length; i++){
+          if(delFile== sel_files[i].name){
+            sel_files.splice(i, 1);
+          }
+        }
+
+        dt = new DataTransfer();
+        for(f in sel_files) {
+          var file = sel_files[f];
+          dt.items.add(file);
+        }
+        file.files = dt.files;
+        var p = ele.parentNode;
+        attZone.removeChild(p)
+      }
+      div.appendChild(img)
+      div.appendChild(btn)
+      return div
+    }
+  }
+)('att_zone', 'file')
+        </script>
         </br>
-        <input type="text" name="postcode" value="postcode"id="postcode" placeholder="우편번호">
+        <input type="text" name="postcode" value="postcode" id="postcode" placeholder="우편번호">
         <input type="button" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
-        <input type="text" name="address" value="address"id="address" placeholder="주소"><br>
-        <input type="text" name="detailAddress" value="detailAddress"id="detailAddress" placeholder="상세주소">
+        <input type="text" name="address" value="address" id="address" placeholder="주소"><br>
+        <input type="text" name="detailAddress" value="detailAddress" id="detailAddress" placeholder="상세주소">
         <input type="text" name="extraAddress" value="extraAddress" id="extraAddress" placeholder="참고항목">
 
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         <script>
+
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
@@ -72,13 +180,10 @@
             }
         }).open();
     }
-
-        </script>
-
-        <br>
+        </script><br>
 
         <a>리뷰</a>
-        <input type="text" name="reviewComment" value="reviewComment">
+        <input type="text" name="reviewComment" id="summernote" value="reviewComment">
 
         <br>
         <a>한줄평</a>
@@ -99,33 +204,65 @@
         <a>계약형식</a>
         <input type="checkbox" name="payment" value="monthly">월세
         <input type="checkbox" name="payment" value="charter">전세
+        <input type="checkbox" name="payment" value="halfCharter">반전세
         <input type="checkbox" name="payment" value="dealing">매매
         <br>
 
         <a>교통편</a>
-        <input type="checkbox" name="traffic" value="subway">지하철
-        <input type="checkbox" name="traffic" value="bus">버스
+        <input type="checkbox" name="traffic" value="SUBWAY">지하철
+        <input type="checkbox" name="traffic" value="BUS">버스
         <br>
 
         <a>옵션</a>
-        <input type="checkbox" name="electronicDevice" value="bed">침대
-        <input type="checkbox" name="electronicDevice" value="airConditioner ">에어컨
-        <input type="checkbox" name="electronicDevice" value="washingMachine ">세탁기
-        <input type="checkbox" name="electronicDevice" value="refrigerator">냉장고<br>
+        <input type="checkbox" name="electronicDevice" value="BED">침대
+        <input type="checkbox" name="electronicDevice" value="AIRCONDITIONER ">에어컨
+        <input type="checkbox" name="electronicDevice" value="WASHINGMACHINE ">세탁기
+        <input type="checkbox" name="electronicDevice" value="REFRIGERATOR">냉장고<br>
 
         <a>건물 시설</a>
-        <input type="checkbox" name="welfare" value="parking">주차장
-        <input type="checkbox" name="welfare" value="deliveryBox">무인택배함
-        <input type="checkbox" name="welfare" value="cctv">cctv<br>
+        <input type="checkbox" name="welfare" value="PARKING">주차장
+        <input type="checkbox" name="welfare" value="DELIVERYBOX">무인택배함
+        <input type="checkbox" name="welfare" value="CCTV">cctv<br>
 
         <a>편의 시설</a>
-        <input type="checkbox" name="convenient" value="store">편의점
-        <input type="checkbox" name="convenient" value="hospital">병원
-        <input type="checkbox" name="convenient" value="coinLaunder">코인세탁소<br>
+        <input type="checkbox" name="convenient" value="STORE">편의점
+        <input type="checkbox" name="convenient" value="HOSPITAL">병원
+        <input type="checkbox" name="convenient" value="COINLAUNDER">코인세탁소<br>
 
+
+        <div>
+            <input type="text" name="tags" placeholder="태그를 입력하세요">
+        </div>
+
+
+        <script>
+        //summernote
+        $('#summernote').summernote({
+            lang: 'ko-KR',
+            placeholder: '자유롭게 작성해보세요!',
+            minHeight: 500,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                ['color', ['color']],
+                ['fontsize', ['fontsize']],
+                ['para', ['paragraph', 'height']],
+                ['insert', ['link', 'picture']]
+            ]
+        });
+
+        //tagify
+
+        var input = document.querySelector('input[name=tags]');
+        new Tagify(input)
+    </script>
+
+        <!--<a>계약 사진</a>
+        <input type="file" name="file" value="file" accept=".pdf">-->
 
         <input type="submit" name="submit button">
+
     </form>
+    </div>
 
 </div>
 </body>

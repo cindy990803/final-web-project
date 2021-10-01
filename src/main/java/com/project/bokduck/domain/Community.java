@@ -22,8 +22,6 @@ import java.util.List;
 @DiscriminatorValue("COMMUNITY")
 public class Community extends Post{
 
-
-
     @Enumerated(EnumType.STRING)
     private CommunityCategory communityCategory;
 

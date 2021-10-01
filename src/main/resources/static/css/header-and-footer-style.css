@@ -112,7 +112,7 @@
             left:20%;
             font-size:15px;
             font-weight: bold;
-            color:#26BAD4;
+            color:black;
         }
 
         #mypage-dropdown-content-icon-text-2-1 {
@@ -131,21 +131,26 @@
 
         .logo-a {
              color:#26BAD4;
+             font-weight : bold;
         }
 
         .logo-a:hover {
              color:#26BAD4;
+             font-weight : bold;
         }
 
         .menu-a {
             color:black;
+            font-weight : bold;
         }
 
         .menu-a:hover {
             color:#26BAD4;
             text-decoration: none;
+            font-weight : bold;
         }
 
         .menu-a:visited {
             text-decoration: none;
+            font-weight : bold;
         }

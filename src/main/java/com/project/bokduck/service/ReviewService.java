@@ -41,10 +41,6 @@ public class ReviewService {
     private final PlatformTransactionManager transactionManager;
 
 
-
-
-
-
     public void createLikeCount(){
         List<Review> reviewList = reviewRepository.findAll();
         for (Review r : reviewList){
@@ -94,6 +90,7 @@ public class ReviewService {
     public enum FlagLike {
         ERROR_AUTH, ERROR_INVALID, DUPLICATE, OK
     }
+<<<<<<< HEAD
 
 //    댓글
     public Review getReview(Long id) { return reviewRepository.findById(id).orElseThrow(); }
@@ -165,3 +162,7 @@ public class ReviewService {
 
 
 
+=======
+}
+
+>>>>>>> f3d124591d5b3eb9d9a6dc9681f4da2ac26cef2a

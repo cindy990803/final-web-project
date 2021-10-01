@@ -37,15 +37,11 @@ public class CommunityService {
     private final PostRepository postRepository;
 
 
-
-
-
-
     public List<Community> findAll() {
         return communityRepository.findAll();
     }
 
-    public Community findCommunityId(Long id){
+    public Community findCommunityId(Long id) {
         return communityRepository.findById(id).orElseThrow();
     }
 
@@ -54,13 +50,13 @@ public class CommunityService {
     public FlagLike addLike(Member member, Long id) {
         Community community = findCommunityId(id);
 
-        if (member == null){ //로그인이 안 되어 있을 때
+        if (member == null) { //로그인이 안 되어 있을 때
             return FlagLike.ERROR_AUTH;
         }
         member = memberRepository.findById(member.getId()).orElseThrow();
-        try{
+        try {
             community = findCommunityId(id);
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             return FlagLike.ERROR_INVALID; //게시물이 삭제 되었을때
         }
         if (member.getLikes().contains(findCommunityId(id))) { //이미 찜한 항태 일때
@@ -78,9 +74,8 @@ public class CommunityService {
     }
 
     public Page<Community> findCommunityCategoryPage(CommunityCategory tip, Pageable pageable) {
-        return communityRepository.findByCommunityCategory(tip,pageable);
+        return communityRepository.findByCommunityCategory(tip, pageable);
     }
-
 
     public enum FlagLike {
         ERROR_AUTH, ERROR_INVALID, ERROR_DUPLICATE, OK
