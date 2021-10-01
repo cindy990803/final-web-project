@@ -1,0 +1,140 @@
+.inner {
+    width: 1100px;
+    margin: 0 auto;
+    position: relative;
+}
+img {
+    display: block;
+    width: 600px;
+    height: 550px;
+
+}
+.read-upper {
+    margin-top: 80px;
+
+}
+.read-upper .inner {
+    height: 120px;
+    display: flex;
+    border-bottom: 1px solid #26BAD4;
+}
+.read-upper .inner .title-main {
+    font-family: Arial, sans-serif;
+}
+
+.read-upper .inner .title-main :nth-child(1) {
+    font-size: 50px;
+}
+.read-upper .inner .title-sub {
+    position: absolute;
+    display: flex;
+    top: 80px;
+    left: 900px;
+    text-align: center;
+
+}
+.read-upper .inner .title-sub img {
+    width: 24px;
+    height: 24px;
+    margin: 0 10px;
+
+}
+
+.images {
+    height: 600px;
+    position: relative;
+}
+.images .swiper-container {
+    width: calc(600px * 3 + 20px);
+    height: 560px;
+    position: absolute;
+    top: 40px;
+    left:50%;
+    margin-left: calc((600px * 3 + 20px)/-2);
+}
+.images .swiper-slide {
+    width: 600px;
+    height: 560px;
+    opacity: 1;
+    transition: opacity 1s;
+    position: relative;
+}
+.images .swiper-slide-active {
+    opacity: 1;
+}
+.information {
+    margin-top:20px;
+}
+.information .inner {
+    height:170px;
+    display: flex;
+    border-bottom: 2px solid #26BAD4;
+}
+.information .inner .inner__left{
+    width: 50%;
+    height: 100%;
+    padding: 10px;
+    align-items: center;
+}
+
+.information .inner .inner__right{
+    width: 50%;
+    height: 100%;
+    padding: 10px;
+    align-items: center;
+
+}
+
+.information .inner div span{
+    font-size: 20px;
+    font-family: Arial, sans-serif;;
+    color: #26BAD4;
+    line-height: 2;
+    font-weight: bold;
+}
+.content .inner {
+    height:800px;
+}
+
+.content .inner span {
+    font-size: 20px;
+    font-family: Arial, sans-serif;;
+    color: #26BAD4;
+    line-height: 2;
+    font-weight: bold;
+}
+
+.content .inner .inner__top {
+    padding: 10px;
+    height: 600px;
+}
+.content .inner .inner__bottom {
+    display: flex;
+}
+.content .inner .inner__bottom :nth-child(2){
+    margin-left: 10px;
+    width: 700px;
+    padding-top: 8px
+}
+
+.content .inner .inner__bottom review-star div{
+    display: flex;
+}
+
+.content img{
+    width: 20px;
+    height: 20px;
+}
+.review-map .inner {
+    height: 700px;
+}
+
+.review-map .inner span {
+    font-size: 20px;
+    font-family: Arial, sans-serif;;
+    color: #26BAD4;
+    line-height: 2;
+    font-weight: bold;
+}
+
+

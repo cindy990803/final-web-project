@@ -5,177 +5,290 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='Login'">
 <head>
-<!--    <script>-->
-<!--        $(document).ready(function(){-->
-<!--            getCommentList();-->
-<!--        });-->
-<!--        function getCommentList() {-->
-<!--            var replyurl = "$"-->
+    <!--    <script>-->
+    <!--        $(document).ready(function(){-->
+    <!--            getCommentList();-->
+    <!--        });-->
+    <!--        function getCommentList() {-->
+    <!--            var replyurl = "$"-->
 
-<!--            $.ajax({-->
-<!--                type: "POST",-->
-<!--                dataType: 'json',-->
-<!--                url: "/review/read/comment",-->
-<!--                success: function (res) {-->
-<!--                    var comments = "";-->
-<!--                    if(result.length < 1) {-->
-<!--                        comments = "등록된 댓글이 없습니다."-->
-<!--                    } else {-->
-<!--                        $(result).each(function() {-->
-<!--                            comments +='<br/>';-->
-<!--                            comments +='<strong>';-->
-<!--                            comments +='작성자 : ' + this.comment_writer;-->
-<!--                            comments +='</strong>&nbsp;&nbsp;&nbsp;';-->
-<!--                            comments +='작성 날짜 :' + this.reply_regdate;-->
-<!--                            comments +='<br/> <p>';-->
-<!--                            comments +='<br/>';-->
-<!--                            comments +='<br/>';-->
-<!--                            comments +='<br/>';-->
-<!--                            comments +='<br/>';-->
-<!--                        })-->
+    <!--            $.ajax({-->
+    <!--                type: "POST",-->
+    <!--                dataType: 'json',-->
+    <!--                url: "/review/read/comment",-->
+    <!--                success: function (res) {-->
+    <!--                    var comments = "";-->
+    <!--                    if(result.length < 1) {-->
+    <!--                        comments = "등록된 댓글이 없습니다."-->
+    <!--                    } else {-->
+    <!--                        $(result).each(function() {-->
+    <!--                            comments +='<br/>';-->
+    <!--                            comments +='<strong>';-->
+    <!--                            comments +='작성자 : ' + this.comment_writer;-->
+    <!--                            comments +='</strong>&nbsp;&nbsp;&nbsp;';-->
+    <!--                            comments +='작성 날짜 :' + this.reply_regdate;-->
+    <!--                            comments +='<br/> <p>';-->
+    <!--                            comments +='<br/>';-->
+    <!--                            comments +='<br/>';-->
+    <!--                            comments +='<br/>';-->
+    <!--                            comments +='<br/>';-->
+    <!--                        })-->
 
-<!--                    }-->
-<!--                }-->
-<!--            });-->
-<!--        }-->
+    <!--                    }-->
+    <!--                }-->
+    <!--            });-->
+    <!--        }-->
 
 
-<!--    </script>-->
-<!--    <script>-->
-<!--        $('#addComment').click(function () {-->
-<!--            let saveContent = $('#saveContent').val();-->
+    <!--    </script>-->
+    <!--    <script>-->
+    <!--        $('#addComment').click(function () {-->
+    <!--            let saveContent = $('#saveContent').val();-->
 
-<!--            $.ajax({-->
-<!--                type: "POST",-->
-<!--                dataType: 'json',-->
-<!--                url: "/review/read/comment",-->
-<!--                data: {-->
-<!--                    "modifyText": Content-->
-<!--                },-->
-<!--                success: function (res) {-->
-<!--                    alert(res.message);-->
-<!--                    showCommentList();-->
-<!--                }-->
-<!--            });-->
-<!--        });-->
-<!--    </script>-->
-<!--    <script>-->
-<!--        $('#modifyComment').click(function () {-->
-<!--            let modifyContent = $('#editContent').val();-->
+    <!--            $.ajax({-->
+    <!--                type: "POST",-->
+    <!--                dataType: 'json',-->
+    <!--                url: "/review/read/comment",-->
+    <!--                data: {-->
+    <!--                    "modifyText": Content-->
+    <!--                },-->
+    <!--                success: function (res) {-->
+    <!--                    alert(res.message);-->
+    <!--                    showCommentList();-->
+    <!--                }-->
+    <!--            });-->
+    <!--        });-->
+    <!--    </script>-->
+    <!--    <script>-->
+    <!--        $('#modifyComment').click(function () {-->
+    <!--            let modifyContent = $('#editContent').val();-->
 
-<!--            $.ajax({-->
-<!--                type: "POST",-->
-<!--                dataType: 'json',-->
-<!--                url: "modifyComment",-->
-<!--                data: {-->
-<!--                    "modifyText": modifyContent-->
-<!--                },-->
-<!--                success: function (res) {-->
-<!--                    alert(res.message);-->
-<!--                    showCommentList();-->
-<!--                }-->
-<!--            });-->
-<!--        });-->
-<!--    </script>-->
-<!--    <script>-->
-<!--        $('#deleteComment').click(function () {-->
+    <!--            $.ajax({-->
+    <!--                type: "POST",-->
+    <!--                dataType: 'json',-->
+    <!--                url: "modifyComment",-->
+    <!--                data: {-->
+    <!--                    "modifyText": modifyContent-->
+    <!--                },-->
+    <!--                success: function (res) {-->
+    <!--                    alert(res.message);-->
+    <!--                    showCommentList();-->
+    <!--                }-->
+    <!--            });-->
+    <!--        });-->
+    <!--    </script>-->
+    <!--    <script>-->
+    <!--        $('#deleteComment').click(function () {-->
 
-<!--            $.ajax({-->
-<!--                type: "POST",-->
-<!--                dataType: 'json',-->
-<!--                url: "/review/read/comment/delete",-->
-<!--                data: { },-->
-<!--                success: function (res) {-->
-<!--                    alert(res.message);-->
-<!--                    showCommentList();-->
-<!--                }-->
-<!--            });-->
-<!--        });-->
-<!--    </script>-->
+    <!--            $.ajax({-->
+    <!--                type: "POST",-->
+    <!--                dataType: 'json',-->
+    <!--                url: "/review/read/comment/delete",-->
+    <!--                data: { },-->
+    <!--                success: function (res) {-->
+    <!--                    alert(res.message);-->
+    <!--                    showCommentList();-->
+    <!--                }-->
+    <!--            });-->
+    <!--        });-->
+    <!--    </script>-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="/css/review-read.css">
+    <!-- SWIPER-->
+    <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+    <script defer src="/js/member/read.js"></script>
+    <!-- 지도   -->
+    <script type="text/javascript"
+            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=176ocp7ltk&submodules=geocoder"></script>
+
 </head>
 
 <body>
-    <div layout:fragment="content" th:object="${review}">
+<div layout:fragment="content" th:object="${review}">
 
 
-      <section class="read-upper">
-<!--  address 정해지면 가져오기  -->
+    <section class="read-upper">
+        <!--  address 정해지면 가져오기  -->
+        <div class="inner">
             <div class="title-main">
                 <span th:text="*{postName}"></span>
-                <span th:text="*{regdate}"></span>
-                <span th:text="*{writer.nickname}"></span>
+                <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"></span>
+                <p th:text="*{writer.nickname}"></p>
             </div>
             <div class="title-sub">
-
+                <img src="/images/like.svg" alt="like">
+                <img src="/images/alarm.png" alt="like">
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="image">
-            <div th:each="img: *{uploadImage}">
-                <img th:src="${img.imagePath}" alt="image">
-            </div>
-        </section>
-
-        <section class="information">
-            <div class="container">
-                <div class="roomsize">
-                    <span>크기 | </span>
-                </div>
-                <div class="structure">
-                    <span>집구조 | </span>
-                </div>
-                <div class="payment">
-                    <span>계약형식 | </span>
-                </div>
-                <div class="traffic">
-                    <span>교통 | </span>
-                </div>
-                <div class="convenient">
-                    <span>편의시설 | </span>
-                </div>
-                <div class=" welfare">
-                    <span>편의시설 | </span>
-                </div>
-                <div class="convenient">
-                    <span>편의시설 | </span>
+    <div class="images">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div th:each="img: *{uploadImage}" class="swiper-slide">
+                    <img th:src="${img.imagePath}" alt="image">
                 </div>
             </div>
-        </section>
-        <section class="content">
-            <div th:text="*{postContent}"></div>
-        </section>
+        </div>
 
-        <section class="review-map">
-            <div id="map" style="width:400px;height:400px;"></div>
-        </section>
-
-<!--        <section class="comment">-->
-<!--            <div class="wirteComment" th:object="${currentMember}>-->
-<!--               <p>-->
-<!--                    <span th:text="*{nickname}" >댓글 작성자</span>-->
-<!--               </p>-->
-<!--                <p>-->
-<!--                    <textarea rows="5" cols="50" name="content" id="saveContent"></textarea>-->
-<!--                </p>-->
-<!--                <p>-->
-<!--                    <button type="submit" id="saveComment">댓글 작성</button>-->
-<!--                </p>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; 댓글 목록 &ndash;&gt;-->
-<!--            <div id="commentList"></div>-->
-<!--        </section>-->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
 
     </div>
 
-<!--    <script>-->
-<!--        var mapOptions = {-->
-<!--            center: new naver.maps.LatLng(37.3595704, 127.105399),-->
-<!--            zoom: 10-->
-<!--        };-->
 
-<!--        var map = new naver.maps.Map('map', mapOptions);-->
-<!--    </script>-->
+    <section class="information">
+        <div class="inner">
+            <div class="inner__left">
+                <div class="roomsize">
+                    <span>크기 | </span>
+                    <span th:unless="*{reviewCategory.roomSize.information.equals(null)}" th:text="*{reviewCategory.roomSize.information}"></span>
+                </div>
+                <div class="structure">
+                    <span>집구조 | </span>
+                    <span th:unless="*{reviewCategory.structure.information.equals(null)}" th:text="*{reviewCategory.structure.information}"></span>
+                </div>
+                <div class="payment">
+                    <span>계약형식 | </span>
+                    <span th:unless="*{reviewCategory.payment.information.equals(null)}" th:text="*{reviewCategory.payment.information}"></span>
+                </div>
+                <div class="traffic">
+                    <span>교통 | </span>
+                    <span th:unless="*{reviewCategory.traffic.information.equals(null)}" th:text="*{reviewCategory.traffic.information}"></span>
+                </div>
+            </div>
 
+            <div class="inner__right">
+                <div class="convenient">
+                    <span>편의시설 | </span>
+                    <span th:unless="*{reviewCategory.convenient.information.equals(null)}" th:text="*{reviewCategory.convenient.information}"></span>
+                </div>
+                <div class=" welfare">
+                    <span>기타 | </span>
+                    <span th:unless="*{reviewCategory.welfare.information.equals(null)}" th:text="*{reviewCategory.welfare.information}"></span>
+                </div>
+                <div class="electronicDevices">
+                    <span>옵션 | </span>
+                    <span th:unless="*{reviewCategory.electronicDevice.information.equals(null)}" th:text="*{reviewCategory.electronicDevice.information}"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+
+        <div class="inner">
+            <div class="inner__top">
+                <span>리뷰 |</span>
+                <div th:text="*{postContent}"></div>
+            </div>
+
+            <div class="inner__bottom">
+                <span>한줄평 |</span>
+                <div class="review-comment" th:text="*{comment}"></div>
+                <div class="review-star">
+                    <div th:if="*{star} == 0">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                    </div>
+                    <div th:if="*{star} == 1">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                    </div>
+                    <div th:if="*{star} == 2">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                    </div>
+                    <div th:if="*{star} == 3">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                    </div>
+                    <div th:if="*{star} == 4">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                    </div>
+                    <div th:if="*{star} == 5">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="review-map">
+        <div class="inner">
+            <span>위치 |</span>
+            <div id="map" style="width:1000px;height:650px; margin: 0 auto;"></div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            let reviewAddress = '[[${review.address}]]';
+
+
+            // 네이버 지오코드
+            naver.maps.Service.geocode({
+                query: reviewAddress // String 타입의 주소값
+            }, function (status, response) {
+                if (status !== naver.maps.Service.Status.OK) {
+                    // 실행이 되지 않을 경우
+                    return alert('Something wrong!');
+                }
+                console.log("Status : " + naver.maps.Service.Status)
+                // 제대로 된 query가 들어가 결과가 나올 경우
+                var result = response.v2, // 검색 결과의 컨테이너
+                    items = result.addresses; // 검색 결과의 배열
+                console.log(items[0].x + ', ' + items[0].y + ', ' + typeof items[0].x + ', ' + typeof items[0].y);
+                console.log("result : " + result);
+                console.log("items : " + items);
+
+                //지도에 마커찍기
+                let x = parseFloat(items[0].x); // 경도
+                let y = parseFloat(items[0].y); // 위도
+
+
+                // 지도 띄우기
+                var map = new naver.maps.Map('map', {
+                    center: new naver.maps.LatLng(y, x),
+                    zoom: 19
+                });
+
+                // 마커 찍기
+                var marker = new naver.maps.Marker({
+                    position: new naver.maps.LatLng(y, x),
+                    map: map
+                });
+
+            });
+
+        })
+
+    </script>
+
+</div>
 </body>
 </html>

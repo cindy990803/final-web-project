@@ -98,18 +98,18 @@ public class MainController {
 
                 Long[] array = {1l,2l};
 
-                // 임시 이미지 만들어주기
-                List<Image> imageList = new ArrayList<>();
-                String[] imgUrlList = {"https://postfiles.pstatic.net/MjAyMDEyMTNfMjky/MDAxNjA3ODYwOTk5Mzc0.aCwwUIuc05kh6ceHxTPfmNf6lKYvr6faPrQChc0XUOgg.uw9cTnUBkJz9RVrKQzB7nXWU8DOTJjciJmc7eXwMwjYg.JPEG.yujoo215/1607860353211.jpg?type=w773",
-                        "https://postfiles.pstatic.net/MjAyMDEyMTNfNDUg/MDAxNjA3ODYwOTEzMDE2.Sn84rrRG4762s_wId0qZPpwOnEwBkVcAh5TKuELUyukg.-xDyC8Aeji3gjaK4lhtn_zTXW5n6YuXogQAR0-2t69cg.JPEG.yujoo215/1607860394134.jpg?type=w773",
-                        "https://postfiles.pstatic.net/MjAyMDEyMTNfMjU0/MDAxNjA3ODYwOTM4NTI0.ThtknKgJrsQQNcWoiukB6CnirvlO2kxr2ZwrYzSpcjkg.ox-6mVkUI9Pm7YmgWeECci4ZOqOQ6TaSe-0d5dy9ddAg.JPEG.yujoo215/1607860392362.jpg?type=w773"};
-
-                for(int i = 0; i < imgUrlList.length; ++i) {
-                    Image image = new Image();
-                    image.setImagePath(imgUrlList[i]);
-                    imageList.add(image);
-                }
-                imageRepository.saveAll(imageList);
+//                // 임시 이미지 만들어주기
+//                List<Image> imageList = new ArrayList<>();
+//                String[] imgUrlList = {"https://postfiles.pstatic.net/MjAyMDEyMTNfMjky/MDAxNjA3ODYwOTk5Mzc0.aCwwUIuc05kh6ceHxTPfmNf6lKYvr6faPrQChc0XUOgg.uw9cTnUBkJz9RVrKQzB7nXWU8DOTJjciJmc7eXwMwjYg.JPEG.yujoo215/1607860353211.jpg?type=w773",
+//                        "https://postfiles.pstatic.net/MjAyMDEyMTNfNDUg/MDAxNjA3ODYwOTEzMDE2.Sn84rrRG4762s_wId0qZPpwOnEwBkVcAh5TKuELUyukg.-xDyC8Aeji3gjaK4lhtn_zTXW5n6YuXogQAR0-2t69cg.JPEG.yujoo215/1607860394134.jpg?type=w773",
+//                        "https://postfiles.pstatic.net/MjAyMDEyMTNfMjU0/MDAxNjA3ODYwOTM4NTI0.ThtknKgJrsQQNcWoiukB6CnirvlO2kxr2ZwrYzSpcjkg.ox-6mVkUI9Pm7YmgWeECci4ZOqOQ6TaSe-0d5dy9ddAg.JPEG.yujoo215/1607860392362.jpg?type=w773"};
+//
+//                for(int i = 0; i < imgUrlList.length; ++i) {
+//                    Image image = new Image();
+//                    image.setImagePath(imgUrlList[i]);
+//                    imageList.add(image);
+//                }
+//                imageRepository.saveAll(imageList);
 
 
                 // 태그 만들어두기
@@ -152,18 +152,17 @@ public class MainController {
                             .regdate(LocalDateTime.now())
                             .hit((int) (Math.random() * 10))
                             .star((int) (Math.random() * 5) + 1)
-                            .likeCount((int) (Math.random() * 100))
-                            .address("서울시 마포구 연희동 1-1")
+                            .address("서울특별시 마포구 월드컵로34길 14")
                             .detailAddress("XX빌라")
                             .extraAddress("연희동")
                             .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
 //                            .reviewCategory(category)
                             .build();
 //이미지
-                    for(Image image  : imageList) {
-                        image.setImageName(review);
-                    }
-                    review.setUploadImage(imageList);
+//                    for(Image image  : imageList) {
+//                        image.setImageName(review);
+//                    }
+//                    review.setUploadImage(imageList);
 
                     review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
                     reviewList.add(review);
@@ -265,12 +264,6 @@ public class MainController {
     }
 
     @RequestMapping("/")
-<<<<<<< HEAD
-    public String index(Model model, @CurrentMember Member member) {
-        List<Review> reviewList = reviewService.getReviewList();
-        model.addAttribute("reviewList", reviewList);
-        log.info("reviewList : {}", reviewList);
-=======
     public String index(Model model) {
 
         //리뷰 인기게시글 불러오기
@@ -289,7 +282,6 @@ public class MainController {
         Page<Community> communityTipList = mainpageService.getCommunityTipList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id")));
         model.addAttribute("communityTipList", communityTipList);
 
->>>>>>> f3d124591d5b3eb9d9a6dc9681f4da2ac26cef2a
         return "index";
     }
 
@@ -358,7 +350,7 @@ public class MainController {
             message = "성공.....";
         }
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", message);
+//        jsonObject.put("message", message);
         return jsonObject.toString();
     }
 

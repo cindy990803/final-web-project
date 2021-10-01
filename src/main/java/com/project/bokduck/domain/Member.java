@@ -75,4 +75,9 @@ public class Member {
         likes.add(community);
     }
 
+    public String getEmail() {
+        return this.username;
+    }
+
+
 }
