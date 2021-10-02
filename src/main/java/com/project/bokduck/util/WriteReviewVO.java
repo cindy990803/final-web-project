@@ -41,8 +41,6 @@ public class WriteReviewVO  {
 
     private String payment;
 
-    private MultipartFile file;
-
     private String Tags;
 
 
