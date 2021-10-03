@@ -187,13 +187,15 @@ function check() {
             </script>
 
             </br>
-            <input type="text" name="postcode" id="postcode" placeholder="우편번호" disabled>
+
+            <input type="text" name="postCode" id="postcode" value="" placeholder="우편번호" readonly>
             <input type="button" onclick="execDaumPostcode()" id="addressBtn" value="우편번호 찾기"><br>
-            <input type="text" name="address" id="address" placeholder="주소" disabled><br>
-            <input type="text" name="detailAddress" id="detailAddress" placeholder="상세주소">
-            <input type="text" name="extraAddress" id="extraAddress" placeholder="참고항목" disabled>
+            <input type="text" name="address" id="address" placeholder="주소" readonly><br>
+            <input type="text" name="detailAddress" value="" id="detailAddress" placeholder="상세주소">
+            <input type="text" name="extraAddress" value="" id="extraAddress" placeholder="참고항목" readonly>
 
             <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
             <script>
     function execDaumPostcode() {
         new daum.Postcode({
@@ -232,12 +234,15 @@ function check() {
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById("address").value = addr;
                 document.getElementById("detailAddress").focus();
+
+
+                document.getElementById("address").setAttribute('value',addr);
             }
+
         }).open();
+
+
     }
-
-
-
             </script>
             <br>
 
@@ -252,59 +257,56 @@ function check() {
                 <input type="text" name="shortComment">
                 <br>
 
-                <a>방형태</a>
-                <input type="radio" name="roomSize" value="oneRoom">빌라
-                <input type="radio" name="roomSize" value="twoRoom">오피스텔
-                <input type="radio" name="roomSize" value="threeRoom">아파트<br>
+                <a>방형태 : </a>
+                <input type="radio" name="roomSize" value="oneRoom">원룸
+                <input type="radio" name="roomSize" value="twoRoom">투룸
+                <input type="radio" name="roomSize" value="threeRoom">쓰리룸<br>
 
-                <a>주거형태</a>
+                <a>주거형태 : </a>
                 <input type="radio" name="structure" value="villa">빌라
                 <input type="radio" name="structure" value="office">오피스텔
                 <input type="radio" name="structure" value="apart">아파트<br>
 
-                <a>계약형식</a>
+                <a>계약형식 : </a>
                 <input type="radio" name="payment" value="monthly">월세
                 <input type="radio" name="payment" value="charter">전세
                 <input type="radio" name="payment" value="halfCharter">반전세
                 <input type="radio" name="payment" value="dealing">매매
                 <br>
 
-                <a>교통편</a>
+                <a>교통편 : </a>
                 <input type="checkbox" name="traffic" value="SUBWAY">지하철
                 <input type="checkbox" name="traffic" value="BUS">버스
                 <br>
 
-                <a>옵션</a>
+                <a>옵션 : </a>
                 <input type="checkbox" name="electronicDevice" value="BED">침대
                 <input type="checkbox" name="electronicDevice" value="AIRCONDITIONER ">에어컨
                 <input type="checkbox" name="electronicDevice" value="WASHINGMACHINE ">세탁기
                 <input type="checkbox" name="electronicDevice" value="REFRIGERATOR">냉장고<br>
 
-                <a>건물 시설</a>
+                <a>건물 시설 : </a>
                 <input type="checkbox" name="welfare" value="PARKING">주차장
                 <input type="checkbox" name="welfare" value="DELIVERYBOX">무인택배함
                 <input type="checkbox" name="welfare" value="CCTV">cctv<br>
 
-                <a>편의 시설</a>
+                <a>편의 시설 : </a>
                 <input type="checkbox" name="convenient" value="STORE">편의점
                 <input type="checkbox" name="convenient" value="HOSPITAL">병원
                 <input type="checkbox" name="convenient" value="COINLAUNDER">코인세탁소<br>
-
 
             </tr>
 
             <input type="text" name="tags" placeholder="태그를 입력하세요">
 
             <div id='pdfDiv'>
-                <input type='file' id='pdf' name="pdf" multiple='multiple' accept="application/pdf"/>
+                <input type='file' id='pdf' name="pdf" multiple='multiple' accept="application/pdf,image/jpeg, image/png">
             </div>
 
             <script>
                 var input = document.querySelector('input[name=tags]');
                 new Tagify(input)
             </script>
-
-
 
             <input type="submit" name="submit button" onclick="return check()">
 

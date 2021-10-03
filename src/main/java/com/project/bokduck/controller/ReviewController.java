@@ -60,16 +60,11 @@ public class ReviewController {
     @Autowired
     FileRepository fileRepository;
 
-
-
     /*@RequestMapping(value = {"/upload"}, method = {RequestMethod.POST}, consumes = MediaType.MULTIPART_FOR_DATA_VALUE)*/
 
 
     @GetMapping("/writeReview")
-    public String writeReview(Model model,@CurrentMember Member member) {
-        if(member == null){
-            return "member/login";
-        }
+    public String writeReview(Model model, @CurrentMember Member member) {
         model.addAttribute("WriteReviewVO", new WriteReviewVO());
         return "post/review/writeReview";
     }
@@ -86,23 +81,30 @@ public class ReviewController {
 
                              File file, Image image, Model model) throws IOException {
 
+if(imageFile!=null) {
+    String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+    image.setImagePath(imageName);
+    image = imageRepository.save(image);
+    String imageUploadDest = "image/" + image.getId();
+    fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile);
 
-        String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
-        image.setImagePath(imageName);
-        image = imageRepository.save(image);
-        String imageUploadDest = "image/" + image.getId();
-        fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile);
+    model.addAttribute("image", image);
+}else {
+    image = imageRepository.save(null);
+    model.addAttribute("image",image);
+}
+if (pdfFile!=null) {
+    String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
+    file.setFilePath(pdfName);
+    file = fileRepository.save(file);
+    String pdfUploadDest = "file/" + file.getId();
+    fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
 
-        model.addAttribute("image", image);
-
-        String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
-        file.setFilePath(pdfName);
-        file = fileRepository.save(file);
-        String pdfUploadDest = "file/" + file.getId();
-        fileUpLoadUtil.saveFile(pdfUploadDest , pdfName, pdfFile);
-
-        model.addAttribute("file", file);
-
+    model.addAttribute("file", file);
+}else {
+    file = fileRepository.save(null);
+    model.addAttribute("file",file);
+}
         switch (writeReviewVO.getRoomSize()) {
             case "oneRoom":
                 reviewCategory.setRoomSize(RoomSize.ONEROOM);
@@ -157,9 +159,30 @@ public class ReviewController {
             }
         }
 
-        reviewCategory.setTraffic(writeReviewVO.getTraffic());
-        reviewCategory.setWelfare(writeReviewVO.getWelfare());
-        reviewCategory.setConvenient(writeReviewVO.getConvenient());
+        if (writeReviewVO.getTraffic() == null) {
+            reviewCategory.setTraffic("");
+        } else {
+            reviewCategory.setTraffic(writeReviewVO.getTraffic());
+        }
+        if (writeReviewVO.getWelfare() == null) {
+            reviewCategory.setWelfare("");
+        } else {
+            reviewCategory.setWelfare(writeReviewVO.getWelfare());
+        }
+        if (writeReviewVO.getConvenient() == null) {
+            reviewCategory.setConvenient("");
+        } else {
+            reviewCategory.setConvenient(writeReviewVO.getConvenient());
+        }
+        if (writeReviewVO.getElectronicDevice()==null){
+            reviewCategory.setConvenient("");
+        }else {
+            reviewCategory.setElectronicDevice(writeReviewVO.getElectronicDevice());
+        }
+
+
+
+
 
         Review review = Review.builder()
                 .writer(member)
@@ -168,7 +191,7 @@ public class ReviewController {
                 .detailAddress(writeReviewVO.getDetailAddress())
                 .postCode(writeReviewVO.getPostCode())
                 .extraAddress(writeReviewVO.getExtraAddress())
-                .comment(writeReviewVO.getConvenient())
+                .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
                 .reviewStatus(ReviewStatus.WAIT)
                 .star(0)
@@ -178,15 +201,9 @@ public class ReviewController {
                 .build();
 
         reviewCategoryRepository.save(reviewCategory);
-
         reviewRepository.save(review);
 
-        for (Tag t : tagList) {
-            if (t.getTagToPost() == null) {
-                t.setTagToPost(new ArrayList<Post>());
-            }
-            t.getTagToPost().add(review);
-        }
+
 
 
         return "index";

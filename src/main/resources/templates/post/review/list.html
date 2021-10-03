@@ -12,6 +12,7 @@
         .photo_image{
             filter: invert(69%) sepia(25%) saturate(146%) hue-rotate(159deg) brightness(95%) contrast(92%);
         }
+
     </style>
 
     <script th:inline="javascript">
@@ -40,6 +41,7 @@
             });
         });
 
+
     </script>
 
 </head>
@@ -65,11 +67,11 @@
                 <!-- 옵션 -->
                 <div id="check_option" class="form-group form-check form-check-inline">
                     <details>
-                        <summary> 검색 옵션 설정하기 </summary>
+                        <summary> 검색 옵션 설정하기</summary>
 
                         <p id="search_address">
                             <span> 지역 : </span>
-                            <input type="text" class="form-control" id = "address"
+                            <input type="text" class="form-control" id="address"
                                    name="address" placeholder="동을 입력하세요. 예) 연희동"
                                    th:value="${param.address == null} ? '' : ${param.address}" value="">
                         </p>
@@ -127,40 +129,45 @@
 
                         <p id="check_electronicDevices">
                             <span> 가구 옵션 : </span>
-                            <input class="form-check-input" type="checkbox" id="e1" name="electronicDevice" value="BED" />
+                            <input class="form-check-input" type="checkbox" id="e1" name="electronicDevice"
+                                   value="BED"/>
                             <label class="form-check-label" for="e1"> 침대 </label>
 
-                            <input class="form-check-input" type="checkbox" id="e2" name="electronicDevice" value="AIRCONDITIONER" />
+                            <input class="form-check-input" type="checkbox" id="e2" name="electronicDevice"
+                                   value="AIRCONDITIONER"/>
                             <label class="form-check-label" for="e2"> 에어컨 </label>
 
-                            <input class="form-check-input" type="checkbox" id="e3" name="electronicDevice" value="WASHINGMACHINE" />
+                            <input class="form-check-input" type="checkbox" id="e3" name="electronicDevice"
+                                   value="WASHINGMACHINE"/>
                             <label class="form-check-label" for="e3"> 세탁기 </label>
 
-                            <input class="form-check-input" type="checkbox" id="e4" name="electronicDevice" value="REFRIGERATOR" />
+                            <input class="form-check-input" type="checkbox" id="e4" name="electronicDevice"
+                                   value="REFRIGERATOR"/>
                             <label class="form-check-label" for="e4"> 냉장고 </label>
                         </p>
 
                         <p id="check_welfare">
                             <span> 건물 시설 : </span>
-                            <input class="form-check-input" type="checkbox" id="w1" name="welfare" value="PARKING" />
+                            <input class="form-check-input" type="checkbox" id="w1" name="welfare" value="PARKING"/>
                             <label class="form-check-label" for="w1"> 주차장 </label>
 
-                            <input class="form-check-input" type="checkbox" id="w2" name="welfare" value="DELIVERYBOX" />
+                            <input class="form-check-input" type="checkbox" id="w2" name="welfare" value="DELIVERYBOX"/>
                             <label class="form-check-label" for="w2"> 무인택배함 </label>
 
-                            <input class="form-check-input" type="checkbox" id="w3" name="welfare" value="CCTV" />
+                            <input class="form-check-input" type="checkbox" id="w3" name="welfare" value="CCTV"/>
                             <label class="form-check-label" for="w3"> CCTV </label>
                         </p>
 
                         <p id="check_convenient">
                             <span> 편의 시설 : </span>
-                            <input class="form-check-input" type="checkbox" id="c1" name="convenient" value="STORE" />
+                            <input class="form-check-input" type="checkbox" id="c1" name="convenient" value="STORE"/>
                             <label class="form-check-label" for="c1"> 편의점 </label>
 
-                            <input class="form-check-input" type="checkbox" id="c2" name="convenient" value="HOSPITAL" />
+                            <input class="form-check-input" type="checkbox" id="c2" name="convenient" value="HOSPITAL"/>
                             <label class="form-check-label" for="c2"> 병원 </label>
 
-                            <input class="form-check-input" type="checkbox" id="c3" name="convenient" value="COINLAUNDRY" />
+                            <input class="form-check-input" type="checkbox" id="c3" name="convenient"
+                                   value="COINLAUNDRY"/>
                             <label class="form-check-label" for="c3"> 코인빨래방 </label>
                         </p>
                     </details>
@@ -169,12 +176,12 @@
                 <!-- 정렬 -->
                 <div class="form-group d-flex justify-content-end" id="line_option" style="float: right">
 
-                    <input type="checkbox" id="photoReview" name="photoReview" value="true" />
+                    <input type="checkbox" id="photoReview" name="photoReview" value="true"/>
                     <label for="photoReview"> 포토리뷰만 보기 </label>
 
                     <select id="lineUp" name="lineUp" class="form-control">
-                        <option name="sort" value="new"}>최신순</option>
-                        <option name="sort" value="star"}>별점순</option>
+                        <option name="sort" value="new" }>최신순</option>
+                        <option name="sort" value="star" }>별점순</option>
                         <option name="sort" value="like">좋아요순</option>
                     </select>
                 </div>
@@ -186,7 +193,7 @@
 
 
                 <!-- 리뷰 리스트 -->
-                <div class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"> </div>
+                <div class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"></div>
 
                 <div th:if="${reviewList.isEmpty()}" style="text-align: center;">
                     <h2>검색결과가 없습니다.</h2>
@@ -195,57 +202,61 @@
                 <div class="table" id="review_table" th:each="review : ${reviewList}" th:object="${review}">
 
 
-                    <table class="table table-borderless wd-100" >
+                    <table class="table table-borderless wd-100">
                         <tr>
-                            <td colspan="5" th:text="*{address} + '  '+ *{detailAddress}" > 주소 </td>
+                            <td colspan="5" th:text="*{address} + '  '+ *{detailAddress}"> 주소</td>
                         </tr>
 
                         <tr>
 
                             <td rowspan="4" style="width: 400px; height: 200px">
-                                <div th:if="*{#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
+                                <div th:if="*{#lists.isEmpty(uploadImage)}"
+                                     style="display: table; width: 400px; height: 200px">
                                     <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
                                        style="text-decoration-line: none; color:black;">
-                                    <div style="display: table-cell; text-align: center; vertical-align: middle; ">
-                                        <img th:src="@{/images/no_photo.svg}" style="width: 350px; height: 200px;"
-                                             class="photo_image"/>
-                                    </div>
+                                        <div style="display: table-cell; text-align: center; vertical-align: middle; ">
+                                            <img th:src="@{/images/no_photo.svg}" style="width: 350px; height: 200px;"
+                                                 class="photo_image"/>
+                                        </div>
                                     </a>
                                 </div>
-                                <div th:unless="*{#lists.isEmpty(uploadImage)}" style="display: table; width: 400px; height: 200px">
+                                <div th:unless="*{#lists.isEmpty(uploadImage)}"
+                                     style="display: table; width: 400px; height: 200px">
                                     <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
                                        style="text-decoration-line: none; color:black;">
-                                    <div style="display: table-cell; text-align: center; vertical-align: middle; ">
-                                        <img th:src="@{*{uploadImage[0].imagePath}}" style="width: 350px; height: 200px;"
-                                             class="photo_image"/>
-                                    </div>
+                                        <div style="display: table-cell; text-align: center; vertical-align: middle; ">
+                                            <img th:src="@{*{uploadImage[0].imagePath}}"
+                                                 style="width: 350px; height: 200px;"
+                                                 class="photo_image"/>
+                                        </div>
                                     </a>
                                 </div>
                             </td>
 
 
-
                             <td colspan="2">
-                                    <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
-                                       style="text-decoration-line: none; color:black;">
+                                <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                   style="text-decoration-line: none; color:black;">
                                     <span th:text="*{postName} + '&nbsp;&nbsp;'" style="font-size: 23px;"/>
-                                    <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}" style="font-size: 15px; color: grey"/>
-                                    </a>
-                                </td>
+                                    <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"
+                                          style="font-size: 15px; color: grey"/>
+                                </a>
+                            </td>
 
 
                             <td rowspan="4">
                                 <div style="text-align: center">
-                                    <p th:text="*{hit}" style="font-size : 40px; " />
+                                    <p th:text="*{hit}" style="font-size : 40px; "/>
                                     조회
                                 </div>
                             </td>
-                            <td rowspan="4" >
+                            <td rowspan="4">
                                 <div style="text-align: center" id="like_div">
-                                    <button type="button" class="like" style="border:0px; outline:0px;background-color:transparent;"
-                                            th:id="like" th:value="*{id}" >
+                                    <button type="button" class="like"
+                                            style="border:0px; outline:0px;background-color:transparent;"
+                                            th:id="like" th:value="*{id}">
                                         <img th:src="@{ ${member?.likes?.contains(review)} ? '/images/like_red.svg' : '/images/like.svg'}"
-                                             th:id="*{id}" width="50px" height="75px" ></button>
+                                             th:id="*{id}" width="50px" height="75px"></button>
                                     <p th:text="'좋아요 '+ *{likers.size}" th:id="likeNum + *{id}"/>
 
                                 </div>
@@ -304,7 +315,7 @@
                                 <span th:if="*{tags != null}" th:each="t:*{tags}">
                                     <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
                                 </span>
-                                <span th:if="*{tags == null}" >
+                                <span th:if="*{tags == null}">
                                 <span th:text="등록된 태그가 없습니다"></span>
                                 </span>
 
@@ -331,11 +342,14 @@
                 </li>
                 <li class="page-item" th:classappend="${i == reviewList.pageable.pageNumber+1} ? 'active'"
                     th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                    <a class="page-link" href="#" th:href="@{/review/list(page=${i - 1},searchText=${param.searchText})}" th:text="${i}">1</a>
-                </li>
-                <li class="page-item" th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
                     <a class="page-link" href="#"
-                       th:href="@{/review/list(page=${reviewList.pageable.pageNumber + 1},searchText=${param.searchText})}"> &gt; </a>
+                       th:href="@{/review/list(page=${i - 1},searchText=${param.searchText})}" th:text="${i}">1</a>
+                </li>
+                <li class="page-item"
+                    th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                    <a class="page-link" href="#"
+                       th:href="@{/review/list(page=${reviewList.pageable.pageNumber + 1},searchText=${param.searchText})}">
+                        &gt; </a>
                 </li>
             </ul>
         </nav>

@@ -525,4 +525,10 @@ public class MainController {
 
     }
 
+    @GetMapping("/member/myPage")
+    public String myPage(){
+
+        return "/member/myPage";
+    }
+
 }
