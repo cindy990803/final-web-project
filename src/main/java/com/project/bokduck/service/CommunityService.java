@@ -12,6 +12,7 @@ import org.springframework.context.annotation.DependsOn;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -84,6 +85,8 @@ public class CommunityService {
     public Page<Community> findCommunityCategoryPage(CommunityCategory tip, Pageable pageable) {
         return communityRepository.findByCommunityCategory(tip, pageable);
     }
+
+
 
     public enum FlagLike {
         ERROR_AUTH, ERROR_INVALID, ERROR_DUPLICATE, OK
