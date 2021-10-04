@@ -38,6 +38,8 @@
             });
         });
 
+
+
     </script>
 </head>
 <body>
@@ -49,13 +51,27 @@
                 <h2>커뮤니티 리스트</h2>
             </div>
 
-            <form class="justify-content-center" method="get" th:action="@{/community/search}">
+            <form class="justify-content-center" method="get" th:action="@{/community/list/category}">
 
                 <!-- 검색창 -->
                 <div class="form-group d-flex justify-content-center row">
                     <input type="text" class="form-control form-control-lg col-6" th:value="${searchText}"
                            id="searchText" name="searchText">
                     <button type="submit" class="btn btn-info col-1">검색</button>
+                </div>
+
+
+                <!-- 정렬 -->
+                <div class="form-group d-flex justify-content-end" id="line_option" style="float: right" th:if="${!state.toString.equals('search')}">
+                    <a th:href="@{/community/list/category(community=${param.community},check=new)}">최신순</a>
+                    <!--                    <a th:href="@{/community/list/category(community=${param.community},check=like, sort=${arrayLike})}">좋아요순</a>-->
+                    <a th:href="@{/community/list/category(community=${param.community},check=like, sort='likeCount,id,desc')}">좋아요순</a>
+
+                </div>
+
+                <div class="form-group d-flex justify-content-end" id="line_option" style="float: right" th:if="${state.toString.equals('search')}">
+                    <a th:href="@{/community/list/category(searchText=${param.searchText},check=new)}">최신순</a>
+                    <a th:href="@{/community/list/category(searchText=${param.searchText},check=like, sort='likeCount,id,desc')}">좋아요 순</a>
                 </div>
 
 
@@ -79,30 +95,31 @@
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('all')? 'nav-link active' : 'nav-link'}"
-                               href="/community/list/all">전체 글</a>
+                               th:href="@{/community/list/category(community=all)}" th:value="all" th:id="category">전체 글</a>
                         </li>
                         <li class="nav-item">
-                            <a th:class="${state.toString.equals('tip')? 'nav-link active' : 'nav-link'}"
-                               href="/community/list/tip">자취방 꿀팁</a>
+                            <a th:class="${state.equals('tip')? 'nav-link active' : 'nav-link'}"
+                               th:href="@{/community/list/category(community=tip)}">자취방 꿀팁</a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link'}"
-                               href="/community/list/interior">자취방 인테리어</a>
+                               th:href="@{/community/list/category(community=interior)}">자취방 인테리어</a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('eat')? 'nav-link active' : 'nav-link'}"
-                               href="/community/list/eat">동네 맛집</a>
+                               th:href="@{/community/list/category(community=eat)}">동네 맛집</a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('board')? 'nav-link active' : 'nav-link'}"
-                               href="/community/list/board">자유 게시판</a>
+                               th:href="@{/community/list/category(community=board)}">자유 게시판</a>
                         </li>
                     </ul>
+                    <input th:type="hidden" th:value="categorry">
                 </div>
 
 
                 <!--리스트 -->
-                <div th:if="${communityList.isEmpty()}" style="text-align: center;">
+                <div th:if="${communityList.isEmpty()}" style="text-align: center;" th:id="sortTable">
                     <h2>검색결과가 없습니다.</h2>
                 </div>
 
@@ -165,29 +182,82 @@
                 </div>
 
             </form>
-
-            <!-- 페이징 -->
             <div th:unless="${communityList.isEmpty()}">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item"
-                            th:classappend="${1 == communityList.pageable.pageNumber + 1} ? 'disabled'">
-                            <a class="page-link" href="#"
-                               th:href="@{/community/list(page=${communityList.pageable.pageNumber - 1})}"
-                               tabindex="-1" aria-disabled="true"> &lt; </a>
-                        </li>
-                        <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
-                            th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                            <a class="page-link" href="#" th:href="@{/community/list(page=${i - 1})}"
-                               th:text="${i}">1</a>
-                        </li>
-                        <li class="page-item"
-                            th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
-                            <a class="page-link" href="#"
-                               th:href="@{/community/list(page=${communityList.pageable.pageNumber + 1})}"> &gt; </a>
-                        </li>
-                    </ul>
-                </nav>
+                <div th:if="${!state.toString().equals('search')}">
+                    <div th:if="${check.toString().equals('like')}">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"
+                                    th:classappend="${1 == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber - 1}
+                               ,community=${param.community},check=like,sort='likeCount,id,desc')}"
+                                       tabindex="-1" aria-disabled="true"> &lt; </a>
+                                </li>
+                                <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                                    th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                    <a class="page-link" href="#" th:href="@{/community/list/category(page=${i - 1},community=${param.community},check=like,sort='likeCount,id,desc')}"
+                                       th:text="${i}">1</a>
+                                </li>
+                                <li class="page-item"
+                                    th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},community=${param.community},check=like,sort='likeCount,id,desc')}"> &gt </a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    </div>
+                    <div th:unless="${check.toString().equals('like')}">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"
+                                    th:classappend="${1 == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber - 1}
+                               ,community=${param.community})}"
+                                       tabindex="-1" aria-disabled="true"> &lt; </a>
+                                </li>
+                                <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                                    th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                    <a class="page-link" href="#" th:href="@{/community/list/category(page=${i - 1},community=${param.community})}"
+                                       th:text="${i}">1</a>
+                                </li>
+                                <li class="page-item"
+                                    th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},community=${param.community})}"> &gt </a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <div th:if="${state.toString().equals('search')}">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item"
+                                th:classappend="${1 == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                                <a class="page-link" href="#"
+                                   th:href="@{/community/list/category(page=${communityList.pageable.pageNumber - 1},searchText=${param.searchText},community=${param.community})}"
+                                   tabindex="-1" aria-disabled="true"> &lt; </a>
+                            </li>
+                            <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                                th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                <a class="page-link" href="#" th:href="@{/community/list/category(page=${i - 1},searchText=${param.searchText},community=${param.community})}"
+                                   th:text="${i}">1</a>
+                            </li>
+                            <li class="page-item"
+                                th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
+                                <a class="page-link" href="#"
+                                   th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},searchText=${param.searchText},community=${param.community})}"> &gt </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                </div>
             </div>
 
         </main>

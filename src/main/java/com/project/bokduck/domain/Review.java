@@ -71,4 +71,5 @@ public class Review extends Post {
 //    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
 //    private List<CommentReview> commentReviews;
 
+
 }

@@ -17,9 +17,17 @@ public class File {
     @Id @GeneratedValue
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Post fileName;
+    private String fileName;
 
-    @Column//(nullable = false)
     private String filePath;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Post FileToPost; // 태그한 게시물
+
+    public String getFilePath(){
+        if(filePath == null) { return null; }
+
+        return "/File/" + id + "/" + filePath;
+    }
+
 }

@@ -20,9 +20,16 @@ public class Image {
 
     private String imageName;
 
-    @Column//(nullable = false)
     private String imagePath;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Post imageToPost; // 태그한 게시물
+
+    public String getImagePath(){
+        if (imagePath == null){return null;}
+
+        return "/image/" + id + "/" + imagePath;
+
+    }
+
 }

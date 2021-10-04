@@ -20,7 +20,7 @@ import java.util.List;
 @SuperBuilder
 @DynamicUpdate
 @DiscriminatorValue("COMMUNITY")
-public class Community extends Post{
+public class Community extends Post {
 
     @Enumerated(EnumType.STRING)
     private CommunityCategory communityCategory;

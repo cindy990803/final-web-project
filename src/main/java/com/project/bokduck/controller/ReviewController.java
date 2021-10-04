@@ -3,6 +3,7 @@ package com.project.bokduck.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.project.bokduck.domain.*;
+import com.project.bokduck.multipart.fileUpLoadUtil;
 import com.project.bokduck.repository.*;
 import com.project.bokduck.service.ReviewService;
 import com.project.bokduck.repository.FileRepository;
@@ -25,11 +26,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,46 +53,58 @@ public class ReviewController {
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final MemberRepository memberRepository;
     private final ReviewCategory reviewCategory = new ReviewCategory();
-    private final ImageRepository imageRepository;
     private final TagRepository tagRepository;
 
-
+    @Autowired
+    ImageRepository imageRepository;
+    @Autowired
     FileRepository fileRepository;
 
     /*@RequestMapping(value = {"/upload"}, method = {RequestMethod.POST}, consumes = MediaType.MULTIPART_FOR_DATA_VALUE)*/
 
 
     @GetMapping("/writeReview")
-    public String writeReview(Model model) {
+    public String writeReview(Model model, @CurrentMember Member member) {
         model.addAttribute("WriteReviewVO", new WriteReviewVO());
-
         return "post/review/writeReview";
     }
 
 
     @PostMapping("/writeReview")
-    public String saveReview(@RequestParam("file") MultipartFile file, @CurrentMember Member member, @ModelAttribute WriteReviewVO writeReviewVO, RedirectAttributes redirectAttribute) {
+    public String saveReview(@RequestParam("image") MultipartFile imageFile,
 
-        if (file != null) {
-            try (
-                    // 맥일 경우
-                    //FileOutputStream fos = new FileOutputStream("/tmp/" + file.getOriginalFilename());
-                    // 윈도우일 경우
-                    FileOutputStream fos = new FileOutputStream("D:\\final-web-project\\src\\main\\resources\\static\\saveImage" + file.getOriginalFilename());
-                    InputStream is = file.getInputStream();
-            ) {
-                int readCount = 0;
-                byte[] buffer = new byte[1024];
-                while ((readCount = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, readCount);
-                }
-            } catch (Exception ex) {
-                throw new RuntimeException("file Save Error");
-            }
+                             @RequestParam("pdf") MultipartFile pdfFile,
 
-        }
+                             @CurrentMember Member member,
 
+                             @ModelAttribute WriteReviewVO writeReviewVO,
 
+                             File file, Image image, Model model) throws IOException {
+
+if(imageFile!=null) {
+    String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+    image.setImagePath(imageName);
+    image = imageRepository.save(image);
+    String imageUploadDest = "image/" + image.getId();
+    fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile);
+
+    model.addAttribute("image", image);
+}else {
+    image = imageRepository.save(null);
+    model.addAttribute("image",image);
+}
+if (pdfFile!=null) {
+    String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
+    file.setFilePath(pdfName);
+    file = fileRepository.save(file);
+    String pdfUploadDest = "file/" + file.getId();
+    fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
+
+    model.addAttribute("file", file);
+}else {
+    file = fileRepository.save(null);
+    model.addAttribute("file",file);
+}
         switch (writeReviewVO.getRoomSize()) {
             case "oneRoom":
                 reviewCategory.setRoomSize(RoomSize.ONEROOM);
@@ -144,9 +159,30 @@ public class ReviewController {
             }
         }
 
-        reviewCategory.setTraffic(writeReviewVO.getTraffic());
-        reviewCategory.setWelfare(writeReviewVO.getWelfare());
-        reviewCategory.setConvenient(writeReviewVO.getConvenient());
+        if (writeReviewVO.getTraffic() == null) {
+            reviewCategory.setTraffic("");
+        } else {
+            reviewCategory.setTraffic(writeReviewVO.getTraffic());
+        }
+        if (writeReviewVO.getWelfare() == null) {
+            reviewCategory.setWelfare("");
+        } else {
+            reviewCategory.setWelfare(writeReviewVO.getWelfare());
+        }
+        if (writeReviewVO.getConvenient() == null) {
+            reviewCategory.setConvenient("");
+        } else {
+            reviewCategory.setConvenient(writeReviewVO.getConvenient());
+        }
+        if (writeReviewVO.getElectronicDevice()==null){
+            reviewCategory.setConvenient("");
+        }else {
+            reviewCategory.setElectronicDevice(writeReviewVO.getElectronicDevice());
+        }
+
+
+
+
 
         Review review = Review.builder()
                 .writer(member)
@@ -155,9 +191,9 @@ public class ReviewController {
                 .detailAddress(writeReviewVO.getDetailAddress())
                 .postCode(writeReviewVO.getPostCode())
                 .extraAddress(writeReviewVO.getExtraAddress())
-                .comment(writeReviewVO.getConvenient())
+                .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
-                .reviewStatus(ReviewStatus.COMPLETE) // todo wait으로 바꾸기
+                .reviewStatus(ReviewStatus.WAIT)
                 .star(0)
                 .postName(writeReviewVO.getTitle())
                 .tags(tagList)
@@ -165,15 +201,9 @@ public class ReviewController {
                 .build();
 
         reviewCategoryRepository.save(reviewCategory);
-
         reviewRepository.save(review);
 
-        for (Tag t : tagList) {
-            if (t.getTagToPost() == null) {
-                t.setTagToPost(new ArrayList<Post>());
-            }
-            t.getTagToPost().add(review);
-        }
+
 
 
         return "index";

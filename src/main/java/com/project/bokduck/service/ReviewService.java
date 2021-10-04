@@ -85,12 +85,17 @@ public class ReviewService {
         return FlagLike.OK;
     }
 
+    public void increaseHit(Long id) {
+       Review review = reviewRepository.findById(id).orElseThrow();
+       int hit = review.getHit();
+       review.setHit(hit+1);
+       reviewRepository.save(review);
+    }
 
 
     public enum FlagLike {
         ERROR_AUTH, ERROR_INVALID, DUPLICATE, OK
     }
-<<<<<<< HEAD
 
 //    댓글
     public Review getReview(Long id) { return reviewRepository.findById(id).orElseThrow(); }
@@ -161,8 +166,3 @@ public class ReviewService {
 }
 
 
-
-=======
-}
-
->>>>>>> f3d124591d5b3eb9d9a6dc9681f4da2ac26cef2a

@@ -61,4 +61,6 @@ public abstract class Post {
         if (uploadFile == null) uploadFile = new ArrayList<>();
         if (uploadImage == null) uploadImage = new ArrayList<>();
     }
+
+
 }

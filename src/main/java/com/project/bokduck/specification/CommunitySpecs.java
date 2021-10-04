@@ -13,6 +13,27 @@ import java.util.List;
 import java.util.Map;
 
 public class CommunitySpecs {
+
+
+    public static Specification<Community> findCategory(Map<String, Object> filter) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            filter.forEach((key, value) -> {
+                String likeValue = "%" + value + "%";
+
+                switch (key) {
+                    case "EAT":  case "TIP":
+                        predicates.add(criteriaBuilder.like(root.get(key).as(String.class), likeValue));
+                        break;
+                }
+            });
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+
+
     public static Specification<Community> searchText(Map<String, Object> filter) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

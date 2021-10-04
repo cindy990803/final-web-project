@@ -5,99 +5,16 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='Login'">
 <head>
-    <!--    <script>-->
-    <!--        $(document).ready(function(){-->
-    <!--            getCommentList();-->
-    <!--        });-->
-    <!--        function getCommentList() {-->
-    <!--            var replyurl = "$"-->
 
-    <!--            $.ajax({-->
-    <!--                type: "POST",-->
-    <!--                dataType: 'json',-->
-    <!--                url: "/review/read/comment",-->
-    <!--                success: function (res) {-->
-    <!--                    var comments = "";-->
-    <!--                    if(result.length < 1) {-->
-    <!--                        comments = "등록된 댓글이 없습니다."-->
-    <!--                    } else {-->
-    <!--                        $(result).each(function() {-->
-    <!--                            comments +='<br/>';-->
-    <!--                            comments +='<strong>';-->
-    <!--                            comments +='작성자 : ' + this.comment_writer;-->
-    <!--                            comments +='</strong>&nbsp;&nbsp;&nbsp;';-->
-    <!--                            comments +='작성 날짜 :' + this.reply_regdate;-->
-    <!--                            comments +='<br/> <p>';-->
-    <!--                            comments +='<br/>';-->
-    <!--                            comments +='<br/>';-->
-    <!--                            comments +='<br/>';-->
-    <!--                            comments +='<br/>';-->
-    <!--                        })-->
-
-    <!--                    }-->
-    <!--                }-->
-    <!--            });-->
-    <!--        }-->
-
-
-    <!--    </script>-->
-    <!--    <script>-->
-    <!--        $('#addComment').click(function () {-->
-    <!--            let saveContent = $('#saveContent').val();-->
-
-    <!--            $.ajax({-->
-    <!--                type: "POST",-->
-    <!--                dataType: 'json',-->
-    <!--                url: "/review/read/comment",-->
-    <!--                data: {-->
-    <!--                    "modifyText": Content-->
-    <!--                },-->
-    <!--                success: function (res) {-->
-    <!--                    alert(res.message);-->
-    <!--                    showCommentList();-->
-    <!--                }-->
-    <!--            });-->
-    <!--        });-->
-    <!--    </script>-->
-    <!--    <script>-->
-    <!--        $('#modifyComment').click(function () {-->
-    <!--            let modifyContent = $('#editContent').val();-->
-
-    <!--            $.ajax({-->
-    <!--                type: "POST",-->
-    <!--                dataType: 'json',-->
-    <!--                url: "modifyComment",-->
-    <!--                data: {-->
-    <!--                    "modifyText": modifyContent-->
-    <!--                },-->
-    <!--                success: function (res) {-->
-    <!--                    alert(res.message);-->
-    <!--                    showCommentList();-->
-    <!--                }-->
-    <!--            });-->
-    <!--        });-->
-    <!--    </script>-->
-    <!--    <script>-->
-    <!--        $('#deleteComment').click(function () {-->
-
-    <!--            $.ajax({-->
-    <!--                type: "POST",-->
-    <!--                dataType: 'json',-->
-    <!--                url: "/review/read/comment/delete",-->
-    <!--                data: { },-->
-    <!--                success: function (res) {-->
-    <!--                    alert(res.message);-->
-    <!--                    showCommentList();-->
-    <!--                }-->
-    <!--            });-->
-    <!--        });-->
-    <!--    </script>-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
     <link rel="stylesheet" href="/css/review-read.css">
     <!-- SWIPER-->
-    <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
-    <script defer src="/js/member/read.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<!--    <script defer src="/js/member/read.js"></script>-->
     <!-- 지도   -->
     <script type="text/javascript"
             src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=176ocp7ltk&submodules=geocoder"></script>
@@ -119,12 +36,13 @@
             <div class="title-sub">
                 <img src="/images/like.svg" alt="like">
                 <img src="/images/alarm.png" alt="like">
+                <span>조회수 :</span> <span th:text="*{hit}"></span>
             </div>
         </div>
     </section>
 
     <div class="images">
-        <div class="swiper-container">
+        <div class="swiper mySwiper">
             <div class="swiper-wrapper">
                 <div th:each="img: *{uploadImage}" class="swiper-slide">
                     <img th:src="${img.imagePath}" alt="image">
@@ -134,43 +52,56 @@
 
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
 
     </div>
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            pagination: {
+                el: ".swiper-pagination",
+                type: "fraction",
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    </script>
 
 
     <section class="information">
         <div class="inner">
             <div class="inner__left">
-                <div class="roomsize">
+                <div class="option">
                     <span>크기 | </span>
-                    <span th:unless="*{reviewCategory.roomSize.information.equals(null)}" th:text="*{reviewCategory.roomSize.information}"></span>
+                    <span th:if="*{reviewCategory.roomSize != null}" th:text="*{reviewCategory.roomSize.information}"></span>
                 </div>
-                <div class="structure">
+                <div class="option">
                     <span>집구조 | </span>
-                    <span th:unless="*{reviewCategory.structure.information.equals(null)}" th:text="*{reviewCategory.structure.information}"></span>
+                    <span th:if="*{reviewCategory.structure != null}" th:text="*{reviewCategory.structure.information}"></span>
                 </div>
-                <div class="payment">
+                <div class="option">
                     <span>계약형식 | </span>
-                    <span th:unless="*{reviewCategory.payment.information.equals(null)}" th:text="*{reviewCategory.payment.information}"></span>
+                    <span th:if="*{reviewCategory.payment != null}" th:text="*{reviewCategory.payment.information}"></span>
                 </div>
-                <div class="traffic">
+                <div class="option">
                     <span>교통 | </span>
-                    <span th:unless="*{reviewCategory.traffic.information.equals(null)}" th:text="*{reviewCategory.traffic.information}"></span>
+                    <span th:if="*{reviewCategory.traffic != null}" th:text="*{reviewCategory.traffic.information}"></span>
                 </div>
             </div>
 
             <div class="inner__right">
-                <div class="convenient">
+                <div class="option">
                     <span>편의시설 | </span>
-                    <span th:unless="*{reviewCategory.convenient.information.equals(null)}" th:text="*{reviewCategory.convenient.information}"></span>
+                    <span th:if="*{reviewCategory.convenient != null}" th:text="*{reviewCategory.convenient.information}"></span>
                 </div>
-                <div class=" welfare">
+                <div class="option">
                     <span>기타 | </span>
-                    <span th:unless="*{reviewCategory.welfare.information.equals(null)}" th:text="*{reviewCategory.welfare.information}"></span>
+                    <span th:if="*{reviewCategory.welfare != null}" th:text="*{reviewCategory.welfare.information}"></span>
                 </div>
-                <div class="electronicDevices">
+                <div class="option">
                     <span>옵션 | </span>
-                    <span th:unless="*{reviewCategory.electronicDevice.information.equals(null)}" th:text="*{reviewCategory.electronicDevice.information}"></span>
+                    <span th:if="*{reviewCategory.electronicDevice != null}" th:text="*{reviewCategory.electronicDevice.information}"></span>
                 </div>
             </div>
         </div>
@@ -188,42 +119,42 @@
                 <span>한줄평 |</span>
                 <div class="review-comment" th:text="*{comment}"></div>
                 <div class="review-star">
-                    <div th:if="*{star} == 0">
+                    <div class="stars" th:if="*{star} == 0" style="display: flex">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
-                    <div th:if="*{star} == 1">
+                    <div class="stars" th:if="*{star} == 1" style="display: flex">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
-                    <div th:if="*{star} == 2">
+                    <div  class="stars" th:if="*{star} == 2" style="display: flex">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
-                    <div th:if="*{star} == 3">
+                    <div class="stars" th:if="*{star} == 3" style="display: flex">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
-                    <div th:if="*{star} == 4">
+                    <div class="stars" th:if="*{star} == 4" style="display: flex">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
-                    <div th:if="*{star} == 5">
+                    <div class="stars" th:if="*{star} == 5" style="display: flex" >
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
@@ -240,7 +171,16 @@
         <div class="inner">
             <span>위치 |</span>
             <div id="map" style="width:1000px;height:650px; margin: 0 auto;"></div>
+            <div class = "changeReview">
+                <div class="edit">
+                    <a href="javascript:void(0)">수정</a>
+                </div>
+                <div class="delete">
+                    <a href="javascript:void(0)">삭제</a>
+                </div>
+            </div>
         </div>
+
     </section>
 
     <script type="text/javascript">
@@ -288,6 +228,13 @@
         })
 
     </script>
+
+
+    <div th:if="${ currentMember.id == 1}" class="adminZone">
+        <div th:each="file: *{uploadFile}" class="swiper-slide">
+            <img th:src="${file.filePath}" alt="image">
+        </div>
+    </div>
 
 </div>
 </body>
