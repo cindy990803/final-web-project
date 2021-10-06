@@ -14,6 +14,7 @@ import com.project.bokduck.specification.CommunitySpecs;
 import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
+import com.project.bokduck.util.ReviewListVo;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -64,7 +64,6 @@ public class MainController {
     private final ImageRepository imageRepository;
     private final MainpageService mainpageService;
     private final PasswordEncoder passwordEncoder;
-
 
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
@@ -408,7 +407,7 @@ public class MainController {
         int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("check", check);
+        model.addAttribute("check",check);
         model.addAttribute("communityList", communityList);
         model.addAttribute("state", "all");
         return "post/community/list";
@@ -422,13 +421,13 @@ public class MainController {
                                 @CurrentMember Member member, String searchText) {
 
         String state = "all";
-        String arrayLike = null;
+        String arrayLike =null;
         communityService.createLikeCount();
         Page<Community> communityList = null;
-        if (check.equals("like")) {
+        if (check.equals("like")){
             check = "like";
-        } else {
-            check = "good";
+        }else{
+            check ="good";
         }
 
         switch (community) {
@@ -483,15 +482,15 @@ public class MainController {
 
         int startPage = Math.max(1, communityList.getPageable().getPageNumber() - 5);
         int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 5);
-        model.addAttribute("pageable", pageable);
+        model.addAttribute("pageable",pageable);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
         model.addAttribute("state", state);
         model.addAttribute("searchText", searchText);
-        model.addAttribute("arrayLike", arrayLike);
+        model.addAttribute("arrayLike",arrayLike);
         model.addAttribute("communityList", communityList);
         model.addAttribute("member", member);
-        model.addAttribute("check", check);
+        model.addAttribute("check",check);
 
         return "post/community/list";
     }
@@ -535,51 +534,22 @@ public class MainController {
 
     }
 
-    @RequestMapping("/password/change")
-    public String passwordChange(Model model, @CurrentMember Member member) {
-        if (member == null) {
-            return "redirect:/";
-        }
-        model.addAttribute("member", "member");
-        return "member/password-change";
+
+    @GetMapping("/mypage")
+    public String mypage(Model model,
+                         @CurrentMember Member member) {
+List<Review> reviewList = new ArrayList<>();
+Review review;
+
+        review = reviewRepository.getById(member.getId());
+
+
+
+        return "/member/mypage";
     }
+    
 
-    @ResponseBody
-    @GetMapping("/password/change/result")
-    public String passwordChangeResult(@CurrentMember Member member, String oldpass, String pass, String repass) {
-        String message = "";
-        if (member == null){
-            message = "로그인 되어있지 않습니다. 다시 로그인해주세요.";
-        }
 
-        if (!oldpass.isEmpty() && !pass.isEmpty() && !repass.isEmpty()) { // 빈칸 모두 없어야 함
-          if (passwordEncoder.matches(oldpass,member.getPassword())) {
-              if (pass.matches("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$")){
-                  if (pass.equals(repass)){
-                      member.setPassword(passwordEncoder.encode(pass));
-                      memberRepository.save(member);
-                      message = "비밀번호 변경 완료 되었습니다.";
-                  }else {
-                      message = "새로운 비밀번호가 서로 다릅니다. 다시 시도해주세요.";
-                  }
-
-              }else {
-                  message = "패스워드는 영문자, 숫자, 특수기호를 조합하여 최소 8자 이상을 입력하셔야 합니다";
-              }
-          }else{ //지금 비밀번호랑 다를때 !
-              message = "현재 비밀번호가 다릅니다.";
-          }
-
-        } else { //빈칸 하나라도 있을때
-            message = "모두 입력하셔야 합니다.";
-        }
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("message", message);
-
-        return jsonObject.toString();
-    }
-
-   
 
 
 }

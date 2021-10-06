@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 
@@ -21,5 +23,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     Page<Community> findAll(Specification<Community>specification, Pageable pageable);
 
     Page<Community> findByPostContentContaining(String searchText, Pageable pageable);
+
 
 }

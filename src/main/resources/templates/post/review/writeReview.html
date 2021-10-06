@@ -7,9 +7,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- include summernote css/js -->
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <!-- tagify css/js 적용 -->
     <script src="https://unpkg.com/@yaireo/tagify"></script>
     <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
@@ -21,6 +18,7 @@
 
         <script>
 function check() {
+
   if(!reviewForm.title.value) {
     alert("제목을 작성해 주세요");
     reviewForm.title.focus();
@@ -28,7 +26,7 @@ function check() {
   }
 
     if(!reviewForm.reviewComment.value) {
-    alert("reviewComment");
+    alert("리뷰를 작성해 주세요");
     reviewForm.reviewComment.focus();
     return false;
   }
@@ -45,25 +43,19 @@ function check() {
   }
 
   if(!reviewForm.roomSize.value) {
-    alert("한줄평을 작성해 주세요");
-    reviewForm.roomSize.focus();
+    alert("방형태는 필수 선택 사항 입니다.");
     return false;
   }
     if(!reviewForm.structure.value) {
-    alert("한줄평을 작성해 주세요");
-    reviewForm.structure.focus();
+    alert("주거 형태는 필수 선택 사항 입니다.");
     return false;
   }
-    if(!reviewForm.roomSize.value) {
-    alert("한줄평을 작성해 주세요");
-    reviewForm.roomSize.focus();
+    if(!reviewForm.payment.value) {
+    alert("계약형식은 필수 선택 사항 입니다.");
     return false;
   }
 
-
-
-
-
+  }
         </script>
         <form commandName="WriteReviewVO" action="/review/writeReview" method="post" id="reviewForm"
               enctype="multipart/form-data">
