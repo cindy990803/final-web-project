@@ -125,4 +125,11 @@ public class MemberService implements UserDetailsService {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(token);
     }
+
+
+    public boolean checkNickname(String newnickname) {
+       return memberRepository.existsBynickname(newnickname);
+    }
+
+
 }

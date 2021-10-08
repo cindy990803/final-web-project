@@ -14,7 +14,6 @@ import com.project.bokduck.specification.CommunitySpecs;
 import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
-import com.project.bokduck.util.ReviewListVo;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +25,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -62,6 +62,7 @@ public class MainController {
     private final MainpageService mainpageService;
     private final PasswordEncoder passwordEncoder;
     private final CommentCommunityRepository commentCommunityRepository;
+
 
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
@@ -459,7 +460,7 @@ public class MainController {
         int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("check",check);
+        model.addAttribute("check", check);
         model.addAttribute("communityList", communityList);
         model.addAttribute("state", "all");
         return "post/community/list";
@@ -473,13 +474,13 @@ public class MainController {
                                 @CurrentMember Member member, String searchText) {
 
         String state = "all";
-        String arrayLike =null;
+        String arrayLike = null;
         communityService.createLikeCount();
         Page<Community> communityList = null;
-        if (check.equals("like")){
+        if (check.equals("like")) {
             check = "like";
-        }else{
-            check ="good";
+        } else {
+            check = "good";
         }
 
         switch (community) {
@@ -511,38 +512,40 @@ public class MainController {
         }
 
         if (searchText != null) { //검색 했을때
-            state = "search";
-            String[] search = {"postName", "postContent"};
-            Specification<Community> searchSpec = null;
+            if (!searchText.isEmpty()) {
+                state = "search";
+                String[] search = {"postName", "postContent"};
+                Specification<Community> searchSpec = null;
 
-            //제목 내용 검색
-            for (String s : search) {
-                Map<String, Object> searchMap = new HashMap<>();
-                searchMap.put(s, searchText);
-                searchSpec =
-                        searchSpec == null ? CommunitySpecs.searchText(searchMap)
-                                : searchSpec.or(CommunitySpecs.searchText(searchMap));
+                //제목 내용 검색
+                for (String s : search) {
+                    Map<String, Object> searchMap = new HashMap<>();
+                    searchMap.put(s, searchText);
+                    searchSpec =
+                            searchSpec == null ? CommunitySpecs.searchText(searchMap)
+                                    : searchSpec.or(CommunitySpecs.searchText(searchMap));
+
+                }
+
+                //태그 검색
+                Specification<Tag> tagSpec = CommunitySpecs.searchTagDetails(searchText);
+                List<Tag> tagList = tagRepository.findAll(tagSpec);
+                searchSpec = searchSpec.or(CommunitySpecs.searchTag(tagList));
+                communityList = communityRepository.findAll(searchSpec, pageable);
             }
-
-            //태그 검색
-            Specification<Tag> tagSpec = CommunitySpecs.searchTagDetails(searchText);
-            List<Tag> tagList = tagRepository.findAll(tagSpec);
-            searchSpec = searchSpec.or(CommunitySpecs.searchTag(tagList));
-            communityList = communityRepository.findAll(searchSpec, pageable);
         }
-
 
         int startPage = Math.max(1, communityList.getPageable().getPageNumber() - 5);
         int endPage = Math.min(communityList.getTotalPages(), communityList.getPageable().getPageNumber() + 5);
-        model.addAttribute("pageable",pageable);
+        model.addAttribute("pageable", pageable);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
         model.addAttribute("state", state);
         model.addAttribute("searchText", searchText);
-        model.addAttribute("arrayLike",arrayLike);
+        model.addAttribute("arrayLike", arrayLike);
         model.addAttribute("communityList", communityList);
         model.addAttribute("member", member);
-        model.addAttribute("check",check);
+        model.addAttribute("check", check);
 
         return "post/community/list";
     }
@@ -586,6 +589,14 @@ public class MainController {
 
     }
 
+    @RequestMapping("/password/change")
+    public String passwordChange(Model model, @CurrentMember Member member) {
+        if (member == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("member", "member");
+        return "member/password-change";
+    }
 
     @GetMapping("/community/read")
     @Transactional
@@ -844,22 +855,144 @@ public class MainController {
 
         return "";
     }
+    @RequestMapping("/mypage")
+
 
 
     @GetMapping("/mypage")
     public String mypage(Model model,
                          @CurrentMember Member member) {
-List<Review> reviewList = new ArrayList<>();
-Review review;
+        List<Review> reviewList = new ArrayList<>();
+        Review review;
+
+        if (member == null) { //로그인 확인
+            return "redirect:/";
+        }
 
         review = reviewRepository.getById(member.getId());
-
-
-
+        model.addAttribute("member",member);
         return "/member/mypage";
     }
 
 
+    @ResponseBody
+    @GetMapping("/password/change/result")
+    public String passwordChangeResult(@CurrentMember Member member, String oldpass, String pass, String repass) {
+        String message = "";
+        if (member == null) {
+            message = "로그인 되어있지 않습니다. 다시 로그인해주세요.";
+        }
+
+
+        if (!oldpass.isEmpty() && !pass.isEmpty() && !repass.isEmpty()) { // 빈칸 모두 없어야 함
+            if (passwordEncoder.matches(oldpass, member.getPassword())) {
+                if (pass.matches("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$")) {
+                    if (pass.equals(repass)) {
+                        member.setPassword(passwordEncoder.encode(pass));
+                        memberRepository.save(member);
+                        message = "비밀번호 변경 완료 되었습니다.";
+                    } else {
+                        message = "새로운 비밀번호가 서로 다릅니다. 다시 시도해주세요.";
+                    }
+
+                } else {
+                    message = "패스워드는 영문자, 숫자, 특수기호를 조합하여 최소 8자 이상을 입력하셔야 합니다";
+                }
+            } else { //지금 비밀번호랑 다를때 !
+                message = "현재 비밀번호가 다릅니다.";
+            }
+
+        } else { //빈칸 하나라도 있을때
+            message = "모두 입력하셔야 합니다.";
+        }
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("message", message);
+
+        return jsonObject.toString();
+    }
+
+
+    @GetMapping("/memberDelete") //회원 탈퇴
+    @ResponseBody
+    public String memberdelete(@CurrentMember Member member) {
+        memberRepository.delete(member);
+        SecurityContextHolder.clearContext();
+        JsonObject jsonObject = new JsonObject();
+        return jsonObject.toString();
+    }
+
+
+    @GetMapping("/mypage/change") //회원 수정
+    @ResponseBody
+    public String mypageChange(String postcode, String address, String detailAddress, String newnickname,
+                               String newtel, String nicknameOpen, @CurrentMember Member member) {
+
+        String message = "변경할 정보가 없습니다";
+
+
+        if (!newnickname.isEmpty()) {
+            if (member.getNickname() == null || !member.getNickname().equals(newnickname)) { //닉네임 변경 할 시
+                boolean nickname = memberService.checkNickname(newnickname);
+                if (newnickname != null && nickname == true) { //닉네임 중복 체크
+                    message = "중복된 닉네임 입니다";
+                } else if (newnickname.length() > 10 || newnickname.length() < 2) { //길이체크
+                    message = "닉네임의 길이는 2자이상 10자 이하여야 합니다.";
+                } else {
+                    member.setNickname(newnickname);
+                    memberRepository.save(member);
+                    message = "변경 완료 되었습니다.";
+                }
+            }
+        }
+
+        if (!member.getTel().equals(newtel)) { //핸드폰 번호 변경시
+            member.setTel(newtel);
+            memberRepository.save(member);
+            message = "변경 완료 되었습니다.";
+        }
+
+
+        if (member.getUserAddress() == null || !member.getUserAddress().getPostcode().equals(postcode) //주소 변경
+                || !member.getUserAddress().getBaseAddress().equals(address)
+                || !member.getUserAddress().getDetailAddress().equals(detailAddress)) {
+            if (!postcode.isEmpty() && !address.isEmpty() && !detailAddress.isEmpty()) {
+                member.setUserAddress(UserAddress.builder()
+                        .postcode(postcode)
+                        .baseAddress(address)
+                        .detailAddress(detailAddress)
+                        .build());
+                memberRepository.save(member);
+                message = "변경 완료 되었습니다.";
+            }if (postcode==null || address == null || detailAddress == null){
+                message= "주소를 모두 입력해주세요";
+            }
+
+        }
+
+
+        if (!String.valueOf(member.isNicknameOpen()).equals(nicknameOpen)) {//닉네임 공개 유무 설정
+            if (member.isNicknameOpen() == true) {
+                member.setNicknameOpen(false);
+                memberRepository.save(member);
+                message = "변경 완료 되었습니다.";
+
+            } else if (member.isNicknameOpen() == false) {
+                if (member.getNickname() == null && newnickname.isEmpty()) {
+                    message = "닉네임 설정후 변경할 수 있습니다.";
+                } else {
+                    member.setNicknameOpen(true);
+                    memberRepository.save(member);
+                    message = "변경 완료 되었습니다.";
+                }
+            }
+
+        }
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("message", message);
+
+        return jsonObject.toString();
+    }
 
 
 
