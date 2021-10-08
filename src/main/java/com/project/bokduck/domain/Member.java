@@ -51,6 +51,9 @@ public class Member {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Post> likes; // 좋아요 한 목록
 
+    @ManyToMany(mappedBy = "visitedMember", cascade = CascadeType.DETACH)
+    private List<Post> visitedPost;
+
     @ColumnDefault("false")
     private boolean nicknameOpen; // 닉네임 공개 여부
 
@@ -66,6 +69,7 @@ public class Member {
     @PostLoad
     public void createList() {
         log.info("PostLoad");
+        if (visitedPost == null) visitedPost = new ArrayList<>();
         if (likes == null) likes = new ArrayList<>();
         if (write == null) write = new ArrayList<>();
     }

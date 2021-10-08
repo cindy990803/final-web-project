@@ -40,6 +40,7 @@ public class MemberService implements UserDetailsService {
                 .password(passwordEncoder.encode("1q2w3e4r!"))
                 .tel("01012341234")
                 .nickname("관리자")
+                .nicknameOpen(true)
                 .joinedAt(LocalDateTime.now())
                 .memberType(MemberType.ROLE_MANAGE)
                 .build()
@@ -50,6 +51,7 @@ public class MemberService implements UserDetailsService {
                 .password(passwordEncoder.encode("1q2w3e4r!"))
                 .tel("01012341234")
                 .nickname("test")
+                .nicknameOpen(false)
                 .joinedAt(LocalDateTime.now())
                 .build()
         );
