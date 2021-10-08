@@ -12,24 +12,12 @@ import java.util.Map;
 @Slf4j
 public class ReviewSpecs {
 
-    public static Specification<Image> searchPhotoReviewDetails(List<String> imageName){
-        return (root, query, criteriaBuilder) -> {
-
-                List<Predicate> predicates = new ArrayList<>();
-                for (String e : imageName) {
-                    predicates.add(criteriaBuilder.equal(root.get("imageName"), e));
-                }
-                return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
-
-        };
-    }
-
     public static Specification<Review> searchPhotoReview(){
         return (root, query, criteriaBuilder) -> {
 
-                List<Predicate> predicates = new ArrayList<>();
-                    predicates.add(criteriaBuilder.isNotEmpty(root.get("uploadImage")));
-                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.isNotEmpty(root.get("uploadImage")));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
 
         };
     }
@@ -48,9 +36,9 @@ public class ReviewSpecs {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-                for (ReviewCategory e : category) {
-                    predicates.add(criteriaBuilder.equal(root.get("reviewCategory"), e));
-                }
+            for (ReviewCategory e : category) {
+                predicates.add(criteriaBuilder.equal(root.get("reviewCategory"), e));
+            }
 
             return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
         };
@@ -94,29 +82,33 @@ public class ReviewSpecs {
                         break;
 
                     case "traffic":
-                        for (Traffic e : (List<Traffic>)value) {
-                            trafficPredicates.add(criteriaBuilder.equal(root.get(key), e));
+                        for (String e : (List<String>)value) {
+                            String likeValue = "%"+e+"%";
+                            trafficPredicates.add(criteriaBuilder.like(root.get(key), likeValue));
                             log.info("e : {} / traffictPredicates : {} ", e, trafficPredicates);
                         }
                         break;
 
                     case "electronicDevice":
-                        for (ElectronicDevices e : (List<ElectronicDevices>)value) {
-                            electronicDevicePredicates.add(criteriaBuilder.equal(root.get(key), e));
+                        for (String e : (List<String>)value) {
+                            String likeValue = "%"+e+"%";
+                            electronicDevicePredicates.add(criteriaBuilder.like(root.get(key), likeValue));
                             log.info("e : {} / electronicDevicePredicates : {} ", e, electronicDevicePredicates);
                         }
                         break;
 
                     case "welfare":
-                        for (Welfare e : (List<Welfare>)value) {
-                            welfarePredicates.add(criteriaBuilder.equal(root.get(key), e));
+                        for (String e : (List<String>)value) {
+                            String likeValue = "%"+e+"%";
+                            welfarePredicates.add(criteriaBuilder.like(root.get(key), likeValue));
                             log.info("e : {} / welfarePredicates : {} ", e, welfarePredicates);
                         }
                         break;
 
                     case "convenient":
-                        for (Convenient e : (List<Convenient>)value) {
-                            convenientPredicates.add(criteriaBuilder.equal(root.get(key), e));
+                        for (String e : (List<String>)value) {
+                            String likeValue = "%"+e+"%";
+                            convenientPredicates.add(criteriaBuilder.like(root.get(key), likeValue));
                             log.info("e : {} / convenientPredicates : {} ", e, convenientPredicates);
                         }
                         break;
@@ -188,7 +180,7 @@ public class ReviewSpecs {
                 switch (key) {
                     case "postName": case "postContent": case "comment":
                     case "address": case "detailAddress": case "postCode": case "extraAddress":
-                      predicates.add(criteriaBuilder.like(root.get(key).as(String.class), likeValue));
+                        predicates.add(criteriaBuilder.like(root.get(key).as(String.class), likeValue));
                         break;
                 }
             });

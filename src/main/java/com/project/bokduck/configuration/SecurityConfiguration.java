@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-
-import javax.servlet.annotation.MultipartConfig;
 import javax.sql.DataSource;
 
 @Configuration
@@ -31,6 +29,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         PathRequest.toStaticResources().atCommonLocations()
                 );
 
+
     }
 
 
@@ -41,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/")
                 .permitAll()
 
-                .antMatchers("/review/list/**", "/review/search/**","/community/list/**")
+                .antMatchers("/review/list/**", "/review/search/**","/community/list/**", "/idsearch")
                 .permitAll()
 
                 .antMatchers("/mypage/**","/password/change/**","/manage/**","/review/read/**","/review/write/**","/community/read/**","/community/write/**")

@@ -22,13 +22,13 @@ public class ReviewListVo {
 
     private List<Payment> payment;
 
-    private List<Traffic> traffic;
+    private List<String> traffic;
 
-    private List<Convenient> convenient;
+    private List<String> convenient;
 
-    private List<Welfare> welfare;
+    private List<String> welfare;
 
-    private List<ElectronicDevices> electronicDevice;
+    private List<String> electronicDevice;
 
     private String photoReview;
 

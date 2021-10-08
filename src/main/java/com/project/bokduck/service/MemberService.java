@@ -38,7 +38,7 @@ public class MemberService implements UserDetailsService {
         memberRepository.save(Member.builder()
                 .username("admin@test.com")
                 .password(passwordEncoder.encode("1q2w3e4r!"))
-                .tel("01012341234")
+                .tel("01011111111")
                 .nickname("관리자")
                 .nicknameOpen(true)
                 .joinedAt(LocalDateTime.now())

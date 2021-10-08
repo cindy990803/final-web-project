@@ -11,7 +11,6 @@ import com.project.bokduck.service.MainpageService;
 import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.specification.CommunitySpecs;
-import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.validation.JoinFormValidator;
@@ -992,6 +991,35 @@ public class MainController {
         jsonObject.addProperty("message", message);
 
         return jsonObject.toString();
+    }
+
+
+    @RequestMapping ("/idsearch")
+    public String idSearchResult(String tel, Model model){
+        // 아이디 찾기
+
+        log.info("tel : {}", tel);
+
+        String message = null;
+
+        try {
+
+            if(tel != null){
+                Member member = memberRepository.findByTel(tel).get();
+                String[] split = member.getUsername().split("@");
+                String repeat = "*".repeat(split[0].length()-2);
+                message = "귀하의 가입하신 정보는 " + split[0].substring(0,2)+repeat+"@"+split[1]+" 입니다";
+            }
+
+        } catch(NoSuchElementException e) {
+            message = "등록된 정보가 없습니다";
+        }
+
+        model.addAttribute("message", message);
+
+        log.info("메세지 : {}", message);
+
+        return "member/idsearch";
     }
 
 
