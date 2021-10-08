@@ -54,6 +54,8 @@ public class ReviewController {
     private final MemberRepository memberRepository;
     private final ReviewCategory reviewCategory = new ReviewCategory();
     private final TagRepository tagRepository;
+    private final PostRepository postRepository;
+
 
     @Autowired
     ImageRepository imageRepository;
@@ -65,6 +67,9 @@ public class ReviewController {
 
     @GetMapping("/writeReview")
     public String writeReview(Model model, @CurrentMember Member member) {
+        if (member==null){
+            return "member/login";
+        }
         model.addAttribute("WriteReviewVO", new WriteReviewVO());
         return "post/review/writeReview";
     }
@@ -81,30 +86,38 @@ public class ReviewController {
 
                              File file, Image image, Model model) throws IOException {
 
-if(imageFile!=null) {
-    String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
-    image.setImagePath(imageName);
+        List<Image> imageList = new ArrayList<>();
+        String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+    image.setImageName(imageName);
+    image.setImagePath("/review_images/"+imageName);
+
     image = imageRepository.save(image);
-    String imageUploadDest = "image/" + image.getId();
+
+    String imageUploadDest = "review_images/" + image.getId();
+
     fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile);
 
+
+    imageList.add(image);
+
+
     model.addAttribute("image", image);
-}else {
-    image = imageRepository.save(null);
-    model.addAttribute("image",image);
-}
-if (pdfFile!=null) {
+
+
+
+
+
+List<File> fileList = new ArrayList<>();
     String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
     file.setFilePath(pdfName);
     file = fileRepository.save(file);
     String pdfUploadDest = "file/" + file.getId();
     fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
+    fileList.add(file);
 
     model.addAttribute("file", file);
-}else {
-    file = fileRepository.save(null);
-    model.addAttribute("file",file);
-}
+
+
         switch (writeReviewVO.getRoomSize()) {
             case "oneRoom":
                 reviewCategory.setRoomSize(RoomSize.ONEROOM);
@@ -142,7 +155,7 @@ if (pdfFile!=null) {
 
         List<Tag> tagList = new ArrayList<>();
 
-        if (writeReviewVO.getTags().isEmpty()) {
+        if (!writeReviewVO.getTags().isEmpty()) {
             JsonArray tagsJsonArray = new Gson().fromJson(writeReviewVO.getTags(), JsonArray.class);
 
             for (int i = 0; i < tagsJsonArray.size(); ++i) {
@@ -175,13 +188,20 @@ if (pdfFile!=null) {
             reviewCategory.setConvenient(writeReviewVO.getConvenient());
         }
         if (writeReviewVO.getElectronicDevice()==null){
-            reviewCategory.setConvenient("");
+            reviewCategory.setElectronicDevice("");
         }else {
             reviewCategory.setElectronicDevice(writeReviewVO.getElectronicDevice());
         }
 
 
-
+        // 태그 포스트에 넣기
+        List<Tag> tag1 = tagRepository.findAll();
+        List<Post> tagPostList = postRepository.findAll();
+        for (Tag t : tag1) {
+            t.setTagToPost(tagPostList);
+        }
+        Review review1;
+        review1 = reviewRepository.getById(member.getId());
 
 
         Review review = Review.builder()
@@ -200,11 +220,10 @@ if (pdfFile!=null) {
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
+
+
         reviewCategoryRepository.save(reviewCategory);
         reviewRepository.save(review);
-
-
-
 
         return "index";
     }

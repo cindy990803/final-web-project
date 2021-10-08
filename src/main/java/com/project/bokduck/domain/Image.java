@@ -28,7 +28,7 @@ public class Image {
     public String getImagePath(){
         if (imagePath == null){return null;}
 
-        return "/image/" + id + "/" + imagePath;
+        return "/review_images/" + id +"/"+ imageName;
 
     }
 

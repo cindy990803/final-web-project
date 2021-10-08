@@ -44,7 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/review/list/**", "/review/search/**","/community/list/**")
                 .permitAll()
 
-                .antMatchers("/mypage/**","/manage/**","/review/read/**","/review/write/**","/community/read/**","/community/write/**")
+                .antMatchers("/mypage/**","/password/change/**","/manage/**","/review/read/**","/review/write/**","/community/read/**","/community/write/**")
                 .authenticated()
 
                 .and()

@@ -23,6 +23,7 @@ import com.project.bokduck.service.ReviewService;
 import com.project.bokduck.service.SmsService;
 
 import com.project.bokduck.util.CurrentMember;
+import com.project.bokduck.util.ReviewListVo;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
@@ -659,6 +660,23 @@ public class MainController {
         return jsonObject.toString();
 
     }
+
+
+    @GetMapping("/mypage")
+    public String mypage(Model model,
+                         @CurrentMember Member member) {
+List<Review> reviewList = new ArrayList<>();
+Review review;
+
+        review = reviewRepository.getById(member.getId());
+
+
+
+        return "/member/mypage";
+    }
     
+
+
+
 
 }
