@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -12,6 +12,7 @@ import com.project.bokduck.repository.ReviewCategoryRepository;
 import com.project.bokduck.repository.ReviewRepository;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.util.WriteReviewVO;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.google.gson.JsonObject;
@@ -52,7 +53,7 @@ public class ReviewController {
     private final ReviewRepository reviewRepository;
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final MemberRepository memberRepository;
-    private final ReviewCategory reviewCategory = new ReviewCategory();
+
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
 
@@ -67,7 +68,7 @@ public class ReviewController {
 
     @GetMapping("/writeReview")
     public String writeReview(Model model, @CurrentMember Member member) {
-        if (member==null){
+        if (member == null) {
             return "member/login";
         }
         model.addAttribute("WriteReviewVO", new WriteReviewVO());
@@ -76,46 +77,66 @@ public class ReviewController {
 
 
     @PostMapping("/writeReview")
-    public String saveReview(@RequestParam("image") MultipartFile imageFile,
+    public String saveReview(
 
-                             @RequestParam("pdf") MultipartFile pdfFile,
+            @RequestParam("image") MultipartFile[] imageFile,
 
-                             @CurrentMember Member member,
+            @RequestParam("pdf") MultipartFile pdfFile,
 
-                             @ModelAttribute WriteReviewVO writeReviewVO,
+            @CurrentMember Member member,
 
-                             File file, Image image, Model model) throws IOException {
+            @ModelAttribute WriteReviewVO writeReviewVO,
+
+            File file, Model model) throws IOException {
 
         List<Image> imageList = new ArrayList<>();
-        String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+        ReviewCategory reviewCategory = new ReviewCategory();
+
+
+
+for (int i = 0; i < imageFile.length;i++) {
+
+    Image image = new Image();
+
+    String imageName = StringUtils.cleanPath(imageFile[i].getOriginalFilename());
+
     image.setImageName(imageName);
-    image.setImagePath("/review_images/"+imageName);
+
 
     image = imageRepository.save(image);
 
+    image.setImagePath("/review_images/" + image.getId()+"/" + imageName);
+
     String imageUploadDest = "review_images/" + image.getId();
 
-    fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile);
-
+    fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile[i]);
 
     imageList.add(image);
 
-
     model.addAttribute("image", image);
 
+}
 
 
 
 
-List<File> fileList = new ArrayList<>();
-    String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
-    file.setFilePath(pdfName);
-    file = fileRepository.save(file);
-    String pdfUploadDest = "file/" + file.getId();
-    fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
-    fileList.add(file);
 
-    model.addAttribute("file", file);
+
+        List<File> fileList = new ArrayList<>();
+
+        String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
+
+        file.setFilePath(pdfName);
+
+        file = fileRepository.save(file);
+
+        String pdfUploadDest = "file/" + file.getId();
+
+        fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
+
+        fileList.add(file);
+
+        model.addAttribute("file", file);
 
 
         switch (writeReviewVO.getRoomSize()) {
@@ -187,9 +208,9 @@ List<File> fileList = new ArrayList<>();
         } else {
             reviewCategory.setConvenient(writeReviewVO.getConvenient());
         }
-        if (writeReviewVO.getElectronicDevice()==null){
+        if (writeReviewVO.getElectronicDevice() == null) {
             reviewCategory.setElectronicDevice("");
-        }else {
+        } else {
             reviewCategory.setElectronicDevice(writeReviewVO.getElectronicDevice());
         }
 
@@ -200,11 +221,21 @@ List<File> fileList = new ArrayList<>();
         for (Tag t : tag1) {
             t.setTagToPost(tagPostList);
         }
+
+/*
+        List<Image> image2 = imageRepository.findAll();
+        List<Post>  imagetoPost = postRepository.findAll();
+         for(Image t : image2){
+         t.setImageToPost(imagetoPost);
+     }
+*/
+
+
         Review review1;
         review1 = reviewRepository.getById(member.getId());
+        reviewCategory = reviewCategoryRepository.save(reviewCategory);
 
-
-        Review review = Review.builder()
+        Review   review = Review.builder()
                 .writer(member)
                 .regdate(LocalDateTime.now())
                 .address(writeReviewVO.getAddress())
@@ -214,16 +245,22 @@ List<File> fileList = new ArrayList<>();
                 .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
                 .reviewStatus(ReviewStatus.WAIT)
-                .star(0)
+                .star((writeReviewVO.getStars() / 2))
+                .uploadImage(imageList)
                 .postName(writeReviewVO.getTitle())
                 .tags(tagList)
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
+        for(int i = 0; i<imageList.size();i++) {
+            imageList.get(i).setImageToPost(review);
+        }
 
-
-        reviewCategoryRepository.save(reviewCategory);
         reviewRepository.save(review);
+
+
+
+
 
         return "index";
     }

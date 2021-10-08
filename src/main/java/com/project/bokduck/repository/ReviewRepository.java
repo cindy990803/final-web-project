@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,5 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
     // 리스트형으로 카테고리 받기
     Page<Review> findAllByReviewCategoryIn(List<ReviewCategory> categoryList, Pageable pageable);
 
+    @Query(value = "SELECT * FROM POST LEFT OUTER JOIN REVIEW WHERE WRITER_ID = :writer",nativeQuery = true)
+    List<Review> findALlByWriter(Long writer);
 }
 

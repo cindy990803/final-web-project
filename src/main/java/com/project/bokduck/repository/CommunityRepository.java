@@ -9,6 +9,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +27,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     Page<Community> findByPostContentContaining(String searchText, Pageable pageable);
 
 
-}
+    @Query(value = "SELECT * FROM POST LEFT OUTER JOIN COMMUNITY WHERE WRITER_ID = :writer" , nativeQuery = true)
+    List<Community> findAllByWriter(Long writer);
+
+ }
