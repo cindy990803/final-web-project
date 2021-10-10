@@ -504,7 +504,7 @@ public class MainController {
 // 리뷰 컨트롤러
 
     @GetMapping("/review/read")
-    public String read(Model model,@RequestParam(name = "reviewId") Long id, @CurrentMember Member member){
+    public String read(Model model,@RequestParam(name = "id") Long id, @CurrentMember Member member){
         Review review = reviewService.getReview(id);
 
         reviewService.increaseHit(id);
