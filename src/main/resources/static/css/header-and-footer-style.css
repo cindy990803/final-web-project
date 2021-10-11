@@ -140,7 +140,7 @@
         }
 
         .menu-a {
-            color:black;
+            color:#808080;
             font-weight : bold;
         }
 
@@ -151,6 +151,19 @@
         }
 
         .menu-a:visited {
+            color:#808080;
             text-decoration: none;
             font-weight : bold;
         }
+
+        .activetab {
+            color:black;
+        }
+        .activetab:hover {
+            color:#26BAD4;
+        }
+        .activetab:visited {
+            color:black;
+        }
+
+

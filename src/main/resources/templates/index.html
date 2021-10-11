@@ -10,18 +10,13 @@
 
     <script>
             function changeDisp() {
-
-                console.log('함수 호출됨.');
-
-                var con = document.getElementById('ddd-content');
+                var con = document.getElementById('check_option');
 
                 if (con.style.display == 'none') {
                     con.style.display = 'block';
                 } else {
                     con.style.display = 'none';
                 }
-
-                console.log('함수 실행완료됨.');
             }
     </script>
 
@@ -45,137 +40,198 @@
 
         <!-- 창 -->
         <div class="input-group" style="position:absolute; top:400px; left:30%; width:40%;">
-            <input id="searchText" name="searchText" type="text" class="form-control" placeholder="태그 및 키워드 검색" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4">
+            <input id="searchText" name="searchText" type="text" value="" th:value="${param.searchText == null} ? '' : ${param.searchText}" class="form-control" placeholder="태그 및 키워드 검색"/>
             <div class="input-group-append" id="button-addon4">
                 <button class="btn btn-info" style="background-color:white; color:black" onclick="javascript:changeDisp();" type="button">옵션</button>
-                <button id="check_option" class="btn btn-info" type="submit">검색</button>
+                <button class="btn btn-info" type="submit">검색</button>
             </div>
         </div>
 
         <!-- 드롭다운 옵션 -->
-        <table id="ddd-content" style="display:none; position:absolute; top:440px; left:30%; background-color:white" frame="box">
-            <tr>
-                <td width="100px">
-                    <span>지역</span>
-                </td>
-                <td width="300px">
-                    <input type="text" class="form-control" id = "address"
-                           name="address" placeholder="동을 입력하세요. (예) 연희동"
-                           th:value="${param.address}">
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>방 형태</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="r1" name="roomSize" value="ONEROOM"
-                    />
-                    <label for="r1"> 원룸 </label>
+        <div class="form-group form-check form-check-inline justify-content-center" id="check_option"
+             style="display:none; width:40%; position:absolute; top:440px; left:30%; background-color:white; border:1px solid gray; z-index:2">
+            <table id="option_table" class="table" style="background-color:white">
+                <tr>
+                    <th scope="row" style="width: 100px;vertical-align:middle; font-weight: bold;"> 지역</th>
+                    <td>
+                        <input type="text" class="form-control" id="address"
+                               name="address" placeholder="지역명 또는 단지명을 입력해주세요"
+                               size="5"
+                               th:value="${param.address == null} ? '' : ${param.address}" value="">
+                    </td>
+                </tr>
 
-                    <input type="checkbox" id="r2" name="roomSize" value="TWOROOM"
-                    />
-                    <label for="r2"> 투룸 </label>
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 방 형태</th>
+                    <td>
+                        <label th:with="isExist = ${param.roomSize != null}">
+                            <input class="form-check-input" type="checkbox" id="r1" name="roomSize"
+                                   value="ONEROOM"
+                                   th:checked="${isExist and  (#strings.contains(param.roomSize,'ONEROOM'))}"/>
+                            <label class="form-check-label" for="r1"> 원룸 </label></label>
 
-                    <input type="checkbox" id="r3" name="roomSize" value="THREEMORE"
-                    />
-                    <label for="r3"> 쓰리룸이상 </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>주거 형태</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="st1" name="structure" value="VILLA" />
-                    <label for="st1"> 빌라 </label>
 
-                    <input type="checkbox" id="st2" name="structure" value="OFFICE" />
-                    <label for="st2"> 오피스텔 </label>
+                        <label th:with="isExist = ${param.roomSize != null}">
+                            <input class="form-check-input" type="checkbox" id="r2" name="roomSize"
+                                   value="TWOROOM"
+                                   th:checked="${isExist and  (#strings.contains(param.roomSize,'TWOROOM'))}"/>
+                            <label class="form-check-label" for="r2"> 투룸 </label></label>
 
-                    <input type="checkbox" id="st3" name="structure" value="APART" />
-                    <label for="st3"> 아파트 </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>계약 형태</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="p1" name="payment" value="MONTHLY" />
-                    <label for="p1"> 월세 </label>
+                        <label th:with="isExist = ${param.roomSize != null}">
+                            <input class="form-check-input" type="checkbox" id="r3" name="roomSize"
+                                   value="THREEMORE"
+                                   th:checked="${isExist and  (#strings.contains(param.roomSize,'THREEMORE'))}"/>
+                            <label class="form-check-label" for="r3"> 쓰리룸이상 </label></label>
+                    </td>
+                </tr>
 
-                    <input type="checkbox" id="p2" name="payment" value="HALFCHARTER" />
-                    <label for="p2"> 반전세 </label>
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 주거 형태</th>
+                    <td>
+                        <label th:with="isExist = ${param.structure != null}">
+                            <input class="form-check-input" type="checkbox" id="st1" name="structure"
+                                   value="VILLA"
+                                   th:checked="${isExist and  (#strings.contains(param.structure,'VILLA'))}"/>
+                            <label class="form-check-label" for="st1"> 빌라 </label></label>
 
-                    <input type="checkbox" id="p3" name="payment" value="CHARTER" />
-                    <label for="p3"> 전세 </label>
+                        <label th:with="isExist = ${param.structure != null}">
+                            <input class="form-check-input" type="checkbox" id="st2" name="structure"
+                                   value="OFFICE"
+                                   th:checked="${isExist and  (#strings.contains(param.structure,'OFFICE'))}"/>
+                            <label class="form-check-label" for="st2"> 오피스텔 </label></label>
 
-                    <input type="checkbox" id="p4" name="payment" value="DEALING" />
-                    <label for="p4"> 매매 </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>교통편의</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="t1" name="traffic" value="BUS" />
-                    <label for="t1"> 버스 </label>
+                        <label th:with="isExist = ${param.structure != null}">
+                            <input class="form-check-input" type="checkbox" id="st3" name="structure"
+                                   value="APART"
+                                   th:checked="${isExist and  (#strings.contains(param.structure,'APART'))}"/>
+                            <label class="form-check-label" for="st3"> 아파트 </label></label>
+                    </td>
+                </tr>
 
-                    <input type="checkbox" id="t2" name="traffic" value="SUBWAY" />
-                    <label for="t2"> 지하철 </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>가구 옵션</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="e1" name="electronicDevice" value="BED" />
-                    <label for="e1"> 침대 </label>
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 계약 형태</th>
+                    <td id="check_payment">
+                        <label th:with="isExist = ${param.payment != null}">
+                            <input class="form-check-input" type="checkbox" id="p1" name="payment"
+                                   value="MONTHLY"
+                                   th:checked="${isExist and  (#strings.contains(param.payment,'MONTHLY'))}"/>
+                            <label class="form-check-label" for="p1"> 월세 </label></label>
 
-                    <input type="checkbox" id="e2" name="electronicDevice" value="AIRCONDITIONER" />
-                    <label for="e2"> 에어컨 </label>
+                        <label th:with="isExist = ${param.payment != null}">
+                            <input class="form-check-input" type="checkbox" id="p2" name="payment"
+                                   value="HALFCHARTER"
+                                   th:checked="${isExist and  (#strings.contains(param.payment,'HALFCHARTER'))}"/>
+                            <label class="form-check-label" for="p2"> 반전세 </label></label>
 
-                    <input type="checkbox" id="e3" name="electronicDevice" value="WASHINGMACHINE" />
-                    <label for="e3"> 세탁기 </label>
+                        <label th:with="isExist = ${param.payment != null}">
+                            <input class="form-check-input" type="checkbox" id="p3" name="payment"
+                                   value="CHARTER"
+                                   th:checked="${isExist and  (#strings.contains(param.payment,'CHARTER'))}"/>
+                            <label class="form-check-label" for="p3"> 전세 </label></label>
 
-                    <input type="checkbox" id="e4" name="electronicDevice" value="REFRIGERATOR" />
-                    <label for="e4"> 냉장고 </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>건물 시설</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="w1" name="welfare" value="PARKING" />
-                    <label for="w1"> 주차장 </label>
+                        <label th:with="isExist = ${param.payment != null}">
+                            <input class="form-check-input" type="checkbox" id="p4" name="payment"
+                                   value="DEALING"
+                                   th:checked="${isExist and  (#strings.contains(param.payment,'DEALING'))}"/>
+                            <label class="form-check-label" for="p4"> 매매 </label></label>
+                    </td>
+                </tr>
 
-                    <input type="checkbox" id="w2" name="welfare" value="DELIVERYBOX" />
-                    <label for="w2"> 무인택배함 </label>
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 교통 편의</th>
+                    <td id="check_traffic">
+                        <label th:with="isExist = ${param.traffic != null}">
+                            <input class="form-check-input" type="checkbox" id="t1" name="traffic" value="BUS"
+                                   th:checked="${isExist and  (#strings.contains(param.traffic,'BUS'))}"/>
+                            <label class="form-check-label" for="t1"> 버스 </label></label>
 
-                    <input type="checkbox" id="w3" name="welfare" value="CCTV" />
-                    <label for="w3"> CCTV </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="100px">
-                    <span>편의 시설</span>
-                </td>
-                <td width="300px">
-                    <input type="checkbox" id="c1" name="convenient" value="STORE" />
-                    <label for="c1"> 편의점 </label>
+                        <label th:with="isExist = ${param.traffic != null}">
+                            <input class="form-check-input" type="checkbox" id="t2" name="traffic"
+                                   value="SUBWAY"
+                                   th:checked="${isExist and  (#strings.contains(param.traffic,'SUBWAY'))}"/>
+                            <label class="form-check-label" for="t2"> 지하철 </label></label>
+                    </td>
+                </tr>
 
-                    <input type="checkbox" id="c2" name="convenient" value="HOSPITAL" />
-                    <label for="c2"> 병원 </label>
 
-                    <input type="checkbox" id="c3" name="convenient" value="COINLAUNDRY" />
-                    <label for="c3"> 코인빨래방 </label>
-                </td>
-            </tr>
-        </table>
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 가구 옵션</th>
+                    <td id="check_electronicDevices">
+                        <label th:with="isExist = ${param.electronicDevice != null}">
+                            <input class="form-check-input" type="checkbox" id="e1" name="electronicDevice"
+                                   value="BED"
+                                   th:checked="${isExist and  (#strings.contains(param.electronicDevice,'BED'))}"/>
+                            <label class="form-check-label" for="e1"> 침대 </label></label>
+
+                        <label th:with="isExist = ${param.electronicDevice != null}">
+                            <input class="form-check-input" type="checkbox" id="e2" name="electronicDevice"
+                                   value="AIRCONDITIONER"
+                                   th:checked="${isExist and  (#strings.contains(param.electronicDevice,'AIRCONDITIONER'))}"/>
+                            <label class="form-check-label" for="e2"> 에어컨 </label></label>
+
+                        <label th:with="isExist = ${param.electronicDevice != null}">
+                            <input class="form-check-input" type="checkbox" id="e3" name="electronicDevice"
+                                   value="WASHINGMACHINE"
+                                   th:checked="${isExist and  (#strings.contains(param.electronicDevice,'WASHINGMACHINE'))}"/>
+                            <label class="form-check-label" for="e3"> 세탁기 </label></label>
+
+                        <label th:with="isExist = ${param.electronicDevice != null}">
+                            <input class="form-check-input" type="checkbox" id="e4" name="electronicDevice"
+                                   value="REFRIGERATOR"
+                                   th:checked="${isExist and  (#strings.contains(param.electronicDevice,'REFRIGERATOR'))}"/>
+                            <label class="form-check-label" for="e4"> 냉장고 </label></label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 건물 시설</th>
+                    <td id="check_welfare">
+                        <label th:with="isExist = ${param.welfare != null}">
+                            <input class="form-check-input" type="checkbox" id="w1" name="welfare"
+                                   value="PARKING"
+                                   th:checked="${isExist and  (#strings.contains(param.welfare,'PARKING'))}"/>
+                            <label class="form-check-label" for="w1"> 주차장 </label></label>
+
+                        <label th:with="isExist = ${param.welfare != null}">
+                            <input class="form-check-input" type="checkbox" id="w2" name="welfare"
+                                   value="DELIVERYBOX"
+                                   th:checked="${isExist and  (#strings.contains(param.welfare,'DELIVERYBOX'))}"/>
+                            <label class="form-check-label" for="w2"> 무인택배함 </label></label>
+
+                        <label th:with="isExist = ${param.welfare != null}">
+                            <input class="form-check-input" type="checkbox" id="w3" name="welfare" value="CCTV"
+                                   th:checked="${isExist and  (#strings.contains(param.welfare,'CCTV'))}"/>
+                            <label class="form-check-label" for="w3"> CCTV </label></label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th style="width: 100px;vertical-align:middle; font-weight: bold;"> 편의 시설</th>
+                    <td id="check_convenient">
+                        <label th:with="isExist = ${param.convenient != null}">
+                            <input class="form-check-input" type="checkbox" id="c1" name="convenient"
+                                   value="STORE"
+                                   th:checked="${isExist and  (#strings.contains(param.convenient,'STORE'))}"/>
+                            <label class="form-check-label" for="c1"> 편의점 </label></label>
+
+                        <label th:with="isExist = ${param.convenient != null}">
+                            <input class="form-check-input" type="checkbox" id="c2" name="convenient"
+                                   value="HOSPITAL"
+                                   th:checked="${isExist and  (#strings.contains(param.convenient,'HOSPITAL'))}"/>
+                            <label class="form-check-label" for="c2"> 병원 </label></label>
+
+                        <label th:with="isExist = ${param.convenient != null}">
+                            <input class="form-check-input" type="checkbox" id="c3" name="convenient"
+                                   value="COINLAUNDRY"
+                                   th:checked="${isExist and  (#strings.contains(param.convenient,'COINLAUNDRY'))}"/>
+                            <label class="form-check-label" for="c3"> 코인빨래방 </label></label>
+                    </td>
+                </tr>
+            </table>
+
+            <input name="lineUp" value="new" hidden>
+
+        </div>
     </form>
 
     <!-- 리뷰글 슬라이드 부분 -->
@@ -190,7 +246,7 @@
                         <div class="text-left" width="300px" style="margin:25px; display:inline-block">
                             <!-- 썸네일 이미지 -->
                             <div th:if="*{#lists.isEmpty(uploadImage)}">
-                                <img width="300px" height="240px" th:src="@{/images/no_image.png}"/>
+                                <img width="300px" height="240px" th:src="@{/images/no_photo.png}"/>
                             </div>
                             <div th:unless="*{#lists.isEmpty(uploadImage)}">
                                 <img width="300px" height="240px" th:src="@{${review.uploadImage[0].imagePath}}"/>
@@ -198,7 +254,7 @@
 
                             <p style="margin:0; padding:0; width: 300px">
                                 <!-- 제목 -->
-                                <a class="title-a" th:text="${review.postName}" href="#" style="font-size:24px; display:inline-block; margin:0; padding:0; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a>
+                                <a class="title-a" th:text="${review.postName}" th:href="@{/review/read(id=${review.id})}" th:value="${review.id}" style="font-size:24px; display:inline-block; margin:0; padding:0; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a>
 
                                 <!-- 별점 -->
                                 <span th:if="${review.star} == 5" style="display:inline-block; margin-top:3px; margin-bottom:3px" class="float-right">
@@ -251,7 +307,7 @@
                         <div class="text-left" width="300px" style="margin:25px; display:inline-block">
                             <!-- 썸네일 이미지 -->
                             <div th:if="*{#lists.isEmpty(uploadImage)}">
-                                <img width="300px" height="240px" th:src="@{/images/no_image.png}"/>
+                                <img width="300px" height="240px" th:src="@{/images/no_photo.png}"/>
                             </div>
                             <div th:unless="*{#lists.isEmpty(uploadImage)}">
                                 <img width="300px" height="240px" th:src="@{${review.uploadImage[0].imagePath}}"/>
@@ -259,7 +315,7 @@
 
                             <p style="margin:0; padding:0; width: 300px">
                                 <!-- 제목 -->
-                                <a class="title-a" th:text="${review.postName}" href="#" style="font-size:24px; display:inline-block; margin:0; padding:0; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a>
+                                <a class="title-a" th:text="${review.postName}" th:href="@{/review/read(id=${review.id})}" th:value="${review.id}" style="font-size:24px; display:inline-block; margin:0; padding:0; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a>
 
                                 <!-- 별점 -->
                                 <span th:if="${review.star} == 5" style="display:inline-block; margin-top:3px; margin-bottom:3px" class="float-right">
@@ -312,7 +368,7 @@
                         <div class="text-left" width="300px" style="margin:25px; display:inline-block">
                             <!-- 썸네일 이미지 -->
                             <div th:if="*{#lists.isEmpty(uploadImage)}">
-                                <img width="300px" height="240px" th:src="@{/images/no_image.png}"/>
+                                <img width="300px" height="240px" th:src="@{/images/no_photo.png}"/>
                             </div>
                             <div th:unless="*{#lists.isEmpty(uploadImage)}">
                                 <img width="300px" height="240px" th:src="@{${review.uploadImage[0].imagePath}}"/>
@@ -320,7 +376,7 @@
 
                             <p style="margin:0; padding:0; width: 300px">
                                 <!-- 제목 -->
-                                <a class="title-a" th:text="${review.postName}" href="#" style="font-size:24px; display:inline-block; margin:0; padding:0; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a>
+                                <a class="title-a" th:text="${review.postName}" th:href="@{/review/read(id=${review.id})}" th:value="${review.id}" style="font-size:24px; display:inline-block; margin:0; padding:0; width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a>
 
                                 <!-- 별점 -->
                                 <span th:if="${review.star} == 5" style="display:inline-block; margin-top:3px; margin-bottom:3px" class="float-right">
@@ -393,7 +449,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="community : ${communityList}">
-                    <td><a class="title-a" th:text="${community.postName}" style="display:inline-block; width:300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" href="#"></a></td>
+                    <td><a class="title-a" th:href="@{/community/read(id=${community.id})}" th:value="${community.id}" th:text="${community.postName}" style="display:inline-block; width:300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a></td>
                     <td th:text="${community.hit}"></td>
                     <td th:text="${community.likeCount}"></td>
                 </tr>
@@ -414,7 +470,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="tip : ${communityTipList}">
-                    <td><a class="title-a" th:text="${tip.postName}" style="display:inline-block; width:300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" href="#"></a></td>
+                    <td><a class="title-a" th:href="@{/community/read(id=${tip.id})}" th:value="${tip.id}" th:text="${tip.postName}" style="display:inline-block; width:300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></a></td>
                     <td th:text="${tip.hit}"></td>
                     <td th:text="${tip.likeCount}"></td>
                 </tr>

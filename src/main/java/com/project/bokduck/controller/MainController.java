@@ -15,6 +15,7 @@ import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
+import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -276,6 +277,9 @@ public class MainController {
         dataBinder.addValidators(new JoinFormValidator(memberRepository));
     }
 
+
+
+
     @RequestMapping("/")
     public String index(Model model) {
 
@@ -370,8 +374,9 @@ public class MainController {
     }
 
     @GetMapping("/community/write")
-    public String communityWriteForm(Model model) {
+    public String communityWriteForm(Model model, @CurrentMember Member member) {
         model.addAttribute("vo", new CommunityFormVo());
+
         return "post/community/write";
     }
 
@@ -441,7 +446,7 @@ public class MainController {
             t.getTagToPost().add(community);
         }
 
-        return "redirect:/";  //TODO id값 어떻게 불러오지?("post/community/read?id=" + "?")
+        return getCommunityRead(model, savedCommu.getId(), member);
     }
 
 
@@ -462,6 +467,7 @@ public class MainController {
         model.addAttribute("check", check);
         model.addAttribute("communityList", communityList);
         model.addAttribute("state", "all");
+
         return "post/community/list";
     }
 
@@ -603,6 +609,16 @@ public class MainController {
 
         Community community = communityRepository.findById(id).orElseThrow();
 
+        if (community.getVisitedMember()==null) {
+            community.setVisitedMember(new ArrayList<>());
+        }
+        if (community.getLikers()==null) {
+            community.setLikers(new ArrayList<>());
+        }
+        if (community.getCommentCommunity()==null) {
+            community.setCommentCommunity(new ArrayList<>());
+        }
+
         //조회수 올리기
         if (! community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
             community.setHit(community.getHit()+1);
@@ -625,13 +641,6 @@ public class MainController {
         return "post/community/read";
     }
 
-//    @GetMapping("/community/delete")
-//    public String communityDelete(@PageableDefault(size = 10,sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @CurrentMember Member member, Model model, long id) {
-//
-//        communityRepository.deleteById(id);
-//
-//        return community(pageable, member, model);  //PostConstruct로 생성한 글을 지우려고 하면 모든 글이 삭제됨. 왜?
-//    }
 
     @GetMapping("/community/delete")
     @ResponseBody
@@ -640,6 +649,7 @@ public class MainController {
         communityRepository.deleteById(id);
 
         JsonObject jsonObject = new JsonObject();
+
         return jsonObject.toString();
     }
 
@@ -848,16 +858,6 @@ public class MainController {
         return jsonObject.toString();
     }
 
-    @PostMapping("/community/read/comment")
-    public String writeCommunityComment() {
-
-
-        return "";
-    }
-    @RequestMapping("/mypage")
-
-
-
     @GetMapping("/mypage")
     public String mypage(Model model,
                          @CurrentMember Member member) {
@@ -917,6 +917,7 @@ public class MainController {
         memberRepository.delete(member);
         SecurityContextHolder.clearContext();
         JsonObject jsonObject = new JsonObject();
+
         return jsonObject.toString();
     }
 
