@@ -140,7 +140,7 @@
         }
 
         .menu-a {
-            color:#808080;
+            color:#A0A0A0;
             font-weight : bold;
         }
 
@@ -151,7 +151,7 @@
         }
 
         .menu-a:visited {
-            color:#808080;
+            color:#A0A0A0;
             text-decoration: none;
             font-weight : bold;
         }
@@ -164,6 +164,23 @@
         }
         .activetab:visited {
             color:black;
+        }
+
+        .menu-aa {
+            color:black;
+            font-weight : bold;
+        }
+
+        .menu-aa:hover {
+            color:#26BAD4;
+            text-decoration: none;
+            font-weight : bold;
+        }
+
+        .menu-aa:visited {
+            color:black;
+            text-decoration: none;
+            font-weight : bold;
         }
 
 
