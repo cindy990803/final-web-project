@@ -3,10 +3,139 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='Login'">
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='복덕복덕 : Review'">
 <head>
 
+    <style>
+        button, button:hover {
+            border: 0;
+            outline: 0;
+        }
+    </style>
+    <script th:inline="javascript">
+        $(document).ready(function (){
+            $(".like").click(function (){ // 좋아요 하는 기능
+                let data = $(this).val();
+                $.ajax({
+                    type: 'POST',
+                    url:'/review/read/like',
+                    data: { "id" : data},
+                    dataType: 'json',
+                    success: function (result){
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                        }else if(result.resultCode == "error.invalid"){
+                            alert(result.message);
+                        }else if(result.resultCode == "ok"){
+                            $("#"+data).attr("src","/images/like_red.svg");
+                            $('#likeNum'+data).html(result.likeCheck);
+                        }else if(result.resultCode == "duplicate"){
+                            $("#"+data).attr("src","/images/like.svg");
+                            $('#likeNum'+data).text(result.likeCheck);
+                        }
+                    }
+                });
+            });
+
+            $(".delete").click(function (){
+                let ans = confirm("삭제하시겠습니까?");
+                if(ans){
+                    let data = $(this).val();
+                    $.ajax({
+                        type: "GET",
+                        url : "/post/review/read/delete",
+                        data: { "id" : data},
+                        dataType: 'json',
+                        success : function(result) {
+                            if(result.resultCode == 200) {
+                                alert(result.message)
+                                let url= "/post/review/list";
+                                location.replace(url);
+                            } else {
+                                alert(result.message)
+                            }
+
+                        }
+                    });
+                }
+            });
+
+        });
+        //답글쓰기 텍스트창 활성화하는 함수
+        function changeDisp(id) {
+
+            console.log('함수 호출됨.');
+
+            var con = document.getElementById(id);
+
+            if (con.style.display == 'none') {
+                con.style.display = 'block';
+            } else {
+                con.style.display = 'none';
+            }
+
+            console.log('함수 실행완료됨.');
+        }
+
+    </script>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $(".confirm").click(function () { // 승인 버튼 눌렀을 때
+                let data = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/manage/list/approval',
+                    data: {"id": data},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                            location.href = "/login";
+                        } else if (result.resultCode == "error.invalid") {
+                            alert(result.message);
+                        } else if (result.resultCode == "ok") {
+                            alert(result.message);
+                            location.href = "/manage";
+                        } else if (result.resultCode == "duplicate") {
+                            alert(result.message);
+                        }
+                    }
+                });
+            });
+        });
+
+
+        $(document).ready(function () {
+            $(".no_confirm").click(function () { // 거부버튼 눌렀을 때
+                let data = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/manage/list/refusal',
+                    data: {"id": data},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                            location.href = "/login";
+                        } else if (result.resultCode == "error.invalid") {
+                            alert(result.message);
+                        } else if (result.resultCode == "ok") {
+                            alert(result.message);
+                            location.href = "/manage";
+                        } else if (result.resultCode == "duplicate") {
+                            alert(result.message);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
     <link
             rel="stylesheet"
             href="https://unpkg.com/swiper/swiper-bundle.min.css"
@@ -14,10 +143,10 @@
     <link rel="stylesheet" href="/css/review-read.css">
     <!-- SWIPER-->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
 <!--    <script defer src="/js/member/read.js"></script>-->
     <!-- 지도   -->
-    <script type="text/javascript"
-            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=176ocp7ltk&submodules=geocoder"></script>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=176ocp7ltk&submodules=geocoder"></script>
 
 </head>
 
@@ -29,14 +158,20 @@
         <!--  address 정해지면 가져오기  -->
         <div class="inner">
             <div class="title-main">
-                <span th:text="*{postName}"></span>
+                <p th:text="*{address}"></p>
+                <span th:text="*{postName}" ></span>
                 <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"></span>
-                <p th:text="*{writer.nickname}"></p>
             </div>
             <div class="title-sub">
-                <img src="/images/like.svg" alt="like">
+                <span style="margin-right: 2px;">조회수 </span> <span th:text="*{hit}"></span>
+                <button type="button" class="like"
+                        style="border:0px; outline:0px;background-color:transparent; margin-right: 2px"
+                        th:id="like" th:value="*{id}">
+                    <img th:src="@{ ${review.likers.contains(currentMember)} ? '/images/like_red.svg': '/images/like.svg'}"
+                         th:id="*{id}" >
+                </button>
+                <span th:text="' '+ *{likers.size}" th:id="likeNum + *{id}"></span>
                 <img src="/images/alarm.png" alt="like">
-                <span>조회수 :</span> <span th:text="*{hit}"></span>
             </div>
         </div>
     </section>
@@ -50,8 +185,8 @@
             </div>
         </div>
 
-        <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
         <div class="swiper-pagination"></div>
 
     </div>
@@ -84,24 +219,55 @@
                     <span>계약형식 | </span>
                     <span th:if="*{reviewCategory.payment != null}" th:text="*{reviewCategory.payment.information}"></span>
                 </div>
-                <div class="option">
+                <div class="option" >
                     <span>교통 | </span>
-                    <span th:if="*{reviewCategory.traffic != null}" th:text="*{reviewCategory.traffic.information}"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.traffic,'SUBWAY')} " th:text="지하철"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.traffic,'BUS')} " th:text="버스"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.traffic,'SUBWAY,BUS')} " th:text="'지하철'+'&nbsp&nbsp'+'버스'"></span>
+
                 </div>
             </div>
 
             <div class="inner__right">
                 <div class="option">
                     <span>편의시설 | </span>
-                    <span th:if="*{reviewCategory.convenient != null}" th:text="*{reviewCategory.convenient.information}"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'STORE')} " th:text="편의점"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'HOSPITAL')} " th:text="병원"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'COINLAUNDER')} " th:text="코인세탁소"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'STORE,HOSPITAL')} " th:text="'편의점'+'&nbsp&nbsp'+'병원'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'STORE,COINLAUNDER')} " th:text="'편의점'+'&nbsp&nbsp'+'코인세탁소'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'HOSPITAL,COINLAUNDER')} " th:text="'병원'+'&nbsp&nbsp'+'코인세탁소''"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.convenient,'STORE,HOSPITAL,COINLAUNDER')} " th:text="'편의점'+'&nbsp&nbsp'+'병원'+'&nbsp&nbsp'+'코인세탁소'"></span>
+
                 </div>
                 <div class="option">
                     <span>기타 | </span>
-                    <span th:if="*{reviewCategory.welfare != null}" th:text="*{reviewCategory.welfare.information}"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'PARKING')} " th:text="주차장"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'DELIVERYBOX')} " th:text="무인택배함"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'CCTV')} " th:text="cctv"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'PARKING,DELIVERYBOX')} " th:text="'주차장'+'&nbsp&nbsp'+'무인택배함'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'PARKING,COINLAUNDER')} " th:text="'주차장'+'&nbsp&nbsp'+'cctv'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'DELIVERYBOX,CCTV')} " th:text="'무인택배함'+'&nbsp&nbsp'+'cctv''"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.welfare,'PARKING,DELIVERYBOX,CCTV')} " th:text="'주차장'+'&nbsp&nbsp'+'무인택배함'+'&nbsp&nbsp'+'cctv'"></span>
+
                 </div>
                 <div class="option">
                     <span>옵션 | </span>
-                    <span th:if="*{reviewCategory.electronicDevice != null}" th:text="*{reviewCategory.electronicDevice.information}"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED')} " th:text="침대"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'AIRCONDITIONER ')} " th:text="에어컨"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'WASHINGMACHINE ')} " th:text="세탁기"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'REFRIGERATOR')} " th:text="냉장고"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,AIRCONDITIONER ')} " th:text="'침대'+'&nbsp&nbsp'+'에어컨'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,WASHINGMACHINE ')} " th:text="'침대'+'&nbsp&nbsp'+'세탁기''"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'냉장고'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'AIRCONDITIONER ,WASHINGMACHINE ')} " th:text="'에어컨'+'&nbsp&nbsp'+'세탁기'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'AIRCONDITIONER ,REFRIGERATOR')} " th:text="'에어컨'+'&nbsp&nbsp'+'냉장고'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'WASHINGMACHINE ,REFRIGERATOR')} " th:text="'세탁기'+'&nbsp&nbsp'+'냉장고''"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,AIRCONDITIONER ,WASHINGMACHINE ')} " th:text="'침대'+'&nbsp&nbsp'+'에어컨'+'&nbsp&nbsp'+'세탁기'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,AIRCONDITIONER ,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'에어컨'+'&nbsp&nbsp'+'냉장고'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'AIRCONDITIONER ,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'에어컨'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
+                    <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,AIRCONDITIONER ,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'에어컨'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
                 </div>
             </div>
         </div>
@@ -113,11 +279,15 @@
             <div class="inner__top">
                 <span>리뷰 |</span>
                 <div th:text="*{postContent}"></div>
+                <div class="review__tage">
+                    <span th:each="tag : *{tags}" th:text="'#'+${tag.tagName}"></span>&nbsp;
+                </div>
             </div>
 
             <div class="inner__bottom">
                 <span>한줄평 |</span>
-                <div class="review-comment" th:text="*{comment}"></div>
+                <div class="review-comment" th:text="*{comment}" ></div>
+                <span>별점 |</span>
                 <div class="review-star">
                     <div class="stars" th:if="*{star} == 0" style="display: flex">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
@@ -169,9 +339,18 @@
 
     <section class="review-map">
         <div class="inner">
-            <span>위치 |</span>
+            <span>위치 |</span><span th:text="*{address}" style="margin-left: 20px; font-size: 16px; font-family: Arial, sans-serif; color: #808080; line-height: 2; font-weight: normal;"></span>
             <div id="map" style="width:1000px;height:650px; margin: 0 auto;"></div>
-            <div class = "changeReview">
+
+            <div th:if="${currentMember.id == 1}" class="adminZone">
+                <div th:each="file: *{uploadFile}" >
+                    <img th:src="${file.filePath}" alt="image">
+                </div>
+                <button type="button" class="badge badge-warning confirm" th:value="*{id}">승인 </button>
+                <button type="button" class="badge badge-danger no_confirm" th:value="*{id}"> 거부 </button>
+            </div>
+
+            <div class = "changeReview" th:if="${currentMember.id == review.writer.id}">
                 <div class="edit">
                     <a href="javascript:void(0)">수정</a>
                 </div>
@@ -230,10 +409,108 @@
     </script>
 
 
-    <div th:if="${ currentMember.id == 1}" class="adminZone">
-        <div th:each="file: *{uploadFile}" class="swiper-slide">
-            <img th:src="${file.filePath}" alt="image">
-        </div>
+    <!-- 댓글 부분 -->
+        <div style="background-color:#EEEEEE; padding:20px; margin-bottom:50px; width: 1100px; margin: 0 auto; position: relative;">
+            <p style="font-size:12px; margin:0px">댓글 <span th:text="${#lists.size(review.commentReview)}"></span>개</p>
+
+            <!-- 댓글쓰기 텍스트박스 -->
+            <div>
+                <form id="comment" th:object="${comment}" th:action="@{/review/read/comment/{id}(id=${review.id})}" method="post" name="comment">
+
+                    <p style="font-size:12px; margin-bottom:10px">
+                                    <span>
+                                        <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                    </span>
+                        <span th:text="${currentMember.nickname}" style="margin:10px"></span>
+                        <span th:if="${!currentMember.nicknameOpen}" style="font-size:10px; padding:4px; border-radius:6px; background-color:#D9D9D9">익명</span>
+                    </p>
+
+                    <div class="input-group mb-3" style="margin-left:32px; position:relative; width:95%;">
+                        <input th:field="${comment.text}" th:class="form-control" class="form-control" type="text" placeholder="댓글을 입력해주세요." style="font-size:12px; border-radius:0px; display:inline-block" required/>
+                        <div class="input-group-append">
+                            <button type="submit" class="btn" style="font-size:12px; background-color:black; border:0px; color:white; border-radius:0px">댓글달기</button>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+
+
+        <!-- 댓글 -->
+        <th:block th:each="i : ${#numbers.sequence(review.commentReview.size() - 1, 0, -1)}">
+                <div th:if="${review.commentReveiw[i].parentId == -1l}">
+                    <hr style="margin = 10px;"/>
+
+                    <div>
+                        <p style="font-size:12px; margin-bottom:10px">
+                                        <span>
+                                            <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                        </span>
+                            <span th:if="${review.commentReview[i].nicknameOpen}" th:text="${review.commentReview[i].nickname}" style="margin:10px"></span>
+                            <span th:if="${! review.commentReview[i].nicknameOpen}" th:text="익명" style="margin:10px"></span>
+                            <span th:text="${#temporals.format(review.commentReview[i].regdate, 'yyyy-MM-dd HH:mm')}" style="font-size:8px; color:#808080"></span>
+                        </p>
+                        <p th:text="${review.commentReview[i].text}" style="font-size:12px; margin-left:32px"></p>
+                        <button th:onclick="javascript:changeDisp( 'writeSubcomment' + [[${i}]] );" type="button" style="font-size:12px; background-color:black; border:0px; color:white; padding-left:10px; padding-right:10px; padding-top:3px; padding-bottom:3px; margin-left:32px">답글달기</button>
+
+                    </div>
+                </div>
+
+                <!-- 대댓글 -->
+                <div th:each="subcomment : ${review.commentReview}">
+
+                    <div th:if="${subcomment.parentId == review.commentReview[i].id}">
+                        <hr style="margin=10px"/>
+
+                        <div>
+                            <p style="font-size:12px; margin-bottom:10px">
+                                <img th:src="@{'/images/right-arrow.svg'}" width="16px" height="16px" style="display:inline-block; margin:2px; margin-left:10px"/>
+                                <span>
+                                                <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                            </span>
+                                <span th:if="${subcomment.nicknameOpen}" th:text="${subcomment.nickname}" style="margin:10px"></span>
+                                <span th:if="${! subcomment.nicknameOpen}" th:text="익명" style="margin:10px"></span>
+                                <span th:text="${#temporals.format(subcomment.regdate, 'yyyy-MM-dd HH:mm')}" style="font-size:8px; color:#808080"></span>
+                            </p>
+                            <p th:text="${subcomment.text}" style="font-size:12px; margin-left:64px"></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 대댓글쓰기 텍스트박스 : 히든으로 해놓고 버튼이 눌리면 보이기 -->
+                <div th:id=" 'writeSubcomment' + ${i} " style="display:none" th:if="${review.commentReview[i].parentId == -1l}">
+
+                    <hr style="margin=10px"/>
+
+                    <div>
+                        <form th:object="${subComment}" th:action="@{/review/read/subcomment/{id}(id=${review.id})}" method="post" name="subComment">
+
+                            <p style="font-size:12px; margin-bottom:10px">
+                                <img th:src="@{'/images/right-arrow.svg'}" width="16px" height="16px" style="display:inline-block; margin:2px; margin-left:10px"/>
+                                <span>
+                                                <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                            </span>
+                                <span th:text="${currentMember.nickname}" style="margin:10px"></span>
+                                <span th:if="${! currentMember.nicknameOpen}" style="font-size:10px; padding:4px; border-radius:6px; background-color:#D9D9D9">익명</span>
+                            </p>
+
+                            <div class="input-group mb-3" style="margin-left:64px; position:relative; width:92%;">
+                                <input th:field="${subComment.text}" th:class="form-control" class="form-control" type="text" placeholder="댓글을 입력해주세요." style="font-size:12px; border-radius:0px; display:inline-block" required/>
+
+                                <input type="hidden" name="parentId" th:value="${review.commentReview[i].id}">
+
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn" style="font-size:12px; background-color:black; border:0px; color:white; border-radius:0px">답글달기</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+        </th:block>
+
     </div>
 
 </div>

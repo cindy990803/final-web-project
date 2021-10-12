@@ -13,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
 @SuperBuilder
 @DynamicInsert
 @DynamicUpdate
-public class Review extends Post {
+public class Review extends Post implements Serializable {
 
     @Column(nullable = false)
     private String comment; // 한줄 코멘트
@@ -52,7 +53,7 @@ public class Review extends Post {
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<CommentReview> commentReviews;
+    private List<CommentReview> commentReview;
 
     @OneToMany(mappedBy = "fileName", cascade = CascadeType.ALL)
     @ToString.Exclude
@@ -67,9 +68,9 @@ public class Review extends Post {
         if (uploadImage == null) uploadImage = new ArrayList<>();
     }
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
-//    private List<CommentReview> commentReviews;
+    @JsonIgnore
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
+    private List<CommentCommunity> commentCommunity;
 
 
 }

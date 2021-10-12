@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='idsearch', title='복덕복덕 : 아이디찾기'">
+<head>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container">
+        <main>
+            <form class="justify-content-center" method="post" th:action="@{/idsearch}">
+
+                <div class="container" th:if="${message} == null" style="height: 700px; display: table;">
+                    <div style="display: table-cell; vertical-align: middle;">
+
+                        <div class="py-5 text-center" style="text-align: center">
+                            <h2>아이디 찾기</h2>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-20">
+                                <label for="tel" class="form-label"> 가입시 작성했던 핸드폰 번호를 입력해주세요</label>
+                                <input class="form-control" name="tel" id="tel" maxlength="11" required
+                                       placeholder="-를 제외하고 입력해주세요" size="20" style="text-align: center">
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center py-3">
+                            <button type="submit" class="btn btn-info">찾기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container" th:if="${message} != null" style="height: 700px; display: table;">
+                    <div style="display: table-cell; vertical-align: middle;">
+
+                        <div class="py-5 text-center" style="text-align: center">
+                            <h2>아이디 찾기</h2>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <p th:text="${message}"></p>
+                        </div>
+
+                        <div class="row justify-content-center py-3">
+                            <a class="btn btn-info" th:href="@{/login}">로그인</a>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </form>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

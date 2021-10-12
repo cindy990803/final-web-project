@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='커뮤니티 - 글쓰기'">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <!-- include summernote css/js -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+
+    <!-- tagify css/js 적용 -->
+    <script src="https://unpkg.com/@yaireo/tagify"></script>
+    <script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div layout:fragment="content" class="d-flex justify-content-center">
+
+
+    <div style="width:70%; left:15%">
+        <form th:object="${vo}" th:action="@{/community/modify/{id}(id=${communityId})}" method="post" name="vo">
+
+
+            <input type="text" th:field="*{postName}" th:class="form-control" th:classappend="${#fields.hasErrors('postName') } ? 'is-invalid'" required/>
+            <div th:if="${#fields.hasErrors('postName')}" th:class="${#fields.hasErrors('postName')}? 'invalid-feedback'"
+                 th:each="err : ${#fields.errors('postName')}" th:text="${err}">
+                Empty title
+            </div>
+
+
+            <hr/>
+
+            <!-- 서머노트 에디터 -->
+            <textarea id="summernote" th:field="*{postContent}"></textarea>
+
+            <hr style="opacity:0"/>
+
+            <!-- tagify 태그 -->
+            <div>
+                <input th:field="*{tags}" placeholder="태그를 입력하세요">
+            </div>
+
+            <br/>
+
+            <!-- 카테고리 선택 버튼 -->
+            카테고리
+            <select th:field="*{communityCategory}">
+                <option value="0">자취방꿀팁</option>
+                <option value="1">자취방인테리어</option>
+                <option value="2">맛집탐방</option>
+                <option value="3">자유게시판</option>
+            </select>
+
+            <br/>
+
+            <hr style="opacity:0"/>
+
+            <input type="submit" class="btn btn-info" value="수정" />
+
+        </form>
+    </div>
+
+    <script>
+
+        //summernote
+        $('#summernote').summernote({
+            lang: 'ko-KR',
+            placeholder: '자유롭게 작성해보세요!',
+            minHeight: 500,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                ['color', ['color']],
+                ['fontsize', ['fontsize']],
+                ['para', ['paragraph', 'height']],
+                ['insert', ['link', 'picture']]
+            ]
+        });
+
+
+        //tagify
+        var input = document.querySelector('input[name=tags]');
+        new Tagify(input)
+    </script>
+</div>
+</body>
+</html>

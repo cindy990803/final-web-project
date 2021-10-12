@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='manage', title='복덕복덕 : Manage'">
+<head>
+
+    <style>
+        th{
+            vertical-align:middle; font-weight: bold; text-align: center;
+        }
+
+        button, button:hover {
+            border: 0;
+            outline: 0;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $(".confirm").click(function () { // 승인 버튼 눌렀을 때
+                let data = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/manage/list/approval',
+                    data: {"id": data},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                            location.href = "/login";
+                        } else if (result.resultCode == "error.invalid") {
+                            alert(result.message);
+                        } else if (result.resultCode == "ok") {
+                            alert(result.message);
+                            location.href = "/manage";
+                        } else if (result.resultCode == "duplicate") {
+                            alert(result.message);
+                        }
+                    }
+                });
+            });
+        });
+
+
+        $(document).ready(function () {
+            $(".no_confirm").click(function () { // 거부버튼 눌렀을 때
+                let data = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/manage/list/refusal',
+                    data: {"id": data},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                            location.href = "/login";
+                        } else if (result.resultCode == "error.invalid") {
+                            alert(result.message);
+                        } else if (result.resultCode == "ok") {
+                            alert(result.message);
+                            location.href = "/manage";
+                        } else if (result.resultCode == "duplicate") {
+                            alert(result.message);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container">
+        <main>
+            <div class="py-5 text-center">
+                <h2>승인 대기 중인 게시물</h2>
+            </div>
+
+            <form class="justify-content-center" method="get" th:action="@{/manage}">
+
+                <!-- 리뷰 리스트 -->
+                <div class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"></div>
+
+                <div th:if="${reviewList.isEmpty()}" style="text-align: center;">
+                    <img th:src="@{/images/no_content.svg}" style="width: 300px; height: 300px;"
+                         class="no_content" id="no_content"/>
+                    <h1 class="no_content">승인 대기중인 게시물이 없습니다</h1>
+                </div>
+
+                <div id="review_table">
+                    <table class="table wd-100">
+                        <thead>
+                            <tr>
+                                <th style="width:50%;"> 제목 </th>
+                                <th> 작성자 </th>
+                                <th> 작성날짜 </th>
+                                <th> 확인 </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr th:each="review : ${reviewList}" th:object="${review}" th:id="*{id}" >
+
+                                <td>
+                                <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                   style="text-decoration-line: none; color:black;">
+                                    <span th:text="*{postName}"></span>
+                                </a>
+                                </td>
+                                <td th:text="*{writer.username}" style="text-align: center"></td>
+                                <td th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}" style="text-align: center"></td>
+
+                                <td style="text-align: center">
+                                <button type="button" class="badge badge-warning confirm" th:value="*{id}">승인 </button>
+                                    <button type="button" class="badge badge-danger no_confirm" th:value="*{id}"> 거부 </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </form>
+
+            <!-- 페이징 -->
+            <div th:unless="${reviewList.isEmpty()}">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${1 == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                            <a class="page-link" href="#"
+                               th:href="@{/manage(page=${reviewList.pageable.pageNumber - 1})}"
+                               tabindex="-1" aria-disabled="true"> &lt; </a>
+                        </li>
+                        <li class="page-item" th:classappend="${i == reviewList.pageable.pageNumber+1} ? 'active'"
+                            th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                            <a class="page-link" href="#"
+                               th:href="@{/manage(page=${i - 1})}"
+                               th:text="${i}">1</a>
+                        </li>
+                        <li class="page-item"
+                            th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                            <a class="page-link" href="#"
+                               th:href="@{/manage(page=${reviewList.pageable.pageNumber + 1})}">
+                                &gt; </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

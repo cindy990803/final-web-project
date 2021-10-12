@@ -11,9 +11,5 @@ import java.util.List;
 
 @Repository
 public interface CommentReviewRepository extends CrudRepository<CommentReview, Long> {
-//
-//    @Query("SELECT r FROM CommentReview r WHERE r.review = ?1 AND r.id > 0 ORDER BY r.id ASC")
-//    List<CommentReview> getCommentOfReview(Review review);
-//
-//    void modifyById(Long commentReviewId);
+
 }

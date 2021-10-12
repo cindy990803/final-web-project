@@ -8,11 +8,11 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Getter @Setter
-@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +20,7 @@ import java.util.List;
 @SuperBuilder
 @DynamicUpdate
 @DiscriminatorValue("COMMUNITY")
-public class Community extends Post {
+public class Community extends Post implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private CommunityCategory communityCategory;

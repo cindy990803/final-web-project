@@ -1,10 +1,268 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='커뮤니티 - 글쓰기'">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <style>
+        .commu-read-a { color:black; }
+        .commu-read-a:hover { color:black; }
+        .commu-read-a:visited { color:black; }
+    </style>
+
+    <script th:inline="javascript">
+        $(document).ready(function (){
+            $(".like").click(function (){ // 좋아요 하는 기능
+                let data = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url:'/community/read/like',
+                    data: { "id" : data},
+                    dataType: 'json',
+                    success: function (result){
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                        }else if(result.resultCode == "error.invalid"){
+                            alert(result.message);
+                        }else if(result.resultCode == "ok"){
+                            $("#"+data).attr("src","/images/like_red.svg");
+                            $('#likeNum'+data).html(result.likeCheck);
+                        }else if(result.resultCode == "duplicate"){
+                            $("#"+data).attr("src","/images/like.svg");
+                            $('#likeNum'+data).text(result.likeCheck);
+                        }
+                    }
+                });
+            });
+        });
+
+        //답글쓰기 텍스트창 활성화하는 함수
+        function changeDisp(id) {
+
+                console.log('함수 호출됨.');
+
+                var con = document.getElementById(id);
+
+                if (con.style.display == 'none') {
+                    con.style.display = 'block';
+                } else {
+                    con.style.display = 'none';
+                }
+
+                console.log('함수 실행완료됨.');
+        }
+
+        //글삭제 팝업창 띄우기
+        $(document).ready(function () {
+            $("a[id='deleteCommu']").click(function () {
+
+                console.log('함수 호출됨.');
+
+                var con = confirm("게시글을 삭제하시겠습니까?");
+
+                if (con == true) { //팝업 창에 뜨는 글씨, 예 눌렀을때 실행됨!
+
+                    console.log('confirm 예 눌렀음.');
+
+                    $.ajax({
+                        type:'GET',
+                        url:'/community/delete',
+                        dataType:'json',
+                        data : { id : $("#deleteCommu-id").val() },
+                        success:function(result) {
+                            location.href = "/community/list";
+                        }
+                    });
+                } else {
+                    console.log('confirm 아니오 누름.');
+                }
+            });
+        });
+
+    </script>
+
+
 </head>
 <body>
+<div layout:fragment="content" class="justify-content-center">
 
+    <div style="position: relative; width:70%; left:15%">
+
+        <!-- 제목 부분 -->
+        <div>
+            <p th:if="${community.communityCategory.toString().equals('EAT')}" style="font-size:14px; color:#808080; margin:0px">맛집탐방</p>
+            <p th:if="${community.communityCategory.toString().equals('TIP')}" style="font-size:14px; color:#808080; margin:0px">자취방꿀팁</p>
+            <p th:if="${community.communityCategory.toString().equals('INTERIOR')}" style="font-size:14px; color:#808080; margin:0px">자취방인테리어</p>
+            <p th:if="${community.communityCategory.toString().equals('BOARD')}" style="font-size:14px; color:#808080; margin:0px">자유게시판</p>
+
+            <p style="margin:0px"><span th:text="${community.postName}" style="font-size:24px"></span> <span th:text="${#temporals.format(community.regdate, 'yyyy-MM-dd HH:mm')}" style="font-size:14px; color:#808080"></span></p>
+
+            <p style="font-size:12px; margin:0px">
+                <span>
+                    <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                </span>
+
+                <span th:text="${ community.writer.nicknameOpen ? community.writer.nickname : '익명' }" style="margin:10px"></span>
+                <span style="inline-block" class="float-right">
+
+                    <span th:if="${community.writer.id} == ${currMem.id}">
+                        <a th:href="@{/community/modify(id=${community.id})}" class="commu-read-a">수정</a>
+                        ·
+                        <!-- 삭제 alert() 하기 -->
+                        <a id="deleteCommu" type="button" class="commu-read-a">삭제</a>
+                        <input id="deleteCommu-id" type="hidden" th:value="${community.id}">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span>
+
+                    <span>
+                        조회 <span th:text="${community.hit}"></span>
+                    </span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span id="like_div">
+
+                        <button type="button" class="like" th:id="like" th:value="${community.id}" style="border:0px; outline:0px;background-color:transparent;">
+                            <img th:src="@{ ${member?.likes?.contains(community)} ? '/images/like_red.svg' : '/images/like.svg'}" th:id="${community.id}" width="14px" height="14px" >
+                        </button>
+
+                        <span th:text="${community.likers.size}" th:id="likeNum + ${community.id}"></span>
+                    </span>
+
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>
+                        <img th:src="@{'/images/flag.svg'}" width="12px" height="12px"/>&nbsp;&nbsp;신고
+                    </span>
+                </span>
+            </p>
+        </div>
+
+        <hr style="font-size:12px; margin-top:10px; margin-bottom:10px"/>
+
+        <!-- 본문 부분 -->
+        <div>
+            <!-- 내용 -->
+            <p th:utext="${community.postContent}"></p>
+
+            <br/>
+
+            <!-- 태그 -->
+            <p style="font-size:12px">
+                <th:block th:each="tag : ${community.tags}">
+                    <span th:text="${tag.tagName}" style="padding:4px; border-radius:6px; background-color:#E2E2E2"></span>&nbsp;
+                </th:block>
+            </p>
+        </div>
+
+        <!-- 댓글 부분 -->
+        <p style="font-size:12px; margin:0px">댓글 <span th:text="${#lists.size(community.commentCommunity)}"></span>개</p>
+                <div style="background-color:#EEEEEE; padding:20px; margin-bottom:50px">
+
+                    <!-- 댓글쓰기 텍스트박스 -->
+                    <div>
+                        <form id="comment" th:object="${comment}" th:action="@{/community/read/comment/{id}(id=${community.id})}" method="post" name="comment">
+
+                        <p style="font-size:12px; margin-bottom:10px">
+                                <span>
+                                    <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                </span>
+                                <span th:text="${currMem.nickname}" style="margin:10px"></span>
+                                <span th:if="${! currMem.nicknameOpen}" style="font-size:10px; padding:4px; border-radius:6px; background-color:#D9D9D9">익명</span>
+                            </p>
+
+                            <div class="input-group mb-3" style="margin-left:32px; position:relative; width:95%;">
+                                    <input th:field="${comment.text}" th:class="form-control" class="form-control" type="text" placeholder="댓글을 입력해주세요." style="font-size:12px; border-radius:0px; display:inline-block" required/>
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn" style="font-size:12px; background-color:black; border:0px; color:white; border-radius:0px">댓글달기</button>
+                                    </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+
+
+                    <!-- 댓글 -->
+                    <th:block th:each="i : ${#numbers.sequence(community.commentCommunity.size() - 1, 0, -1)}">
+
+                        <div th:if="${community.commentCommunity[i].parentId == -1l}">
+                            <hr style="margin=10px"/>
+
+                            <div>
+                                <p style="font-size:12px; margin-bottom:10px">
+                                    <span>
+                                        <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                    </span>
+                                    <span th:if="${community.commentCommunity[i].nicknameOpen}" th:text="${community.commentCommunity[i].nickname}" style="margin:10px"></span>
+                                    <span th:if="${! community.commentCommunity[i].nicknameOpen}" th:text="익명" style="margin:10px"></span>
+                                    <span th:text="${#temporals.format(community.commentCommunity[i].regdate, 'yyyy-MM-dd HH:mm')}" style="font-size:8px; color:#808080"></span>
+                                </p>
+                                <p th:text="${community.commentCommunity[i].text}" style="font-size:12px; margin-left:32px"></p>
+                                <button th:onclick="javascript:changeDisp( 'writeSubcomment' + [[${i}]] );" type="button" style="font-size:12px; background-color:black; border:0px; color:white; padding-left:10px; padding-right:10px; padding-top:3px; padding-bottom:3px; margin-left:32px">답글달기</button>
+
+                            </div>
+                        </div>
+
+                        <!-- 대댓글 -->
+                        <div th:each="subcomment : ${community.commentCommunity}">
+
+                            <div th:if="${subcomment.parentId == community.commentCommunity[i].id}">
+                                <hr style="margin=10px"/>
+
+                                <div>
+                                    <p style="font-size:12px; margin-bottom:10px">
+                                        <img th:src="@{'/images/right-arrow.svg'}" width="16px" height="16px" style="display:inline-block; margin:2px; margin-left:10px"/>
+                                        <span>
+                                            <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                        </span>
+                                        <span th:if="${subcomment.nicknameOpen}" th:text="${subcomment.nickname}" style="margin:10px"></span>
+                                        <span th:if="${! subcomment.nicknameOpen}" th:text="익명" style="margin:10px"></span>
+                                        <span th:text="${#temporals.format(subcomment.regdate, 'yyyy-MM-dd HH:mm')}" style="font-size:8px; color:#808080"></span>
+                                    </p>
+                                    <p th:text="${subcomment.text}" style="font-size:12px; margin-left:64px"></p>
+                                    </div>
+                            </div>
+
+                        </div>
+
+                        <!-- 대댓글쓰기 텍스트박스 : 히든으로 해놓고 버튼이 눌리면 보이기 -->
+                        <div th:id=" 'writeSubcomment' + ${i} " style="display:none" th:if="${community.commentCommunity[i].parentId == -1l}">
+
+                            <hr style="margin=10px"/>
+
+                            <div>
+                                <form th:object="${subComment}" th:action="@{/community/read/subcomment/{id}(id=${community.id})}" method="post" name="subComment">
+
+                                    <p style="font-size:12px; margin-bottom:10px">
+                                        <img th:src="@{'/images/right-arrow.svg'}" width="16px" height="16px" style="display:inline-block; margin:2px; margin-left:10px"/>
+                                        <span>
+                                            <svg style="filter: invert(71%) sepia(83%) saturate(1618%) hue-rotate(147deg) brightness(88%) contrast(87%);" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 512 512" height="20" viewBox="0 0 512 512" width="20"><g><path d="m399.98 402.421c.018-1.072.024-2.147.018-3.224-.43-78.454-64.434-142.599-142.887-143.193-79.91-.606-145.111 64.224-145.111 143.996 0 1.112.013 2.222.038 3.328 1.095 48.019 34.827 89.15 81.4 100.897 20.319 5.125 41.328 7.775 62.562 7.775 21.23 0 42.235-2.649 62.551-7.772 46.901-11.827 80.627-53.444 81.429-101.807z"/><path d="m437.012 74.972c-48.069-48.065-113.036-74.972-181.013-74.972-68.38 0-132.667 26.629-181.019 74.98-48.352 48.352-74.98 112.639-74.98 181.02 0 60.347 21.397 118.944 60.256 165.004 4.528 5.361 9.288 10.549 14.245 15.531 3.463 3.48 9.315.339 8.423-4.489-1.92-10.394-2.924-21.105-2.924-32.046 0-73.03 44.711-135.812 108.198-162.414 3.295-1.381 4.145-5.705 1.56-8.172-19.08-18.214-30.69-44.188-29.699-72.803 1.731-49.986 42.17-90.602 92.149-92.537 54.654-2.117 99.792 41.733 99.792 95.926 0 27.273-11.435 51.921-29.759 69.414-2.584 2.467-1.733 6.791 1.561 8.172 63.487 26.602 108.198 89.384 108.198 162.414 0 10.941-1.004 21.652-2.925 32.045-.892 4.828 4.96 7.969 8.423 4.489 4.958-4.983 9.72-10.172 14.25-15.537 38.855-46.052 60.252-104.649 60.252-164.997 0-68.385-26.631-132.676-74.988-181.028z"/><circle cx="256" cy="160" r="64"/></g></svg>
+                                        </span>
+                                        <span th:text="${currMem.nickname}" style="margin:10px"></span>
+                                        <span th:if="${! currMem.nicknameOpen}" style="font-size:10px; padding:4px; border-radius:6px; background-color:#D9D9D9">익명</span>
+                                    </p>
+
+                                    <div class="input-group mb-3" style="margin-left:64px; position:relative; width:92%;">
+                                        <input th:field="${subComment.text}" th:class="form-control" class="form-control" type="text" placeholder="댓글을 입력해주세요." style="font-size:12px; border-radius:0px; display:inline-block" required/>
+
+                                        <input type="hidden" name="parentId" th:value="${community.commentCommunity[i].Id}">
+
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn" style="font-size:12px; background-color:black; border:0px; color:white; border-radius:0px">답글달기</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+
+                    </th:block>
+
+                </div>
+    </div>
+
+</div>
 </body>
 </html>

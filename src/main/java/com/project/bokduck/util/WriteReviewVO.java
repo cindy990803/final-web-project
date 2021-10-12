@@ -1,13 +1,14 @@
 package com.project.bokduck.util;
 
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class WriteReviewVO  {
 
     private String title;
@@ -41,5 +42,9 @@ public class WriteReviewVO  {
     private String payment;
 
     private String Tags;
+
+    private int stars;
+
+  /*  private MultipartFile[] image;*/
 
 }

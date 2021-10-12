@@ -10,42 +10,47 @@ img {
 
 }
 .read-upper {
-    margin-top: 80px;
+    margin-top: 60px;
 
 }
 .read-upper .inner {
-    height: 120px;
+    height: 56px;
+    padding-bottom: 8px;
     display: flex;
-    border-bottom: 1px solid #26BAD4;
+    border-bottom: 1px solid #D3D3D3;
 }
 .read-upper .inner .title-main {
+    padding-top: 10px;
     font-family: Arial, sans-serif;
-}
 
-.read-upper .inner .title-main :nth-child(1) {
-    font-size: 50px;
+}
+.read-upper .inner .title-main :not(:nth-child(2)) {
+    font-size: 14px;
+    color: #808080
+}
+.read-upper .inner .title-main :nth-child(2) {
+    font-size: 24px;
 }
 .read-upper .inner .title-sub {
     position: absolute;
     display: flex;
-    top: 80px;
+    top: 30px;
     left: 900px;
     text-align: center;
 
 }
 .read-upper .inner .title-sub img {
-    width: 24px;
-    height: 24px;
-    margin: 0 10px;
+    width: 14px;
+    height: 14px;
+    margin-right: 7px;
+
 
 }
-
-.read-upper .inner .title-sub img {
-    width: 24px;
-    height: 24px;
-    margin: 0 10px;
-
+.read-upper .inner .title-sub span{
+    font-size: 14px;
+    margin-right: 4px;
 }
+
 .images {
     height: 700px;
     position: relative;
@@ -84,10 +89,14 @@ img {
     object-fit: cover;
 }
 .images .swiper-button-prev {
-    margin-left: 200px;
+    left: 50%;
+    margin-left: -510px;
+    color: #403b3b;
 }
 .images .swiper-button-next {
-    margin-right: 200px;
+    right: 50%;
+    margin-right: -510px;
+    color: #403b3b;
 }
 
 .information {
@@ -95,21 +104,21 @@ img {
 .information .inner {
     height:170px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #26BAD4;
+    border-bottom: 1px solid #D3D3D3;
     display:flex;
 }
 .information .inner .option :nth-child(1){
-    font-size: 20px;
+    font-size: 18px;
     font-family: Arial, sans-serif;;
-    color: #26BAD4;
+    color: #403b3b;
     line-height: 2;
     font-weight: bold;
 }
 .information .inner .option :nth-child(2){
     margin-left: 20px;
-    font-size: 18px;
+    font-size: 16px;
     font-family: Arial, sans-serif;;
-    color: #000;
+    color: #808080;
     line-height: 2;
     font-weight: normal;
 }
@@ -136,48 +145,113 @@ img {
 /*    font-weight: bold;*/
 /*}*/
 .content .inner {
-    height:800px;
+    /*height:800px;*/
 }
 
 .content .inner span {
-    font-size: 20px;
+    font-size: 18px;
     font-family: Arial, sans-serif;;
-    color: #26BAD4;
+    color: #403b3b;
     line-height: 2;
     font-weight: bold;
 }
 
 .content .inner .inner__top {
-    margin-top: 20px;
-    padding: 10px;
-    height: 600px;
+    position: relative;
+    margin-top: 16px;
+    padding: 10px 0 100px 0;
+
 }
+
+.content .inner .inner__top .review__tage {
+    display: flex;
+    position: absolute;
+    left: 5px;
+    bottom: 10px;
+
+}
+.content .inner .inner__top .review__tage span {
+    display: block;
+    margin-left: 8px;
+    padding:3px;
+    font-size: 12px;
+    font-family: Arial, sans-serif;;
+    color: #000;
+    line-height: 2;
+    border-radius:6px;
+    background-color: #E2E2E2;
+}
+
+.content .inner .inner__top .review__tage :first-child {
+  margin-left: 0;
+}
+
 .content .inner .inner__bottom {
     display: flex;
 }
 .content .inner .inner__bottom .review-comment{
     margin-left: 10px;
-    width: 500px;
-    padding-top: 8px
+    width: 300px;
+    padding-top: 10px
 }
 .content img{
+    margin-top: 7px;
     display: block;
     width: 20px;
     height: 20px;
 }
 .review-map .inner {
-    height: 800px;
+    height: 750px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #26BAD4;
+    border-bottom: 1px solid #D9D9D9;
 
 }
 
 .review-map .inner span {
-    font-size: 20px;
+    font-size: 18px;
     font-family: Arial, sans-serif;;
-    color: #26BAD4;
+    color: #403b3b;
     line-height: 2;
     font-weight: bold;
 }
+.review-map .inner .adminZone{
+    position: absolute;
+    right: 120px;
+    bottom: 15px;
+}
 
+.review-map .inner .changeReview {
+    position: absolute;
+    right: 20px;
+    bottom: 8px;
+    display: flex;
+}
+
+.review-map .inner .changeReview {
+    position: absolute;
+    right: 38px;
+    bottom: 8px;
+    display: flex;
+}
+
+.review-map .inner .changeReview :nth-child(2)::before {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 12px;
+    background-color: #e5e5e5;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.review-map .inner .changeReview a{
+    margin: 0 5px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;;
+    color: #808080;
+    line-height: 2;
+    font-weight: bold;
+}
 

@@ -45,6 +45,9 @@ public abstract class Post {
     @ColumnDefault("0")
     private int hit; // 조회수
 
+    @ManyToMany(cascade = CascadeType.DETACH)
+    private List<Member> visitedMember;
+
     @ManyToMany(mappedBy = "tagToPost", cascade = CascadeType.ALL)
     private List<Tag> tags; // 태그
 
@@ -56,6 +59,7 @@ public abstract class Post {
 
     @PostLoad
     public void createList() {
+        if (visitedMember == null) visitedMember = new ArrayList<>();
         if (likers == null) likers = new ArrayList<>();
         if (tags == null) tags = new ArrayList<>();
         if (uploadFile == null) uploadFile = new ArrayList<>();

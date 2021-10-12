@@ -12,6 +12,7 @@ import com.project.bokduck.repository.ReviewCategoryRepository;
 import com.project.bokduck.repository.ReviewRepository;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.util.WriteReviewVO;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.google.gson.JsonObject;
@@ -29,7 +30,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class ReviewController {
     private final ReviewRepository reviewRepository;
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final MemberRepository memberRepository;
-    private final ReviewCategory reviewCategory = new ReviewCategory();
+
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
 
@@ -67,7 +67,7 @@ public class ReviewController {
 
     @GetMapping("/writeReview")
     public String writeReview(Model model, @CurrentMember Member member) {
-        if (member==null){
+        if (member == null) {
             return "member/login";
         }
         model.addAttribute("WriteReviewVO", new WriteReviewVO());
@@ -76,46 +76,66 @@ public class ReviewController {
 
 
     @PostMapping("/writeReview")
-    public String saveReview(@RequestParam("image") MultipartFile imageFile,
+    public String saveReview(
 
-                             @RequestParam("pdf") MultipartFile pdfFile,
+            @RequestParam("image") MultipartFile[] imageFile,
 
-                             @CurrentMember Member member,
+            @RequestParam("pdf") MultipartFile pdfFile,
 
-                             @ModelAttribute WriteReviewVO writeReviewVO,
+            @CurrentMember Member member,
 
-                             File file, Image image, Model model) throws IOException {
+            @ModelAttribute WriteReviewVO writeReviewVO,
+
+            File file, Model model) throws IOException {
 
         List<Image> imageList = new ArrayList<>();
-        String imageName = StringUtils.cleanPath(imageFile.getOriginalFilename());
-    image.setImageName(imageName);
-    image.setImagePath("/review_images/"+imageName);
-
-    image = imageRepository.save(image);
-
-    String imageUploadDest = "review_images/" + image.getId();
-
-    fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile);
-
-
-    imageList.add(image);
-
-
-    model.addAttribute("image", image);
+        ReviewCategory reviewCategory = new ReviewCategory();
 
 
 
+        for (int i = 0; i < imageFile.length;i++) {
+
+            Image image = new Image();
+
+            String imageName = StringUtils.cleanPath(imageFile[i].getOriginalFilename());
+
+            image.setImageName(imageName);
 
 
-List<File> fileList = new ArrayList<>();
-    String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
-    file.setFilePath(pdfName);
-    file = fileRepository.save(file);
-    String pdfUploadDest = "file/" + file.getId();
-    fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
-    fileList.add(file);
+            image = imageRepository.save(image);
 
-    model.addAttribute("file", file);
+            image.setImagePath("/review_images/" + image.getId()+"/" + imageName);
+
+            String imageUploadDest = "review_images/" + image.getId();
+
+            fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile[i]);
+
+            imageList.add(image);
+
+            model.addAttribute("image", image);
+
+        }
+
+
+
+
+
+
+        List<File> fileList = new ArrayList<>();
+
+        String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
+
+        file.setFilePath(pdfName);
+
+        file = fileRepository.save(file);
+
+        String pdfUploadDest = "file/" + file.getId();
+
+        fileUpLoadUtil.saveFile(pdfUploadDest, pdfName, pdfFile);
+
+        fileList.add(file);
+
+        model.addAttribute("file", file);
 
 
         switch (writeReviewVO.getRoomSize()) {
@@ -187,9 +207,9 @@ List<File> fileList = new ArrayList<>();
         } else {
             reviewCategory.setConvenient(writeReviewVO.getConvenient());
         }
-        if (writeReviewVO.getElectronicDevice()==null){
+        if (writeReviewVO.getElectronicDevice() == null) {
             reviewCategory.setElectronicDevice("");
-        }else {
+        } else {
             reviewCategory.setElectronicDevice(writeReviewVO.getElectronicDevice());
         }
 
@@ -200,11 +220,21 @@ List<File> fileList = new ArrayList<>();
         for (Tag t : tag1) {
             t.setTagToPost(tagPostList);
         }
+
+/*
+        List<Image> image2 = imageRepository.findAll();
+        List<Post>  imagetoPost = postRepository.findAll();
+         for(Image t : image2){
+         t.setImageToPost(imagetoPost);
+     }
+*/
+
+
         Review review1;
         review1 = reviewRepository.getById(member.getId());
+        reviewCategory = reviewCategoryRepository.save(reviewCategory);
 
-
-        Review review = Review.builder()
+        Review   review = Review.builder()
                 .writer(member)
                 .regdate(LocalDateTime.now())
                 .address(writeReviewVO.getAddress())
@@ -214,19 +244,26 @@ List<File> fileList = new ArrayList<>();
                 .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
                 .reviewStatus(ReviewStatus.WAIT)
-                .star(0)
+                .star((writeReviewVO.getStars() / 2))
+                .uploadImage(imageList)
                 .postName(writeReviewVO.getTitle())
                 .tags(tagList)
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
+        for(int i = 0; i<imageList.size();i++) {
+            imageList.get(i).setImageToPost(review);
+        }
 
-
-        reviewCategoryRepository.save(reviewCategory);
         reviewRepository.save(review);
+
+
+
+
 
         return "index";
     }
+
 
     @GetMapping("/list")
     public String reviewList(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -260,12 +297,10 @@ List<File> fileList = new ArrayList<>();
                                ReviewListVo vo,
                                @CurrentMember Member member) {
 
-        log.info("vo 페이지 : {}", vo.getPage());
-        log.info("vo 포토리뷰 : {}", vo.getPhotoReview());
-        log.info("vo searchText : {}", vo.getSearchText());
-        log.info("vo address : {}", vo.getAddress());
-
         reviewService.createLikeCount();
+
+        log.info("vo 페이지 : {}", vo.getPage());
+        log.info("vo 룸사이즈 : {}", vo.getRoomSize());
 
         if (member != null) {
             member = memberRepository.findById(member.getId()).orElseThrow();
@@ -277,38 +312,37 @@ List<File> fileList = new ArrayList<>();
         Specification<ReviewCategory> categorySpec = null;
         Map<String, List<?>> map = new HashMap<>();
 
-        if (vo.getRoomSize() != null) {
+        if (vo.getRoomSize() != null && !vo.getRoomSize().isEmpty()) {
             map.put("roomSize", vo.getRoomSize());
         }
 
-        if (vo.getStructure() != null) {
+        if (vo.getStructure() != null && !vo.getStructure().isEmpty()) {
             map.put("structure", vo.getStructure());
         }
 
-        if (vo.getPayment() != null) {
+        if (vo.getPayment() != null && !vo.getPayment().isEmpty()) {
             map.put("payment", vo.getPayment());
         }
 
-        if (vo.getTraffic() != null) {
+        if (vo.getTraffic() != null && !vo.getTraffic().isEmpty()) {
             map.put("traffic", vo.getTraffic());
         }
 
-        if (vo.getConvenient() != null) {
+        if (vo.getConvenient() != null && !vo.getConvenient().isEmpty()) {
             map.put("convenient", vo.getConvenient());
         }
 
-        if (vo.getWelfare() != null) {
+        if (vo.getWelfare() != null && !vo.getWelfare().isEmpty()) {
             map.put("welfare", vo.getWelfare());
         }
 
-        if (vo.getElectronicDevice() != null) {
+        if (vo.getElectronicDevice() != null && !vo.getElectronicDevice().isEmpty()) {
             map.put("electronicDevice", vo.getElectronicDevice());
         }
 
         categorySpec = ReviewSpecs.searchCategoryDetails(map);
         List<ReviewCategory> categoryList = reviewCategoryRepository.findAll(categorySpec);
         spec = spec.and(ReviewSpecs.searchCategory(categoryList));
-        reviewList = reviewRepository.findAll(spec, pageable);
 
         if (!vo.getAddress().isEmpty()) {
             // 지역 검색했을 때
@@ -317,14 +351,12 @@ List<File> fileList = new ArrayList<>();
 
             for (String s : search) {
                 Map<String, Object> searchMap = new HashMap<>();
-                searchMap.put(s, vo.getAddress());
+                searchMap.put(s, vo.getAddress().trim());
                 addressSpec =
                         addressSpec == null ? ReviewSpecs.searchText(searchMap)
                                 : addressSpec.or(ReviewSpecs.searchText(searchMap));
             }
             spec = spec.and(addressSpec);
-
-            reviewList = reviewRepository.findAll(spec, pageable);
 
         }
 
@@ -337,7 +369,7 @@ List<File> fileList = new ArrayList<>();
 
             for (String s : search) {
                 Map<String, Object> searchMap = new HashMap<>();
-                searchMap.put(s, vo.getSearchText());
+                searchMap.put(s, vo.getSearchText().trim());
                 searchSpec =
                         searchSpec == null ? ReviewSpecs.searchText(searchMap)
                                 : searchSpec.or(ReviewSpecs.searchText(searchMap));
@@ -345,40 +377,33 @@ List<File> fileList = new ArrayList<>();
 
             // 태그 검색하기
 
-            Specification<Tag> tagSpec = ReviewSpecs.searchTagDetails(vo.getSearchText());
+            Specification<Tag> tagSpec = ReviewSpecs.searchTagDetails(vo.getSearchText().trim());
             List<Tag> tagList = tagRepository.findAll(tagSpec);
             searchSpec = searchSpec.or(ReviewSpecs.searchTag(tagList));
             spec = spec.and(searchSpec);
 
-            reviewList = reviewRepository.findAll(spec, pageable);
 
         }
 
-        if (vo.getPhotoReview() != null) {
+        if (vo.getPhotoReview() != null && !vo.getPhotoReview().isEmpty()) {
             // 포토리뷰 체크했을때
             spec = spec.and(ReviewSpecs.searchPhotoReview());
-            reviewList = reviewRepository.findAll(spec, pageable);
         }
 
 
-        if (vo.getLineUp() != null) {
-            // 라인업 체크했을때
-            switch (vo.getLineUp()) {
-                case "star": // 별점순
-                    Sort sort = Sort.by(Sort.Direction.DESC, "star")
-                            .and(Sort.by(Sort.Direction.DESC, "id"));
-                    pageable = PageRequest.of(0, 5, Sort.by("star").descending().and(Sort.by("id").descending()));
-                    reviewList = reviewRepository.findAll(spec, pageable);
-                    break;
-                case "like": // 좋아요순
-                    pageable = PageRequest.of(0, 5, Sort.by("likeCount").descending().and(Sort.by("id").descending()));
-                    reviewList = reviewRepository.findAll(spec, pageable);
-                    break;
-                default: // 최신순
-                    pageable = PageRequest.of(0, 5, Sort.by("id").descending());
-                    reviewList = reviewRepository.findAll(spec, pageable);
-                    break;
-            }
+        switch (vo.getLineUp()) { // 라인업체크했을때
+            case "star": // 별점순
+                pageable = PageRequest.of(vo.getPage(), 5, Sort.by("star").descending().and(Sort.by("id").descending()));
+                reviewList = reviewRepository.findAll(spec, pageable);
+                break;
+            case "like": // 좋아요순
+                pageable = PageRequest.of(vo.getPage(), 5, Sort.by("likeCount").descending().and(Sort.by("id").descending()));
+                reviewList = reviewRepository.findAll(spec, pageable);
+                break;
+            default: // 최신순
+                pageable = PageRequest.of(vo.getPage(), 5, Sort.by("id").descending());
+                reviewList = reviewRepository.findAll(spec, pageable);
+                break;
         }
 
 
@@ -435,5 +460,51 @@ List<File> fileList = new ArrayList<>();
 
         return jsonObject.toString();
     }
+
+    @PostMapping("/read/like")
+    @ResponseBody
+    public String readLikeReview(Long id, @CurrentMember Member member) {
+        // 좋아요 눌렀을 때
+        log.info("좋아요 아이디 : {}", id);
+
+        String resultCode = "";
+        String message = "";
+
+        // 좋아요 개수
+        int likeCheck = reviewService.findById(id).getLikers().size();
+
+
+        switch (reviewService.addLike(member, id)) {
+            case ERROR_AUTH:
+                resultCode = "error.auth";
+                message = "로그인이 필요한 서비스입니다.";
+                break;
+            case ERROR_INVALID:
+                resultCode = "error.invalid";
+                message = "삭제된 게시물 입니다.";
+                break;
+            case DUPLICATE:
+                resultCode = "duplicate";
+                message = "좋아요 취소 완료!";
+                likeCheck -= 1;
+                break;
+            case OK:
+                resultCode = "ok";
+                message = "좋아요 완료!";
+                likeCheck += 1;
+                break;
+        }
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("resultCode", resultCode);
+        jsonObject.addProperty("message", message);
+        jsonObject.addProperty("likeCheck", likeCheck);
+
+        log.info("jsonObject.toString() : {}", jsonObject.toString());
+
+        return jsonObject.toString();
+    }
+
+
 
 }
