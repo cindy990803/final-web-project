@@ -20,15 +20,18 @@ import java.util.List;
 @Repository
 
 public interface CommunityRepository extends JpaRepository<Community, Long> {
+   // Page<Community> findByCommunityCategory(CommunityCategory category, Pageable pageable);
+    Page<Community> findByCommunityCategory(CommunityCategory tip, Pageable pageable);
 
- Page<Community> findByCommunityCategory(CommunityCategory tip, Pageable pageable);
+    Page<Community> findAll(Specification<Community>specification, Pageable pageable);
 
- Page<Community> findAll(Specification<Community>specification, Pageable pageable);
-
- Page<Community> findByPostContentContaining(String searchText, Pageable pageable);
+    Page<Community> findByPostContentContaining(String searchText, Pageable pageable);
 
 
- @Query(value = "SELECT * FROM POST LEFT OUTER JOIN COMMUNITY WHERE WRITER_ID = :writer" , nativeQuery = true)
- List<Community> findAllByWriter(Long writer);
+    /*List<Community> findAllByWriter(Member writer);*/
 
-}
+    Page<Community> findAllByWriter(Member writer,Pageable pageable);
+
+    
+
+ }

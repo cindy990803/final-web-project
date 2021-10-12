@@ -1,15 +1,78 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main-layout}" th:with="activeTab='items', title='복덕복덕 : 마이페이지'">
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='items', title='bokduck'">
 
 <head>
-<style>
-    #logout:link { color: black; text-decoration: none;}
-    #logout:visited { color: black; text-decoration: none;}
-    #logout:hover { color: black; text-decoration: none;}
+    <style>
+    a:link { color: red; text-decoration: none;}
+    a:visited { color: black; text-decoration: none;}
+    a:hover { color: black; text-decoration: none;}
 
-</style>
+
+    </style>
+
+    <style>
+        section {
+            display: none;
+            padding: 20px 0 0;
+            border-top: 1px solid #ddd;}
+        input {
+              display: none;}
+        label {
+            display: inline-block;
+            padding: 15px 25px;
+            font-weight: 600;
+            color: #bbb;
+            border: 1px solid transparent;}
+        label:hover {
+            color: #2e9cdf;
+            cursor: pointer;}
+        /*input 클릭시, label 스타일*/
+        input:checked + label {
+              color: #555;
+              border: 1px solid #ddd;
+              border-top: 2px solid #2e9cdf;
+              border-bottom: 1px solid #ffffff;}
+
+        #tab1:checked ~ #content1,
+        #tab2:checked ~ #content2,
+        #tab3:checked ~ #content3,
+        #tab4:checked ~ #content4 {
+            display: block;}
+
+    </style>
+    <style>
+        section {
+            display: none;
+            padding: 20px 0 0;
+            border-top: 1px solid #ddd;}
+        input {
+              display: none;}
+        label {
+            display: inline-block;
+            padding: 15px 25px;
+            font-weight: 600;
+            color: #bbb;
+            border: 1px solid transparent;}
+        label:hover {
+            color: #2e9cdf;
+            cursor: pointer;}
+        /*input 클릭시, label 스타일*/
+        input:checked + label {
+              color: #555;
+              border: 1px solid #ddd;
+              border-top: 2px solid #2e9cdf;
+              border-bottom: 1px solid #ffffff;}
+
+        #tab1:checked ~ #content1,
+        #tab2:checked ~ #content2,
+        #tab3:checked ~ #content3,
+        #tab4:checked ~ #content4 {
+            display: block;}
+
+    </style>
+
     <script th:inline="javascript">
         $(document).ready(function () {
             $('#nicknameButton').click(function () { //회원정보 공개 비공개로 변경
@@ -72,9 +135,14 @@
 
         });
 
+
+
+
     </script>
 </head>
+
 <body>
+
 <div layout:fragment="content">
     <!--    내 정보 -->
     <div class="container">
@@ -110,7 +178,7 @@
                     <label class="col-sm-2 col-form-label"><span style="font-weight: bold">비밀번호 변경</span></label>
                     <div class="col-sm-1"> |</div>
                     <div class="col-sm-5">
-                        <a class="btn" th:href="@{/password/change}" role="button" style="background-color: #E8ECF5">비밀번호 변경</a><br>
+                        <a class="btn btn-warning" th:href="@{/password/change}" role="button">비밀번호 변경</a><br>
                     </div>
                 </div>
 
@@ -206,6 +274,7 @@
                             }
                         }).open();
                     }
+
                 </script>
 
                 <div class="row g-2 justify-content-left">
@@ -214,16 +283,15 @@
 
                 <hr class="col-12 my-4">
 
-<!--                !!!!!!!!!!!!!!!내가 쓴글 여기에 쓰면 될듯?-->
+                <!--                !!!!!!!!!!!!!!!내가 쓴글 여기에 쓰면 될듯?-->
 
                 <!--    로그아웃, 회원 탈퇴 기능-->
                 <div class="py-5 text-center">
-                    <button style="background-color: transparent; border: 0; outline: 0;"><a href="/logout" id="logout">
+                    <button style="background-color: transparent; border: 0; outline: 0;"><a href="/logout">
                         <span>로그아웃&nbsp;&nbsp;|&nbsp;&nbsp;</span></a></button>
-                    <button th:id="out"style="background-color: transparent; border: 0; outline: 0;">
+                    <button th:id="out" style="background-color: transparent; border: 0; outline: 0;">
                         <span> 회원탈퇴</span></button>
                 </div>
-
 
 
             </div>
@@ -231,6 +299,278 @@
     </div>
 
 
+
+
+<div class="container">
+    <div class=writeByMyself>
+        <div class="main" style="text-align:left">
+
+            <h2>내가 쓴글</h2>
+
+            <input id="tab1" type="radio" name="tabs" checked>
+            <label for="tab1">리뷰</label>
+
+            <input id="tab2" type="radio" name="tabs">
+            <label for="tab2">커뮤니티</label>
+
+            <!--페이지 1-->
+            <section id="content1" style="margin-bottom:20px;">
+
+                <div th:if="${reviewList.isEmpty()}" style="text-align: center;">
+                    <h2>검색결과가 없습니다.</h2>
+                </div>
+
+                <div class="table" id="review_table" th:each="review : ${reviewList}" th:object="${review}">
+                    <table class="table table-borderless wd-100">
+
+                        <tr>
+
+                            <td rowspan="4" style="width: 400px; height: 200px">
+                                <div th:if="*{#lists.isEmpty(uploadImage)}"
+                                     style="display: table; width: 400px; height: 200px">
+                                    <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                       style="text-decoration-line: none; color:black;">
+                                        <div style="display: table-cell; text-align: center; vertical-align: middle; ">
+                                            <img th:src="@{/images/no_photo.png}" style="width: 350px; height: 200px;"
+                                                 class="photo_image"/>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div th:unless="*{#lists.isEmpty(uploadImage)}"
+                                     style="display: table; width: 400px; height: 200px">
+                                    <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                       style="text-decoration-line: none; color:black;">
+                                        <div style="display: table-cell; text-align: center; vertical-align: middle; ">
+                                            <img th:src="@{*{uploadImage[0].imagePath}}"
+                                                 style="width: 350px; height: 200px;"
+                                                 class="photo_image"/>
+                                        </div>
+                                    </a>
+                                </div>
+                            </td>
+
+                            <td colspan="2">
+                                <a th:href="@{/review/read(id=*{id})}" th:value="*{id}" class="review_read"
+                                   style="text-decoration-line: none; color:black;">
+                                    <span th:text="*{postName} + '&nbsp;&nbsp;'" style="font-size: 23px;"/>
+                                    <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"
+                                          style="font-size: 15px; color: grey"/>
+                                </a>
+                            </td>
+
+                            <td rowspan="4">
+                                <div style="text-align: center">
+                                    <p th:text="*{hit}" style="font-size : 40px; "/>
+                                    조회
+                                </div>
+                            </td>
+                            <td rowspan="4">
+                                <div style="text-align: center" id="like_div">
+                                    <button type="button" class="like"
+                                            style="border:0px; outline:0px;background-color:transparent;"
+                                            th:id="like" th:value="*{id}">
+                                        <img th:src="@{${member?.likes?.contains(review)} ? '/images/like_red.svg' : '/images/like.svg'}"
+                                             th:id="*{id}" width="50px" height="75px">
+                                    </button>
+                                    <p th:text="'좋아요 '+ *{likers.size}" th:id="likeNum + *{id}"/>
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" th:if="*{star} == 0">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 1">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 2">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 3">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 4">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                            </td>
+                            <td colspan="2" th:if="*{star} == 5">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                                <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" th:text="*{comment}"> 코멘트</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+
+                                <span th:if="*{tags != null}" th:each="t:*{tags}">
+                                    <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
+                                </span>
+                                <span th:if="*{tags == null}">
+                                <span th:text="등록된 태그가 없습니다"></span>
+                                </span>
+
+                            </td>
+                        </tr>
+                    </table>
+
+                    <hr class="col-12 my-4">
+                </div>
+
+                <div class="page-num"
+                     th:with="start=${(reviewList.number/reviewMaxPage)*reviewMaxPage + 1},
+                  end=(${(reviewList.totalPages == 0) ? 1 : (start + (reviewMaxPage - 1) < reviewList.totalPages ? start + (reviewMaxPage - 1) : reviewList.totalPages)})" >
+
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:if="${start > 1}">
+                            <a class="page-link" th:href="@{/mypage?(page=0)}" th:text="'<<'"></a></li>
+                        </li>
+                        <li class="page-item" th:if="${start > 1}">
+                            <a class="page-link" th:href="@{/mypage?(page=${start - reviewMaxPage})}" th:text="'<'"></a>
+                        </li>
+                        <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}">
+                            <a class="page-link" th:href="@{/mypage?(page=${page-1})}" th:text="${page}"></a></li>
+                        </li>
+
+                        <li class="page-item" th:if="${end < reviewList.totalPages}">
+                            <a class="page-link" th:href="@{/mypage?(page=${start + reviewMaxPage})}" th:text="'>'"></a>
+                        </li>
+
+                        <li class="page-item" th:if="${end < reviewList.totalPages}">
+                            <a class="page-link" th:href="@{/mypage?(page=${reviewList.totalPages-1})}" th:text="'>>'"></a></li>
+                        </li>
+                    </ul>
+
+                </div>
+
+
+
+
+            </section>
+            <section id="content2" style="margin-bottom:20px;">
+
+                <div class="table" id="community_table">
+
+                    <div th:if="${communityList.isEmpty()}" style="text-align: center;" th:id="sortTable">
+                        <h2>검색결과가 없습니다.</h2>
+                    </div>
+
+                    <table class="table table-borderless wd-250" th:each="communityList : ${communityList}"
+                           style="table-layout: fixed">
+                        <tr>
+                            <td th:colspan="6" th:if="${communityList.communityCategory.toString().equals('EAT')}">동네 맛집</td>
+                            <td th:colspan="6" th:if="${communityList.communityCategory.toString().equals('TIP')}">자취방 꿀팁</td>
+                            <td th:colspan="6" th:if="${communityList.communityCategory.toString().equals('INTERIOR')}">자취방
+                                인테리어
+                            </td>
+                            <td th:colspan="6" th:if="${communityList.communityCategory.toString().equals('BOARD')}">자유</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <a th:href="@{/community/read(id=${communityList.id})}" th:value="${communityList.id}"
+                                   class="review_read"
+                                   style="text-decoration-line: none; color:black;">
+                                    <span th:text="${communityList.postName} + '&nbsp;&nbsp;'"
+                                          style="font-size: 23px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width: 100"/>
+                                    <span th:text="${#temporals.format(communityList.regdate, 'yyyy-MM-dd HH:mm:ss')}"
+                                          style="font-size: 15px; color: grey"/>
+                                </a>
+                            </td>
+                            <td th:colspan="1">조회 <span th:text="${communityList.hit}"> </span></td>
+
+                            <td th:colspan="1">
+                                <button type="button" class="like"
+                                        style="border:0px; outline:0px;background-color:transparent;"
+                                        th:id="like" th:value="${communityList.id}">
+                                    <img th:src="@{ ${member?.likes?.contains(community)} ?  '/images/like_red.svg' : '/images/like.svg'}"
+                                         th:id="${communityList.id}" th:width="25" th:height="25"></button>
+                                <span th:text="${communityList.likers.size}" th:id="likeNum+${communityList.id}"></span>
+                            </td>
+
+
+                        </tr>
+
+                        <tr>
+                            <td colspan="6" width="1500" height="64"
+                                th:utext="${communityList.postContent.toString().replaceAll('<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>',' ')
+                                .replaceAll('<\/?(span|font)[^>]*>',' ')
+                                .replaceAll('<img',' ')
+                                }"
+                                style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"></td>
+
+                        </tr>
+                        <tr>
+                            <td th:colspan="6">
+                                <span th:each="t: ${communityList.tags}">
+                 <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
+                </span>
+                            </td>
+                        </tr>
+                        <hr class="col-12 my-4">
+                    </table>
+
+                </div>
+                    <div class="page-num"
+                         th:with="start=${(communityList.number/communityMaxPage)*communityMaxPage + 1},
+                  end=(${(communityList.totalPages == 0) ? 1 : (start + (communityMaxPage - 1) < communityList.totalPages ? start + (communityMaxPage - 1) : communityList.totalPages)})" >
+
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:if="${start > 1}">
+                                <a class="page-link" th:href="@{/mypage?(page=0)}" th:text="'<<'"></a></li>
+                            </li>
+                            <li class="page-item" th:if="${start > 1}">
+                                <a class="page-link" th:href="@{/mypage?(page=${start - communityMaxPage})}" th:text="'<'"></a>
+                            </li>
+                            <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}">
+                                <a class="page-link" th:href="@{/mypage?(page=${page-1})}" th:text="${page}"></a></li>
+                            </li>
+
+                            <li class="page-item" th:if="${end < communityList.totalPages}">
+                                <a class="page-link" th:href="@{/mypage?(page=${start + communityMaxPage})}" th:text="'>'"></a>
+                            </li>
+
+                            <li class="page-item" th:if="${end < communityList.totalPages}">
+                                <a class="page-link" th:href="@{/mypage?(page=${communityList.totalPages-1})}" th:text="'>>'"></a></li>
+                            </li>
+                        </ul>
+
+                    </div>
+
+
+            </section>
+        </div>
+    </div>
 </div>
+</div>
+</body>
+
+<body>
+
+
 </body>
 </html>

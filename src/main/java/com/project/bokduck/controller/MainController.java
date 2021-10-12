@@ -13,15 +13,19 @@ import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.specification.CommunitySpecs;
 import com.project.bokduck.util.CommunityFormVo;
 import com.project.bokduck.util.CurrentMember;
+import com.project.bokduck.specification.ReviewSpecs;
+import com.project.bokduck.util.*;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
-import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +47,7 @@ import javax.persistence.criteria.Order;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Controller
 @RequiredArgsConstructor
@@ -62,7 +67,6 @@ public class MainController {
     private final MainpageService mainpageService;
     private final PasswordEncoder passwordEncoder;
     private final CommentCommunityRepository commentCommunityRepository;
-    private final CommentReviewRepository commentReviewRepository;
 
 
     /**
@@ -119,7 +123,6 @@ public class MainController {
                             .writer(member)
                             .comment("무난하다")
                             .regdate(LocalDateTime.now())
-                            .updateDate(LocalDateTime.now())
                             .hit((int) (Math.random() * 10))
                             .star((int) (Math.random() * 5) + 1)
                             .likeCount((int) (Math.random() * 100))
@@ -207,66 +210,15 @@ public class MainController {
                             .hit((int) ((Math.random() * 50) + 1))
                             .likeCount((int) (Math.random() * 100))
                             .regdate(localDateTime)
-                            .updateDate(localDateTime)
                             .communityCategory(categories[(int) (Math.random() * categories.length)])
                             .build());
                 }
-
                 communityRepository.saveAll(communityList);
 
                 List<Tag> tag2 = tagRepository.findAll();
                 List<Post> tagPostList2 = postRepository.findAll();
                 for (Tag t : tag2) {
                     t.setTagToPost(tagPostList2);
-                }
-
-
-                //커뮤니티 댓글 만들어놓기
-                for (Community commu : communityList) {
-                    Member member1 = memberRepository.findById(arry[(int) (Math.random() * arry.length)]).orElseThrow();
-                    Member member2 = memberRepository.findById(arry[(int) (Math.random() * arry.length)]).orElseThrow();
-
-                    CommentCommunity comment1 = CommentCommunity.builder()
-                            .text("댓글1 본문입니다... 리뷰 잘 봤습니다.")
-                            .nickname(member1.getNickname())
-                            .nicknameOpen(member1.isNicknameOpen())
-                            .community(commu)
-                            .parentId(-1l)
-                            .regdate(LocalDateTime.now())
-                            .build();
-
-                    CommentCommunity comment2 = CommentCommunity.builder()
-                            .text("댓글2 본문입니다... 좋은 리뷰였습니다.")
-                            .nickname(member2.getNickname())
-                            .nicknameOpen(member2.isNicknameOpen())
-                            .community(commu)
-                            .parentId(-1l)
-                            .regdate(LocalDateTime.now())
-                            .build();
-
-                    comment1 = commentCommunityRepository.save(comment1);
-                    commentCommunityRepository.save(comment2);
-
-                    CommentCommunity comment3 = CommentCommunity.builder()
-                            .text("댓글1의 대댓글1입니다... 저도 그렇게 생각합니다.")
-                            .nickname(member1.getNickname())
-                            .nicknameOpen(member1.isNicknameOpen())
-                            .community(commu)
-                            .parentId(comment1.getId())
-                            .regdate(LocalDateTime.now())
-                            .build();
-
-                    CommentCommunity comment4 = CommentCommunity.builder()
-                            .text("댓글1의 대댓글2입니다... 하하하.")
-                            .nickname(member2.getNickname())
-                            .nicknameOpen(member2.isNicknameOpen())
-                            .community(commu)
-                            .parentId(comment1.getId())
-                            .regdate(LocalDateTime.now())
-                            .build();
-
-                    commentCommunityRepository.save(comment3);
-                    commentCommunityRepository.save(comment4);
                 }
             }
         });
@@ -277,7 +229,6 @@ public class MainController {
     protected void initBinder(WebDataBinder dataBinder) {
         dataBinder.addValidators(new JoinFormValidator(memberRepository));
     }
-
 
     @RequestMapping("/")
     public String index(Model model) {
@@ -293,6 +244,7 @@ public class MainController {
         //커뮤니티 인기게시글(좋아요순) 불러오기
         Page<Community> communityList = mainpageService.getCommunityList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "likeCount")));
         model.addAttribute("communityList", communityList);
+
 
         //자취방꿀팁(일단 좋아요순으로 통일함) 불러오기
         Page<Community> communityTipList = mainpageService.getCommunityTipList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id")));
@@ -373,18 +325,14 @@ public class MainController {
     }
 
     @GetMapping("/community/write")
-    public String communityWriteForm(Model model, @CurrentMember Member member) {
+    public String communityWriteForm(Model model) {
         model.addAttribute("vo", new CommunityFormVo());
-
         return "post/community/write";
     }
 
     @PostMapping("/community/write")
     @Transactional
-    public String communityWriteSubmit(@CurrentMember Member member, CommunityFormVo vo, Model model, @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-
-        String strTags = vo.getTags();
-        log.info("string형 태그들 : " + strTags);
+    public String communityWriteSubmit(@CurrentMember Member member, CommunityFormVo vo, Model model) {
 
         //DB에 저장할 List<Tag>형 변수 설정
         List<Tag> tagList = new ArrayList<>();
@@ -435,7 +383,7 @@ public class MainController {
                 .communityCategory(category)
                 .build();
 
-        Community savedCommu = communityRepository.save(community);
+        communityRepository.save(community);
 
         //TAG_TAG_TO_POST 테이블에 데이터 넣기
         for (Tag t : tagList) {
@@ -445,7 +393,7 @@ public class MainController {
             t.getTagToPost().add(community);
         }
 
-        return getCommunityRead(model, savedCommu.getId(), member);
+        return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
     }
 
 
@@ -608,16 +556,6 @@ public class MainController {
 
         Community community = communityRepository.findById(id).orElseThrow();
 
-        if (community.getVisitedMember() == null) {
-            community.setVisitedMember(new ArrayList<>());
-        }
-        if (community.getLikers() == null) {
-            community.setLikers(new ArrayList<>());
-        }
-        if (community.getCommentCommunity() == null) {
-            community.setCommentCommunity(new ArrayList<>());
-        }
-
         //조회수 올리기
         if (!community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
             community.setHit(community.getHit() + 1);
@@ -640,6 +578,13 @@ public class MainController {
         return "post/community/read";
     }
 
+//    @GetMapping("/community/delete")
+//    public String communityDelete(@PageableDefault(size = 10,sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @CurrentMember Member member, Model model, long id) {
+//
+//        communityRepository.deleteById(id);
+//
+//        return community(pageable, member, model);  //PostConstruct로 생성한 글을 지우려고 하면 모든 글이 삭제됨. 왜?
+//    }
 
     @GetMapping("/community/delete")
     @ResponseBody
@@ -648,7 +593,6 @@ public class MainController {
         communityRepository.deleteById(id);
 
         JsonObject jsonObject = new JsonObject();
-
         return jsonObject.toString();
     }
 
@@ -856,18 +800,51 @@ public class MainController {
         return jsonObject.toString();
     }
 
+    @PostMapping("/community/read/comment")
+    public String writeCommunityComment() {
+
+
+        return "";
+    }
+
+    @RequestMapping("/mypage")
+
+
     @GetMapping("/mypage")
     public String mypage(Model model,
-                         @CurrentMember Member member) {
-        List<Review> reviewList = new ArrayList<>();
+                         @CurrentMember Member member,
+                         @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                         @RequestParam(required = false, defaultValue = "all") String check,
+                         @RequestParam(value = "page", defaultValue = "0") int page
+    ) {
         Review review;
 
         if (member == null) { //로그인 확인
             return "redirect:/";
+        } else {
+            member = memberRepository.findById(member.getId()).orElseThrow();
         }
 
         review = reviewRepository.getById(member.getId());
+
         model.addAttribute("member", member);
+        //커뮤니티
+        Page<Community> communityList = communityRepository.findAllByWriter(member, pageable);
+        /*List<Community> communityList = communityRepository.findAllByWriter(member);*/
+        //리뷰
+
+        Page<Review> reviewList = reviewRepository.findAllByWriter(member, pageable);
+        /*List<Review> reviewList = reviewRepository.findAllByWriter(member);*/
+
+
+        model.addAttribute("communityMaxPage", communityList.getSize());
+        model.addAttribute("reviewMaxPage", reviewList.getSize());
+        model.addAttribute("check", check);
+        model.addAttribute("state", "all");
+        model.addAttribute("communityList", communityList);
+        model.addAttribute("reviewList", reviewList);
+
+
         return "/member/mypage";
     }
 
@@ -909,54 +886,12 @@ public class MainController {
     }
 
 
-    @Transactional
     @GetMapping("/memberDelete") //회원 탈퇴
     @ResponseBody
     public String memberdelete(@CurrentMember Member member) {
-
-        List<Post> posts = postRepository.findByWriter(member);
-        List<CommentCommunity> commentCommunityList = commentCommunityRepository.findByNickname(member.getNickname());
-        List<CommentReview> commentReviews = commentReviewRepository.findByNickname(member.getNickname());
-        List<Post> postdLike = postRepository.findBylikers(member);
-        List<Post> postHit = postRepository.findByVisitedMember(member);
-
-
-
-
-        if (commentReviews != null){ //리뷰 댓글 삭제
-            for (int i=0; i<commentReviews.size(); i++){
-                commentReviewRepository.delete(commentReviews.get(i));
-            }
-        }
-
-        if (commentCommunityList != null) { //커뮤니티 댓글 삭제
-            for (int i = 0; i < commentCommunityList.size(); i++) {
-                commentCommunityRepository.delete(commentCommunityList.get(i));
-            }
-        }
-
-        if (postdLike != null){ // 좋아요 삭제
-            for (int i=0; i<postdLike.size(); i++){
-                postdLike.get(i).setLikers(null);
-                postRepository.save(postdLike.get(i));
-            }
-        }
-        if (postHit != null) { //조회수 삭제
-            for (int i = 0; i < postHit.size(); i++) {
-                postHit.get(i).setVisitedMember(null);
-                postRepository.save(postHit.get(i));
-            }
-        }
-
-        if (posts != null) { //모든 게시물 삭제
-            for (int i = 0; i < posts.size(); i++) {
-                postRepository.delete(posts.get(i));
-            }
-        }
         memberRepository.delete(member);
         SecurityContextHolder.clearContext();
         JsonObject jsonObject = new JsonObject();
-
         return jsonObject.toString();
     }
 
@@ -1064,4 +999,7 @@ public class MainController {
     }
 
 
+
+
 }
+

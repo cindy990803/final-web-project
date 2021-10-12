@@ -1,9 +1,7 @@
 package com.project.bokduck.repository;
 
 
-import com.project.bokduck.domain.Post;
-import com.project.bokduck.domain.Review;
-import com.project.bokduck.domain.ReviewCategory;
+import com.project.bokduck.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,7 +19,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
     // 리스트형으로 카테고리 받기
     Page<Review> findAllByReviewCategoryIn(List<ReviewCategory> categoryList, Pageable pageable);
 
-    @Query(value = "SELECT * FROM POST LEFT OUTER JOIN REVIEW WHERE WRITER_ID = :writer",nativeQuery = true)
-    List<Review> findALlByWriter(Long writer);
+   /* List<Review> findALlByWriter(Member writer);*/
+
+
+    Page<Review> findAllByWriter(Member writer,Pageable pageable);
+   /*List<Review> findAllByWriter(Member writer);*/
+
 }
 
