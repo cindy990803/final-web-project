@@ -78,6 +78,7 @@ public class OAuth2Attributes {
     public Member toMember(){
         return Member.builder()
                 .username(username)
+                .nickname("익명")
                 .memberType(MemberType.ROLE_USER)
                 .emailVerified(true)
                 .password("{noop}")

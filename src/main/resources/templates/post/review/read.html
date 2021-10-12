@@ -5,7 +5,62 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='복덕복덕 : Review'">
 <head>
+    <script th:inline="javascript">
+        $(document).ready(function (){
+            $(".like").click(function (){ // 좋아요 하는 기능
+                let data = $(this).val();
+                $.ajax({
+                    type: 'POST',
+                    url:'/review/read/like',
+                    data: { "id" : data},
+                    dataType: 'json',
+                    success: function (result){
+                        if (result.resultCode == "error.auth") {
+                            alert(result.message);
+                        }else if(result.resultCode == "error.invalid"){
+                            alert(result.message);
+                        }else if(result.resultCode == "ok"){
+                            $("#"+data).attr("src","/images/like_red.svg");
+                            $('#likeNum'+data).html("좋아요 " + result.likeCheck);
+                        }else if(result.resultCode == "duplicate"){
+                            $("#"+data).attr("src","/images/like.svg");
+                            $('#likeNum'+data).text("좋아요 " + result.likeCheck);
+                        }
+                    }
+                });
+            });
 
+            $(".delete").click(function (){
+                let ans = confirm("삭제하시겠습니까?");
+                if(ans){
+                    let data = $(this).val();
+                    $.ajax({
+                        type: "GET",
+                        url : "/review/read/delete",
+                        data: { "id" : data},
+                        dataType: 'json',
+                        success : function(result) {
+                            if(result.resultCode == 200) {
+                                alert(result.message)
+                                let url= "/post/review/list";
+                                location.replace(url);
+                            } else {
+                                alert(result.message)
+                            }
+
+                        }
+                    })
+                }
+            })
+
+
+
+        });
+
+
+    </script>
+
+<<<<<<< Updated upstream
     <style>
         button, button:hover {
             border: 0;
@@ -133,6 +188,8 @@
     </script>
 
 
+=======
+>>>>>>> Stashed changes
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
@@ -159,18 +216,32 @@
         <div class="inner">
             <div class="title-main">
                 <p th:text="*{address}"></p>
+<<<<<<< Updated upstream
                 <span th:text="*{postName}" ></span>
+=======
+                <span th:text="*{postName}"></span>
+>>>>>>> Stashed changes
                 <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"></span>
             </div>
             <div class="title-sub">
+<<<<<<< Updated upstream
                 <span style="margin-right: 2px;">조회수 </span> <span th:text="*{hit}"></span>
                 <button type="button" class="like"
                         style="border:0px; outline:0px;background-color:transparent; margin-right: 2px"
+=======
+                <span>조회수 : </span> <span th:text="*{hit}"></span>
+                <button type="button" class="like"
+                        style="border:0px; outline:0px;background-color:transparent;"
+>>>>>>> Stashed changes
                         th:id="like" th:value="*{id}">
                     <img th:src="@{ ${review.likers.contains(currentMember)} ? '/images/like_red.svg': '/images/like.svg'}"
                          th:id="*{id}" >
                 </button>
+<<<<<<< Updated upstream
                 <span th:text="' '+ *{likers.size}" th:id="likeNum + *{id}"></span>
+=======
+                <p th:text="' '+ *{likers.size}" th:id="likeNum + *{id}"/>
+>>>>>>> Stashed changes
                 <img src="/images/alarm.png" alt="like">
             </div>
         </div>
@@ -221,16 +292,21 @@
                 </div>
                 <div class="option" >
                     <span>교통 | </span>
+<<<<<<< Updated upstream
                     <span th:if="${#strings.equals(review.reviewCategory.traffic,'SUBWAY')} " th:text="지하철"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.traffic,'BUS')} " th:text="버스"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.traffic,'SUBWAY,BUS')} " th:text="'지하철'+'&nbsp&nbsp'+'버스'"></span>
 
+=======
+                    <span th:if="*{reviewCategory.traffic != null}" th:text="*{reviewCategory.traffic}"></span>
+>>>>>>> Stashed changes
                 </div>
             </div>
 
             <div class="inner__right">
                 <div class="option">
                     <span>편의시설 | </span>
+<<<<<<< Updated upstream
                     <span th:if="${#strings.equals(review.reviewCategory.convenient,'STORE')} " th:text="편의점"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.convenient,'HOSPITAL')} " th:text="병원"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.convenient,'COINLAUNDER')} " th:text="코인세탁소"></span>
@@ -268,6 +344,17 @@
                     <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'AIRCONDITIONER ,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'에어컨'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,AIRCONDITIONER ,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'에어컨'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
+=======
+                    <span th:if="*{reviewCategory.convenient != null}" th:text="*{reviewCategory.convenient}"></span>
+                </div>
+                <div class="option">
+                    <span>기타 | </span>
+                    <span th:if="*{reviewCategory.welfare != null}" th:text="*{reviewCategory.welfare}"></span>
+                </div>
+                <div class="option">
+                    <span>옵션 | </span>
+                    <span th:if="*{reviewCategory.electronicDevice != null}" th:text="*{reviewCategory.electronicDevice}"></span>
+>>>>>>> Stashed changes
                 </div>
             </div>
         </div>

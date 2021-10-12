@@ -30,6 +30,12 @@ img {
 }
 .read-upper .inner .title-main :nth-child(2) {
     font-size: 24px;
+
+}
+
+.read-upper .inner .title-main :nth-child(2) {
+    font-size: 50px;
+>>>>>>> Stashed changes
 }
 .read-upper .inner .title-sub {
     position: absolute;
@@ -218,6 +224,13 @@ img {
     position: absolute;
     right: 120px;
     bottom: 15px;
+}
+
+.review-map .inner .changeReview {
+    position: absolute;
+    right: 20px;
+    bottom: 8px;
+    display: flex;
 }
 
 .review-map .inner .changeReview {

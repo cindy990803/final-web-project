@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.google.gson.JsonObject;
 import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.ReviewListVo;
+import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -65,17 +67,18 @@ public class ReviewController {
     /*@RequestMapping(value = {"/upload"}, method = {RequestMethod.POST}, consumes = MediaType.MULTIPART_FOR_DATA_VALUE)*/
 
 
-    @GetMapping("/writeReview")
-    public String writeReview(Model model, @CurrentMember Member member) {
+    @GetMapping("/write")
+    public String write(Model model, @CurrentMember Member member) {
         if (member == null) {
             return "member/login";
         }
         model.addAttribute("WriteReviewVO", new WriteReviewVO());
-        return "post/review/writeReview";
+        return "post/review/write";
     }
 
 
-    @PostMapping("/writeReview")
+    @PostMapping("/write")
+    @Transactional
     public String saveReview(
 
             @RequestParam("image") MultipartFile[] imageFile,
@@ -90,17 +93,23 @@ public class ReviewController {
 
         List<Image> imageList = new ArrayList<>();
         ReviewCategory reviewCategory = new ReviewCategory();
+        Image image;
 
+if (imageFile==null){
+    image = new Image();
+    image.setImageName(null);
+    image.setImagePath(null);
+    model.addAttribute("image",image);
+}else {
 
 
         for (int i = 0; i < imageFile.length;i++) {
 
-            Image image = new Image();
+            image = new Image();
 
             String imageName = StringUtils.cleanPath(imageFile[i].getOriginalFilename());
 
             image.setImageName(imageName);
-
 
             image = imageRepository.save(image);
 
@@ -116,6 +125,8 @@ public class ReviewController {
 
         }
 
+}
+
 
 
 
@@ -128,6 +139,8 @@ public class ReviewController {
         file.setFilePath(pdfName);
 
         file = fileRepository.save(file);
+
+        file.setFilePath("/file/" + file.getId()+"/"+ pdfName);
 
         String pdfUploadDest = "file/" + file.getId();
 
@@ -214,21 +227,6 @@ public class ReviewController {
         }
 
 
-        // 태그 포스트에 넣기
-        List<Tag> tag1 = tagRepository.findAll();
-        List<Post> tagPostList = postRepository.findAll();
-        for (Tag t : tag1) {
-            t.setTagToPost(tagPostList);
-        }
-
-/*
-        List<Image> image2 = imageRepository.findAll();
-        List<Post>  imagetoPost = postRepository.findAll();
-         for(Image t : image2){
-         t.setImageToPost(imagetoPost);
-     }
-*/
-
 
         Review review1;
         review1 = reviewRepository.getById(member.getId());
@@ -255,8 +253,16 @@ public class ReviewController {
             imageList.get(i).setImageToPost(review);
         }
 
+
+
         reviewRepository.save(review);
 
+        for (Tag t : tagList) {
+            if (t.getTagToPost() == null) {
+                t.setTagToPost(new ArrayList<Post>());
+            }
+            t.getTagToPost().add(review);
+        }
 
 
 

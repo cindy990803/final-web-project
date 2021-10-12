@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='커뮤니티 - 글쓰기'">
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='community', title='복덕복덕 : Community'">
 
 <head>
     <meta charset="UTF-8">
@@ -82,6 +82,10 @@
             });
         });
 
+
+
+
+
     </script>
 
 
@@ -111,7 +115,6 @@
                     <span th:if="${community.writer.id} == ${currMem.id}">
                         <a th:href="@{/community/modify(id=${community.id})}" class="commu-read-a">수정</a>
                         ·
-                        <!-- 삭제 alert() 하기 -->
                         <a id="deleteCommu" type="button" class="commu-read-a">삭제</a>
                         <input id="deleteCommu-id" type="hidden" th:value="${community.id}">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -162,7 +165,7 @@
 
                     <!-- 댓글쓰기 텍스트박스 -->
                     <div>
-                        <form id="comment" th:object="${comment}" th:action="@{/community/read/comment/{id}(id=${community.id})}" method="post" name="comment">
+                        <form id="commentForm" th:object="${comment}" th:action="@{/community/read/comment/{id}(id=${community.id})}" method="post" name="comment">
 
                         <p style="font-size:12px; margin-bottom:10px">
                                 <span>
@@ -175,7 +178,7 @@
                             <div class="input-group mb-3" style="margin-left:32px; position:relative; width:95%;">
                                     <input th:field="${comment.text}" th:class="form-control" class="form-control" type="text" placeholder="댓글을 입력해주세요." style="font-size:12px; border-radius:0px; display:inline-block" required/>
                                     <div class="input-group-append">
-                                        <button type="submit" class="btn" style="font-size:12px; background-color:black; border:0px; color:white; border-radius:0px">댓글달기</button>
+                                        <button type="submit" id="commentWrite" class="btn" style="font-size:12px; background-color:black; border:0px; color:white; border-radius:0px">댓글달기</button>
                                     </div>
 
                             </div>
@@ -185,6 +188,8 @@
 
 
                     <!-- 댓글 -->
+                    <div id="new-comment"></div>
+
                     <th:block th:each="i : ${#numbers.sequence(community.commentCommunity.size() - 1, 0, -1)}">
 
                         <div th:if="${community.commentCommunity[i].parentId == -1l}">

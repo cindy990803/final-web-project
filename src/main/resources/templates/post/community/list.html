@@ -3,13 +3,28 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main-layout}" th:with="activeTab='', title='community'"
-      xmlns:td="http://www.w3.org/1999/html">
+      layout:decorate="~{layout/main-layout}" th:with="activeTab='community', title='복덕복덕 : Community'">
 <head>
     <style>
         .pagination {
             justify-content: center;
         }
+
+        #sort:link {
+            color: black;
+            text-decoration: none;
+        }
+
+        #sort:visited {
+            color: black;
+            text-decoration: none;
+        }
+
+        #sort:hover {
+            color: black;
+            text-decoration: none;
+        }
+
     </style>
 
     <script th:inline="javascript">
@@ -39,7 +54,6 @@
         });
 
 
-
     </script>
 </head>
 <body>
@@ -47,38 +61,52 @@
 <div layout:fragment="content">
     <div class="container">
         <main>
-            <div class="py-5 text-center">
-                <h2>커뮤니티 리스트</h2>
+            <div class="text-center">
+                <img th:src="@{/images/logo.svg}" style="width: 30%;" id="logo"/>
             </div>
 
             <form class="justify-content-center" method="get" th:action="@{/community/list/category}">
 
                 <!-- 검색창 -->
-                <div class="form-group d-flex justify-content-center row">
+                <div class="form-group d-flex justify-content-center row" >
                     <input type="text" class="form-control form-control-lg col-6" th:value="${searchText}"
-                           id="searchText" name="searchText">
+                           id="searchText" name="searchText" placeholder="키워드 및 태그 검색">
                     <button type="submit" class="btn btn-info col-1">검색</button>
+                </div>
+
+                <!-- 글쓰기 -->
+                <div id="community_write" class="d-flex flex-row-reverse bd-highlight">
+                    <div class="p-2 bd-highlight">
+                        <a class="btn btn-outline-info" th:href="@{/community/write}">글쓰기</a>
+                    </div>
                 </div>
 
 
                 <!-- 정렬 -->
-                <div class="form-group d-flex justify-content-end" id="line_option" style="float: right" th:if="${!state.toString.equals('search')}">
-                    <a th:href="@{/community/list/category(community=${param.community},check=new)}">최신순</a>
-                    <!--                    <a th:href="@{/community/list/category(community=${param.community},check=like, sort=${arrayLike})}">좋아요순</a>-->
-                    <a th:href="@{/community/list/category(community=${param.community},check=like, sort='likeCount,id,desc')}">좋아요순</a>
+                <div class="form-group d-flex justify-content-end"  style="float: right" th:if="${!state.toString.equals('search')}">
+                    <a th:id="sort" th:href="@{/community/list/category(community= ${param.community},check=new)}">
+                        <span th:if="${check} != 'like'" style="color: #28BBD4; font-size: 20px">최신순</span>
+                        <span th:unless="${check} != 'like'" style="color: black; font-size: 20px">최신순</span>
+                    <span>&nbsp;&nbsp; | &nbsp;&nbsp;</span></a>
 
+                    <a th:id="sort"
+                       th:href="@{/community/list/category(community=${param.community},check=like, sort='likeCount,id,desc')}">
+                        <span th:if="${check} != 'like'" style="color: black; font-size: 20px">좋아요순</span>
+                        <span th:unless="${check} != 'like'" style="color: #28BBD4; font-size: 20px">좋아요순</span></a>
                 </div>
 
-                <div class="form-group d-flex justify-content-end" id="line_option" style="float: right" th:if="${state.toString.equals('search')}">
-                    <a th:href="@{/community/list/category(searchText=${param.searchText},check=new)}">최신순</a>
-                    <a th:href="@{/community/list/category(searchText=${param.searchText},check=like, sort='likeCount,id,desc')}">좋아요 순</a>
+                <div class="form-group d-flex justify-content-end" th:if="${state.toString.equals('search')}">
+                    <a th:id="sort" th:href="@{/community/list/category(searchText=${param.searchText},check=new)}">
+                        <span th:if="${check} != 'like'" style="color: #28BBD4; font-size: 20px">최신순</span>
+                        <span th:unless="${check} != 'like'" style="color: black; font-size: 20px">최신순</span>
+                        <span>&nbsp;&nbsp; | &nbsp;&nbsp;</span></a>
+                    <a th:id="sort"
+                       th:href="@{/community/list/category(searchText=${param.searchText},check=like, sort='likeCount,id,desc')}">
+                        <span th:if="${check} != 'like'" style="color: black; font-size: 20px">좋아요순</span>
+                        <span th:unless="${check} != 'like'" style="color: #28BBD4; font-size: 20px">좋아요순</span></a>
                 </div>
 
 
-                <!-- 글쓰기 -->
-                <div id="review_write" class="container justify-content-end">
-                    <a class="btn btn-outline-info" th:href="@{/community/write}">글쓰기</a>
-                </div>
 
                 <!-- 카테고리-->
 
@@ -86,32 +114,50 @@
                 <div th:if="${state.toString.equals('search')}">
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/community/list/all" th:value="search">검색 결과</a>
+                            <a class="nav-link active" href="/community/list/all"
+                               th:value="search" style="font-size: 20px; color: #28BBD4; font-weight: bold">검색 결과</a>
                         </li>
                     </ul>
                 </div>
+
                 <!--검색 안 했을때 -->
                 <div th:unless="${state.toString.equals('search')}">
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
-                            <a th:class="${state.toString.equals('all')? 'nav-link active' : 'nav-link'}"
-                               th:href="@{/community/list/category(community=all)}" th:value="all" th:id="category">전체 글</a>
+                            <a th:class="${state.toString.equals('all')?  'nav-link active'  : 'nav-link' }"
+                               th:href="@{/community/list/category(community=all)}" th:value="all" th:id="category">
+                                <span th:if="${state} == all" style="font-size: 20px; color: #28BBD4; font-weight: bold" >전체글</span>
+                                <span th:unless="${state} == all" style="font-size: 20px; color: black" >전체글</span>
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a th:class="${state.equals('tip')? 'nav-link active' : 'nav-link'}"
-                               th:href="@{/community/list/category(community=tip)}">자취방 꿀팁</a>
+                            <a th:class="${state.equals('tip')?  'nav-link active' : 'nav-link'  }"
+                               th:href="@{/community/list/category(community=tip)}">
+                                <span th:if="${state} == tip" style="font-size: 20px; color: #28BBD4; font-weight: bold">자취방 꿀팁</span>
+                                <span th:unless="${state} == tip" style="font-size: 20px; color: black" >자취방 꿀팁</span>
+
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link'}"
-                               th:href="@{/community/list/category(community=interior)}">자취방 인테리어</a>
+                            <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link' }"
+                               th:href="@{/community/list/category(community=interior)}">
+                                <span th:if="${state} == interior" style="font-size: 20px; color: #28BBD4; font-weight: bold">자취방 인테리어</span>
+                                <span th:unless="${state} == interior" style="font-size: 20px; color: black">자취방 인테리어</span>
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a th:class="${state.toString.equals('eat')? 'nav-link active' : 'nav-link'}"
-                               th:href="@{/community/list/category(community=eat)}">동네 맛집</a>
+                            <a th:class="${state.toString.equals('eat')?  'nav-link active' : 'nav-link' }"
+                               th:href="@{/community/list/category(community=eat)}">
+                                <span th:if="${state} == eat" style="font-size: 20px; color: #28BBD4; font-weight: bold" >동네 맛집</span>
+                                <span th:unless="${state} == eat" style="font-size: 20px; color: black" >동네 맛집</span>
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a th:class="${state.toString.equals('board')? 'nav-link active' : 'nav-link'}"
-                               th:href="@{/community/list/category(community=board)}">자유 게시판</a>
+                            <a th:class="${state.toString.equals('board')?  'nav-link active' : 'nav-link' }"
+                               th:href="@{/community/list/category(community=board)}">
+                                <span th:if="${state} == board" style="font-size: 20px; color: #28BBD4; font-weight: bold">자유 게시판</span>
+                                <span th:unless="${state} == board" style="font-size: 20px; color: black">자유 게시판</span>
+                            </a>
                         </li>
                     </ul>
                     <input th:type="hidden" th:value="categorry">
@@ -119,31 +165,33 @@
 
 
                 <!--리스트 -->
-                <div th:if="${communityList.isEmpty()}" style="text-align: center;" th:id="sortTable">
-                    <h2>검색결과가 없습니다.</h2>
+                <div th:if="${communityList.isEmpty()}" style="text-align: center;">
+                    <img th:src="@{/images/no_content.svg}" style="width: 300px; height: 300px;"
+                         class="no_content" id="no_content"/>
+                    <h1 class="no_content">검색 결과가 없습니다</h1>
                 </div>
 
                 <div class="table" id="community_table">
                     <table class="table table-borderless wd-250" th:each="product : ${communityList}"
                            style="table-layout: fixed">
                         <tr>
-                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('EAT')}">동네 맛집</td>
-                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('TIP')}">자취방 꿀팁</td>
-                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('INTERIOR')}">자취방
-                                인테리어
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('EAT')}"><span style="color: #303F4F">동네 맛집</span></td>
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('TIP')}"><span style="color: #303F4F">자취방 꿀팁</span></td>
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('INTERIOR')}"><span style="color: #303F4F">자취방
+                                인테리어</span>
                             </td>
-                            <td th:colspan="6" th:if="${product.communityCategory.toString().equals('BOARD')}">자유</td>
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('BOARD')}"><span style="color: #303F4F">자유 게시판</span></td>
                         </tr>
 
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <a th:href="@{/community/read(id=${product.id})}" th:value="${product.id}"
                                    class="review_read"
                                    style="text-decoration-line: none; color:black;">
-                                    <span th:text="${product.postName} + '&nbsp;&nbsp;'"
-                                          style="font-size: 23px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width: 100"/>
-                                    <span th:text="${#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')}"
-                                          style="font-size: 15px; color: grey"/>
+                                    <span th:text="${product.postName}"
+                                          style="font-size: 23px;  display:inline-block; max-width:440px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"/>
+                                    <span th:text="${'&nbsp;&nbsp;'+#temporals.format(product.regdate, 'yyyy-MM-dd HH:mm:ss')}"
+                                          style="font-size: 15px; display:inline-block;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; color: grey;  "/>
                                 </a>
                             </td>
                             <td th:colspan="1">조회 <span th:text="${product.hit}"> </span></td>
@@ -153,11 +201,9 @@
                                         style="border:0px; outline:0px;background-color:transparent;"
                                         th:id="like" th:value="${product.id}">
                                     <img th:src="@{ ${member?.likes?.contains(product)} ?  '/images/like_red.svg' : '/images/like.svg'}"
-                                         th:id="${product.id}" th:width="25" th:height="25"></button>
+                                         th:id="${product.id}" th:width="30" th:height="30"></button>
                                 <span th:text="${product.likers.size}" th:id="likeNum+${product.id}"></span>
                             </td>
-
-
                         </tr>
 
                         <tr>
@@ -167,13 +213,15 @@
                                 .replaceAll('<img',' ')
                                 }"
                                 style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"></td>
-
                         </tr>
                         <tr>
-                            <td th:colspan="6">
-                                <span th:each="t: ${product.tags}">
-                 <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
-                </span>
+                            <td th:colspan="7" rowspan="1">
+                                <span th:if="${product.tags != null}" th:each="t: ${product.tags}">
+                                    <span th:text="${t.tagName}" style="background-color: #eeeeee"></span>
+                                </span>
+
+                                <span th:if="${product.tags.isEmpty}">등록된 태그가 없습니다</span>
+
                             </td>
                         </tr>
                         <hr class="col-12 my-4">
@@ -194,15 +242,18 @@
                                ,community=${param.community},check=like,sort='likeCount,id,desc')}"
                                        tabindex="-1" aria-disabled="true"> &lt; </a>
                                 </li>
-                                <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                                <li class="page-item"
+                                    th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
                                     th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                                    <a class="page-link" href="#" th:href="@{/community/list/category(page=${i - 1},community=${param.community},check=like,sort='likeCount,id,desc')}"
+                                    <a class="page-link" href="#"
+                                       th:href="@{/community/list/category(page=${i - 1},community=${param.community},check=like,sort='likeCount,id,desc')}"
                                        th:text="${i}">1</a>
                                 </li>
                                 <li class="page-item"
                                     th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
                                     <a class="page-link" href="#"
-                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},community=${param.community},check=like,sort='likeCount,id,desc')}"> &gt </a>
+                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},community=${param.community},check=like,sort='likeCount,id,desc')}">
+                                        &gt </a>
                                 </li>
 
                             </ul>
@@ -218,15 +269,18 @@
                                ,community=${param.community})}"
                                        tabindex="-1" aria-disabled="true"> &lt; </a>
                                 </li>
-                                <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                                <li class="page-item"
+                                    th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
                                     th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                                    <a class="page-link" href="#" th:href="@{/community/list/category(page=${i - 1},community=${param.community})}"
+                                    <a class="page-link" href="#"
+                                       th:href="@{/community/list/category(page=${i - 1},community=${param.community})}"
                                        th:text="${i}">1</a>
                                 </li>
                                 <li class="page-item"
                                     th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
                                     <a class="page-link" href="#"
-                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},community=${param.community})}"> &gt </a>
+                                       th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},community=${param.community})}">
+                                        &gt </a>
                                 </li>
 
                             </ul>
@@ -243,15 +297,18 @@
                                    th:href="@{/community/list/category(page=${communityList.pageable.pageNumber - 1},searchText=${param.searchText},community=${param.community})}"
                                    tabindex="-1" aria-disabled="true"> &lt; </a>
                             </li>
-                            <li class="page-item" th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
+                            <li class="page-item"
+                                th:classappend="${i == communityList.pageable.pageNumber+1} ? 'active'"
                                 th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                                <a class="page-link" href="#" th:href="@{/community/list/category(page=${i - 1},searchText=${param.searchText},community=${param.community})}"
+                                <a class="page-link" href="#"
+                                   th:href="@{/community/list/category(page=${i - 1},searchText=${param.searchText},community=${param.community})}"
                                    th:text="${i}">1</a>
                             </li>
                             <li class="page-item"
                                 th:classappend="${communityList.totalPages == communityList.pageable.pageNumber + 1} ? 'disabled'">
                                 <a class="page-link" href="#"
-                                   th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},searchText=${param.searchText},community=${param.community})}"> &gt </a>
+                                   th:href="@{/community/list/category(page=${communityList.pageable.pageNumber + 1},searchText=${param.searchText},community=${param.community})}">
+                                    &gt </a>
                             </li>
 
                         </ul>

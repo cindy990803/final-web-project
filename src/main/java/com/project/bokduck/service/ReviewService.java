@@ -76,6 +76,7 @@ public class ReviewService {
        reviewRepository.save(review);
     }
 
+
     @Transactional
     public FlagLike addApproval(Member member, Long id) {
         // 승인 버튼 눌렀을 때

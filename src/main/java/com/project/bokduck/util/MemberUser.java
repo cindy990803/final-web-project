@@ -20,5 +20,8 @@ public class MemberUser extends User {
         this.member=member;
     }
 
-
+    @Override
+    public String getUsername() {
+        return member.getNickname();
+    }
 }
