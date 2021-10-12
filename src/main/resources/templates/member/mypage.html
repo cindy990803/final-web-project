@@ -5,9 +5,9 @@
 
 <head>
 <style>
-    a:link { color: red; text-decoration: none;}
-    a:visited { color: black; text-decoration: none;}
-    a:hover { color: black; text-decoration: none;}
+    #logout:link { color: black; text-decoration: none;}
+    #logout:visited { color: black; text-decoration: none;}
+    #logout:hover { color: black; text-decoration: none;}
 
 </style>
     <script th:inline="javascript">
@@ -110,7 +110,7 @@
                     <label class="col-sm-2 col-form-label"><span style="font-weight: bold">비밀번호 변경</span></label>
                     <div class="col-sm-1"> |</div>
                     <div class="col-sm-5">
-                        <a class="btn btn-warning" th:href="@{/password/change}" role="button">비밀번호 변경</a><br>
+                        <a class="btn" th:href="@{/password/change}" role="button" style="background-color: #E8ECF5">비밀번호 변경</a><br>
                     </div>
                 </div>
 
@@ -218,7 +218,7 @@
 
                 <!--    로그아웃, 회원 탈퇴 기능-->
                 <div class="py-5 text-center">
-                    <button style="background-color: transparent; border: 0; outline: 0;"><a href="/logout">
+                    <button style="background-color: transparent; border: 0; outline: 0;"><a href="/logout" id="logout">
                         <span>로그아웃&nbsp;&nbsp;|&nbsp;&nbsp;</span></a></button>
                     <button th:id="out"style="background-color: transparent; border: 0; outline: 0;">
                         <span> 회원탈퇴</span></button>

@@ -62,6 +62,7 @@ public class MainController {
     private final MainpageService mainpageService;
     private final PasswordEncoder passwordEncoder;
     private final CommentCommunityRepository commentCommunityRepository;
+    private final CommentReviewRepository commentReviewRepository;
 
 
     /**
@@ -276,8 +277,6 @@ public class MainController {
     protected void initBinder(WebDataBinder dataBinder) {
         dataBinder.addValidators(new JoinFormValidator(memberRepository));
     }
-
-
 
 
     @RequestMapping("/")
@@ -609,28 +608,28 @@ public class MainController {
 
         Community community = communityRepository.findById(id).orElseThrow();
 
-        if (community.getVisitedMember()==null) {
+        if (community.getVisitedMember() == null) {
             community.setVisitedMember(new ArrayList<>());
         }
-        if (community.getLikers()==null) {
+        if (community.getLikers() == null) {
             community.setLikers(new ArrayList<>());
         }
-        if (community.getCommentCommunity()==null) {
+        if (community.getCommentCommunity() == null) {
             community.setCommentCommunity(new ArrayList<>());
         }
 
         //조회수 올리기
-        if (! community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
-            community.setHit(community.getHit()+1);
+        if (!community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
+            community.setHit(community.getHit() + 1);
             List members = community.getVisitedMember();
             members.add(member);
             community.setVisitedMember(members);
         }
 
 
-        model.addAttribute("community",community);
+        model.addAttribute("community", community);
 
-        model.addAttribute("currMem",member);
+        model.addAttribute("currMem", member);
 
         CommentCommunity comment = new CommentCommunity();
         model.addAttribute("comment", comment);
@@ -667,7 +666,7 @@ public class MainController {
         //[{"value":"태그"},{"value":"테스트"},{"value":"test"}]
 
         String strTags = "[";
-        for (int i=0; i<community.getTags().size(); ++i) {
+        for (int i = 0; i < community.getTags().size(); ++i) {
             strTags += "{\"value\":\"" + community.getTags().get(i).getTagName() + "\"}";
 
             if (i == community.getTags().size() - 1) break;
@@ -749,7 +748,6 @@ public class MainController {
         }
 
 
-
         Community community = communityRepository.findById(id).orElseThrow();
         community.setPostName(vo.getPostName());
         community.setPostContent(vo.getPostContent());
@@ -761,15 +759,15 @@ public class MainController {
         community.setTags(tagList);
 
         //현재 게시물을 수정 시 지운 태그들의 tagToPost에서 제거
-        for(Tag t : previousTagList){
+        for (Tag t : previousTagList) {
             List<Post> postList = t.getTagToPost();
             postList.remove(communityRepository.findById(id).orElseThrow());
             t.setTagToPost(postList);
         }
 
         //수정 시 추가한 태그들의 tagToPost에 현재 게시물 추가
-        for(Tag t : tagList){
-            if (t.getTagToPost()==null) {
+        for (Tag t : tagList) {
+            if (t.getTagToPost() == null) {
                 t.setTagToPost(new ArrayList<Post>());
             }
             t.getTagToPost().add(community);
@@ -869,7 +867,7 @@ public class MainController {
         }
 
         review = reviewRepository.getById(member.getId());
-        model.addAttribute("member",member);
+        model.addAttribute("member", member);
         return "/member/mypage";
     }
 
@@ -911,9 +909,50 @@ public class MainController {
     }
 
 
+    @Transactional
     @GetMapping("/memberDelete") //회원 탈퇴
     @ResponseBody
     public String memberdelete(@CurrentMember Member member) {
+
+        List<Post> posts = postRepository.findByWriter(member);
+        List<CommentCommunity> commentCommunityList = commentCommunityRepository.findByNickname(member.getNickname());
+        List<CommentReview> commentReviews = commentReviewRepository.findByNickname(member.getNickname());
+        List<Post> postdLike = postRepository.findBylikers(member);
+        List<Post> postHit = postRepository.findByVisitedMember(member);
+
+
+
+
+        if (commentReviews != null){ //리뷰 댓글 삭제
+            for (int i=0; i<commentReviews.size(); i++){
+                commentReviewRepository.delete(commentReviews.get(i));
+            }
+        }
+
+        if (commentCommunityList != null) { //커뮤니티 댓글 삭제
+            for (int i = 0; i < commentCommunityList.size(); i++) {
+                commentCommunityRepository.delete(commentCommunityList.get(i));
+            }
+        }
+
+        if (postdLike != null){ // 좋아요 삭제
+            for (int i=0; i<postdLike.size(); i++){
+                postdLike.get(i).setLikers(null);
+                postRepository.save(postdLike.get(i));
+            }
+        }
+        if (postHit != null) { //조회수 삭제
+            for (int i = 0; i < postHit.size(); i++) {
+                postHit.get(i).setVisitedMember(null);
+                postRepository.save(postHit.get(i));
+            }
+        }
+
+        if (posts != null) { //모든 게시물 삭제
+            for (int i = 0; i < posts.size(); i++) {
+                postRepository.delete(posts.get(i));
+            }
+        }
         memberRepository.delete(member);
         SecurityContextHolder.clearContext();
         JsonObject jsonObject = new JsonObject();
@@ -963,8 +1002,9 @@ public class MainController {
                         .build());
                 memberRepository.save(member);
                 message = "변경 완료 되었습니다.";
-            }if (postcode==null || address == null || detailAddress == null){
-                message= "주소를 모두 입력해주세요";
+            }
+            if (postcode == null || address == null || detailAddress == null) {
+                message = "주소를 모두 입력해주세요";
             }
 
         }
@@ -995,8 +1035,8 @@ public class MainController {
     }
 
 
-    @RequestMapping ("/idsearch")
-    public String idSearchResult(String tel, Model model){
+    @RequestMapping("/idsearch")
+    public String idSearchResult(String tel, Model model) {
         // 아이디 찾기
 
         log.info("tel : {}", tel);
@@ -1005,14 +1045,14 @@ public class MainController {
 
         try {
 
-            if(tel != null){
+            if (tel != null) {
                 Member member = memberRepository.findByTel(tel).get();
                 String[] split = member.getUsername().split("@");
-                String repeat = "*".repeat(split[0].length()-2);
-                message = "귀하의 가입하신 정보는 " + split[0].substring(0,2)+repeat+"@"+split[1]+" 입니다";
+                String repeat = "*".repeat(split[0].length() - 2);
+                message = "귀하의 가입하신 정보는 " + split[0].substring(0, 2) + repeat + "@" + split[1] + " 입니다";
             }
 
-        } catch(NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             message = "등록된 정보가 없습니다";
         }
 
@@ -1022,7 +1062,6 @@ public class MainController {
 
         return "member/idsearch";
     }
-
 
 
 }
