@@ -24,6 +24,6 @@ public class MemberOAuth2User extends DefaultOAuth2User {
 
     @Override
     public String getName() {
-        return member.getUsername();
+        return member.getNickname();
     }
 }
