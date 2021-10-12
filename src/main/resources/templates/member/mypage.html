@@ -5,9 +5,9 @@
 
 <head>
     <style>
-    a:link { color: red; text-decoration: none;}
-    a:visited { color: black; text-decoration: none;}
-    a:hover { color: black; text-decoration: none;}
+    #logout:link { color: black; text-decoration: none;}
+    #logout:visited { color: black; text-decoration: none;}
+    #logout:hover { color: black; text-decoration: none;}
 
 
     </style>
@@ -560,7 +560,7 @@
         </div>
         <!--    로그아웃, 회원 탈퇴 기능-->
         <div class="py-5 text-center">
-            <button style="background-color: transparent; border: 0; outline: 0;"><a href="/logout">
+            <button style="background-color: transparent; border: 0; outline: 0;"><a href="/logout" id="logout">
                 <span>로그아웃&nbsp;&nbsp;|&nbsp;&nbsp;</span></a></button>
             <button th:id="out" style="background-color: transparent; border: 0; outline: 0;">
                 <span> 회원탈퇴</span></button>
