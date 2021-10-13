@@ -32,11 +32,6 @@ img {
     font-size: 24px;
 
 }
-
-.read-upper .inner .title-main :nth-child(2) {
-    font-size: 50px;
->>>>>>> Stashed changes
-}
 .read-upper .inner .title-sub {
     position: absolute;
     display: flex;
