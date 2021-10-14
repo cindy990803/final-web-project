@@ -7,6 +7,7 @@ import javax.validation.constraints.*;
 
 /**
  * 회원가입 뷰에서 form의 파라미터를 받을 포장 객체
+ * @author 이선주
  */
 @Data
 public class JoinFormVo {

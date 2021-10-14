@@ -11,7 +11,10 @@ import org.springframework.validation.Validator;
 
 import java.util.Optional;
 
-
+/**
+ * 회원가입 시 입력받은 이메일이 사용 가능한지/비밀번호가 일치하는지 확인하는 Validator
+ * @author 이선주
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

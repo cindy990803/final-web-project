@@ -338,7 +338,8 @@ public class MainController {
 
     /**
      * "/" 요청을 받으면 메인페이지를 불러온다
-     * @param model
+     * @author 이선주
+     * @param model 리턴되는 페이지로 애트리뷰트 전달
      * @return index.html
      */
     @RequestMapping("/")
@@ -352,12 +353,11 @@ public class MainController {
         Page<Review> reviewList3 = mainpageService.getReviewList(PageRequest.of(2, 3, Sort.by(Sort.Direction.DESC, "likeCount")));
         model.addAttribute("reviewList3", reviewList3);
 
-        //커뮤니티 인기게시글(좋아요순) 불러오기
+        //커뮤니티 인기게시글 불러오기
         Page<Community> communityList = mainpageService.getCommunityList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "likeCount")));
         model.addAttribute("communityList", communityList);
 
-
-        //자취방꿀팁(일단 좋아요순으로 통일함) 불러오기
+        //자취방꿀팁 불러오기
         Page<Community> communityTipList = mainpageService.getCommunityTipList(PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id")));
         model.addAttribute("communityTipList", communityTipList);
 
@@ -371,7 +371,8 @@ public class MainController {
 
     /**
      * 회원가입 버튼이 눌리면(요청이 들어오면) 회원가입 폼 페이지를 불러온다
-     * @param model
+     * @author 이선주
+     * @param model 리턴되는 페이지로 애트리뷰트 전달
      * @return /member/signup.html
      */
     @GetMapping("/signup")
@@ -382,19 +383,17 @@ public class MainController {
 
     /**
      * 회원가입 폼을 입력 후 가입 버튼을 눌렀을 때, DB에 사용자가 입력한 정보들을 저장하고 강제 로그인해준다
-     * @param joinFormVo
-     * @param errors
+     * @author 이선주
+     * @param joinFormVo 회원가입 입력 폼을 위한 VO
+     * @param errors 일어날 수 있는 회원가입 에러들
      * @return 메인페이지로 되돌아간다
      */
     @PostMapping("/signup")
     public String signupSubmit(@Valid JoinFormVo joinFormVo, Errors errors) {
-        log.info("joinFormVo : {}", joinFormVo);
         if (errors.hasErrors()) {
             log.info("회원가입 에러 : {}", errors.getAllErrors());
             return "/member/signup";
         }
-
-        log.info("회원가입 정상!");
 
         memberService.processNewMember(joinFormVo);
 
@@ -404,9 +403,10 @@ public class MainController {
 
     /**
      * 회원가입 완료 후 사용자가 입력한 이메일주소로 이메일을 보내 인증한다
-     * @param username
-     * @param token
-     * @param model
+     * @author 이선주
+     * @param username 회원가입한 사용자의 이메일
+     * @param token 이메일이 일치하는지 확인하기 위한 토큰
+     * @param model 리턴할 페이지로 애트리뷰트 전달
      * @return member/email-check-result.html
      */
     @Transactional
@@ -603,7 +603,8 @@ public class MainController {
 
     /**
      * 커뮤니티 '글쓰기' 버튼을 눌렀을 때 글쓰기 폼 페이지를 불러온다
-     * @param model
+     * @author 이선주
+     * @param model 리턴할 페이지로 애트리뷰트 전달
      *@return post/community/write.html
      */
     @GetMapping("/community/write")
@@ -613,10 +614,11 @@ public class MainController {
     }
 
     /**
-     *글쓰기를 완료하고 '게시' 버튼을 눌렀을 때 DB에 사용자가 입력한 정보를 저장한다
-     * @param member
-     * @param vo
-     * @param model
+     * 글쓰기를 완료하고 '게시' 버튼을 눌렀을 때 DB에 사용자가 입력한 정보를 저장한다
+     * @author 이선주
+     * @param member 글쓴이
+     * @param vo 커뮤니티 글 입력 폼을 위한 VO
+     * @param model 리턴할 페이지로 애트리뷰트 전달
      * @return 글 상세보기 페이지로 이동
      */
     @PostMapping("/community/write")
@@ -624,7 +626,6 @@ public class MainController {
     public String communityWriteSubmit(@CurrentMember Member member, CommunityFormVo vo, Model model) {
 
         String strTags = vo.getTags();
-        log.info("string형 태그들 : " + strTags);
 
         //DB에 저장할 List<Tag>형 변수 설정
         List<Tag> tagList = new ArrayList<>();
@@ -840,9 +841,10 @@ public class MainController {
 
     /**
      * 커뮤니티 상세보기 페이지 요청이 들어왔을 때 페이지를 불러온다
-     * @param model
-     * @param id
-     * @param member
+     * @author 이선주
+     * @param model 리턴할 페이지로 애트리뷰트 전달
+     * @param id 상세보기할 글의 id
+     * @param member 현재 로그인해있는 유저
      * @return 커뮤니티 상세보기 페이지로 이동
      */
     @GetMapping("/community/read")
@@ -882,8 +884,9 @@ public class MainController {
     }
 
     /**
-     * '삭제' 버튼을 눌렀을 때때 커뮤니티 게글을 DB에서 삭제해준다
-     * @param id
+     * '삭제' 버튼을 눌렀을 때 커뮤니티 게시글을 DB에서 삭제해준다
+     * @author 이선주
+     * @param id 삭제할 커뮤니티 글의 id
      * @return jsonObject
      */
     @GetMapping("/community/delete")
@@ -899,8 +902,9 @@ public class MainController {
 
     /**
      * 커뮤니티 게시글 수정 페이지 요청이 들어왔을 때 수정 폼 페이지를 불러온다
-     * @param model
-     * @param id
+     * @author 이선주
+     * @param model 리턴할 페이지로 애트리뷰트 전달
+     * @param id 수정할 글의 id
      * @return 글 수정 페이지
      */
     @GetMapping("/community/modify")
@@ -923,8 +927,6 @@ public class MainController {
         }
         strTags += "]";
 
-        log.info("strTags : " + strTags);
-
         vo.setTags(strTags);
 
         //카테고리 작업
@@ -943,8 +945,6 @@ public class MainController {
             intCa = 3;
         }
 
-        log.info("intCa : " + intCa);
-
         vo.setCommunityCategory(intCa);
 
         model.addAttribute("vo", vo);
@@ -955,10 +955,11 @@ public class MainController {
 
     /**
      * 사용자가 폼 작성 후 '수정'을 누르면 DB에 수정된 정보를 저장한다
-     * @param id
-     * @param member
-     * @param vo
-     * @param model
+     * @author 이선주
+     * @param id 수정할 글의 id
+     * @param member 글을 수정한 유저(현재 로그인해있는 유저)
+     * @param vo 수정한 정보를 담을 커뮤니티 글 입력 폼 VO
+     * @param model 리턴할 페이지로 애트리뷰트 전달
      * @return 수정된 글 상세보기 페이지
      */
     @PostMapping("/community/modify/{id}")
@@ -1007,7 +1008,6 @@ public class MainController {
         community.setPostContent(vo.getPostContent());
         community.setCommunityCategory(category);
 
-        //TODO TAG_TAG_TO_POST 테이블에 수정한 데이터 갱신하기
         List<Tag> previousTagList = community.getTags();
         community.setTags(tagList);
 
@@ -1031,10 +1031,11 @@ public class MainController {
 
     /**
      * 댓글을 쓴 후 댓글쓰기 버튼을 누르면 댓글 정보를 DB에 저장한다
-     * @param comment
-     * @param id
-     * @param model
-     * @param member
+     * @author 이선주
+     * @param comment 쓴 댓글 내용을 담는 객체
+     * @param id 댓글을 쓴 글의 id
+     * @param model 리턴할 페이지로 애트리뷰트 전달
+     * @param member 댓글을 쓴 유저(현재 로그인해있는 유저)
      * @return 댓글 정보가 업데이트된 상세보기 페이지
      */
     @PostMapping("/community/read/comment/{id}")
@@ -1057,10 +1058,11 @@ public class MainController {
 
     /**
      * 답글을 쓴 후 답글쓰기 버튼을 누르면 답글 정보를 DB에 저장한다
-     * @param subComment
-     * @param id
-     * @param model
-     * @param member
+     * @author 이선주
+     * @param subComment 쓴 답글 내용을 담는 객체
+     * @param id 댓글을 쓴 글의 id
+     * @param model 리턴할 페이지로 애트리뷰트 전달
+     * @param member 답글을 쓴 유저(현재 로그인해있는 유저)
      * @return 답글 정보가 업데이트된 상세보기 페이지
      */
     @PostMapping("/community/read/subcomment/{id}")
@@ -1083,22 +1085,19 @@ public class MainController {
 
     /**
      * 좋아요(하트)를 누르면 DB의 정보를 업데이트한다
-     * @param id
-     * @param member
+     * @author 이선주
+     * @param id 좋아요를 누를 글의 id
+     * @param member 좋아요를 누를 유저(현재 로그인해있는 유저)
      * @return jsonObject
      */
     @GetMapping("/community/read/like")
     @ResponseBody
     public String communitReadLike(Long id, @CurrentMember Member member) {
-        // 좋아요 눌렀을 때
-        log.info("좋아요 아이디 : {}", id);
-
         String resultCode = "";
         String message = "";
 
         // 좋아요 개수
         int likeCheck = communityRepository.findById(id).orElseThrow().getLikers().size();
-
 
         switch (communityService.addLike(member, id)) {
             case ERROR_AUTH:
@@ -1125,8 +1124,6 @@ public class MainController {
         jsonObject.addProperty("resultCode", resultCode);
         jsonObject.addProperty("message", message);
         jsonObject.addProperty("likeCheck", likeCheck);
-
-        log.info("jsonObject.toString() : {}", jsonObject.toString());
 
         return jsonObject.toString();
     }

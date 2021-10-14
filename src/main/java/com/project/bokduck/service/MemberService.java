@@ -57,7 +57,6 @@ public class MemberService implements UserDetailsService {
         );
 
         List<Member> memberList = memberRepository.findAll();
-        log.info("멤버서비스 - 멤버레파지토리 잘 불러오니? {}", memberList.get(0).getUsername());
     }
 
     @Override
@@ -71,11 +70,12 @@ public class MemberService implements UserDetailsService {
     }
 
     /**
-     * 1. JoinFormVo 객체를 Member DB에 저장
-     * 2. 이메일 보내기
-     * 3. 로그인 처리해주기
-     *
-     * @param vo
+     * 회원가입 프로세스 처리
+     *  1. JoinFormVo 객체를 Member DB에 저장
+     *  2. 이메일 보내기
+     *  3. 로그인 처리해주기
+     * @author 이선주
+     * @param vo 회원가입 폼을 위한 VO
      */
     public void processNewMember(JoinFormVo vo) {
         Member member = saveNewMember(vo);
@@ -85,9 +85,9 @@ public class MemberService implements UserDetailsService {
 
     /**
      * JoinFormVo 객체를 Member DB에 저장
-     *
-     * @param vo
-     * @return
+     * @author 이선주
+     * @param vo 회원가입 폼을 위한 VO
+     * @return 회원정보가 저장된 유저
      */
     private Member saveNewMember(JoinFormVo vo) {
         Member member = Member.builder()
@@ -109,6 +109,7 @@ public class MemberService implements UserDetailsService {
 
     /**
      * 강제 로그인
+     * @author 이선주
      * @param member
      */
     public void login(Member member) {

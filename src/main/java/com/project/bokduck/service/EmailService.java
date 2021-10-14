@@ -18,6 +18,11 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
+    /**
+     * 고유 토큰을 생성 후 유저에게 인증 이메일을 보낸다
+     * @author 이선주
+     * @param member 이메일을 보낼 유저
+     */
     @Transactional
     public void sendEmail(Member member) {
         //TOKEN 생성
@@ -30,6 +35,11 @@ public class EmailService {
         sendSimpleMailMessage(member);
     }
 
+    /**
+     * 유저에게 인증 이메일을 보낸다
+     * @author 이선주
+     * @param member 이메일을 보낼 유저
+     */
     private void sendSimpleMailMessage(Member member) {
         // 이메일 날리기
         String url =
@@ -46,13 +56,5 @@ public class EmailService {
         mailMessage.setText(message);
         mailMessage.setFrom(sender);
         javaMailSender.send(mailMessage);
-
-        log.info("\nTo. {}\nTitle : {} \n{}\nFrom.{}",
-                mailMessage.getTo(),
-                mailMessage.getSubject(),
-                mailMessage.getText(),
-                mailMessage.getFrom());
     }
-
-
 }
