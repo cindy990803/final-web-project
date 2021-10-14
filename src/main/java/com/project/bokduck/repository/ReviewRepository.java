@@ -19,11 +19,16 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
     // 리스트형으로 카테고리 받기
     Page<Review> findAllByReviewCategoryIn(List<ReviewCategory> categoryList, Pageable pageable);
 
-   /* List<Review> findALlByWriter(Member writer);*/
 
-
+    /**
+     * @Author MunKyoung
+     *  review 에서 맴버형을 가지고 조회
+     *
+     * @param writer
+     * @param pageable
+     * @return
+     */
     Page<Review> findAllByWriter(Member writer,Pageable pageable);
-   /*List<Review> findAllByWriter(Member writer);*/
 
 
      Review findAllById(Long id);

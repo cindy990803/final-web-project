@@ -12,13 +12,11 @@ import com.project.bokduck.repository.ReviewCategoryRepository;
 import com.project.bokduck.repository.ReviewRepository;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.util.WriteReviewVO;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.google.gson.JsonObject;
 import com.project.bokduck.specification.ReviewSpecs;
 import com.project.bokduck.util.ReviewListVo;
-import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,9 +31,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,17 +50,20 @@ public class ReviewController {
     private final ReviewRepository reviewRepository;
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final MemberRepository memberRepository;
-
     private final TagRepository tagRepository;
-    private final PostRepository postRepository;
-
 
     @Autowired
     ImageRepository imageRepository;
     @Autowired
     FileRepository fileRepository;
 
-
+    /**
+     *  /write 요청시 리뷰 쓰기 뷰페이지로 리턴
+     * @author MunKyoung
+     * @param model
+     * @param member
+     * @return "post/review/write" 글쓰기 뷰페이지로 리턴
+     */
     @GetMapping("/write")
     public String write(Model model, @CurrentMember Member member) {
         if (member == null) {
@@ -74,7 +73,18 @@ public class ReviewController {
         return "post/review/write";
     }
 
-
+    /**
+     * 뷰페이지에서 받아온 파라미터를 db에 저장후 리턴
+     *@Author MunKyoung
+     * @param imageFile multipart[]형으로 받아온 이미지 파일
+     * @param pdfFile multipart[]형으로 받아온 pdf 파일
+     * @param member 현재 사용자 정보
+     * @param writeReviewVO  vo객체로 받아온 파라미터
+     * @param file
+     * @param model
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/write")
     @Transactional
     public String saveReview(
@@ -93,15 +103,11 @@ public class ReviewController {
         ReviewCategory reviewCategory = new ReviewCategory();
         Image image;
 
-        if (imageFile==null){
-            image = new Image();
-            image.setImageName(null);
-            image.setImagePath(null);
-            model.addAttribute("image",image);
-        }else {
+if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
 
 
-            for (int i = 0; i < imageFile.length;i++) {
+
+            for (int i = 0; i < imageFile.length; i++) {
 
                 image = new Image();
 
@@ -111,7 +117,9 @@ public class ReviewController {
 
                 image = imageRepository.save(image);
 
-                image.setImagePath("/review_images/" + image.getId()+"/" + imageName);
+
+
+                    image.setImagePath("/review_images/" + image.getId() + "/" + imageName);
 
                 String imageUploadDest = "review_images/" + image.getId();
 
@@ -123,12 +131,7 @@ public class ReviewController {
 
             }
 
-        }
-
-
-
-
-
+}
 
         List<File> fileList = new ArrayList<>();
 
@@ -138,7 +141,7 @@ public class ReviewController {
 
         file = fileRepository.save(file);
 
-        file.setFilePath("/file/" + file.getId()+"/"+ pdfName);
+        file.setFilePath("/file/" + file.getId() + "/" + pdfName);
 
         String pdfUploadDest = "file/" + file.getId();
 
@@ -225,35 +228,39 @@ public class ReviewController {
         }
 
 
-
         Review review1;
         review1 = reviewRepository.getById(member.getId());
         reviewCategory = reviewCategoryRepository.save(reviewCategory);
 
-        Review   review = Review.builder()
+        Review review = Review.builder()
                 .writer(member)
                 .regdate(LocalDateTime.now())
                 .address(writeReviewVO.getAddress())
                 .detailAddress(writeReviewVO.getDetailAddress())
-              .postCode(writeReviewVO.getPostCode())
+                .postCode(writeReviewVO.getPostCode())
                 .extraAddress(writeReviewVO.getExtraAddress())
                 .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
                 .reviewStatus(ReviewStatus.WAIT)
-                .star((writeReviewVO.getStars() / 2))
                 .uploadImage(imageList)
+                .star((writeReviewVO.getStars() / 2))
                 .postName(writeReviewVO.getTitle())
                 .tags(tagList)
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
-        for(int i = 0; i<imageList.size();i++) {
-            imageList.get(i).setImageToPost(review);
-        }
-        for(int i = 0; i<fileList.size();i++) {
-            fileList.get(i).setFileToPost(review);
+        if(!imageList.get(0).getImageName().equals("")){
+            review = Review.builder()
+                    .uploadImage(imageList)
+                    .build();
         }
 
+        for (int i = 0; i < imageList.size(); i++) {
+            imageList.get(i).setImageToPost(review);
+        }
+        for (int i = 0; i < fileList.size(); i++) {
+            fileList.get(i).setFileToPost(review);
+        }
 
 
         reviewRepository.save(review);
@@ -266,11 +273,8 @@ public class ReviewController {
         }
 
 
-
-
         return "index";
     }
-
 
 
     @GetMapping("/list")
@@ -469,10 +473,58 @@ public class ReviewController {
         return jsonObject.toString();
     }
 
+    @PostMapping("/read/like")
+    @ResponseBody
+    public String readLikeReview(Long id, @CurrentMember Member member) {
+        // 좋아요 눌렀을 때
+        log.info("좋아요 아이디 : {}", id);
+
+        String resultCode = "";
+        String message = "";
+
+        // 좋아요 개수
+        int likeCheck = reviewService.findById(id).getLikers().size();
 
 
+        switch (reviewService.addLike(member, id)) {
+            case ERROR_AUTH:
+                resultCode = "error.auth";
+                message = "로그인이 필요한 서비스입니다.";
+                break;
+            case ERROR_INVALID:
+                resultCode = "error.invalid";
+                message = "삭제된 게시물 입니다.";
+                break;
+            case DUPLICATE:
+                resultCode = "duplicate";
+                message = "좋아요 취소 완료!";
+                likeCheck -= 1;
+                break;
+            case OK:
+                resultCode = "ok";
+                message = "좋아요 완료!";
+                likeCheck += 1;
+                break;
+        }
 
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("resultCode", resultCode);
+        jsonObject.addProperty("message", message);
+        jsonObject.addProperty("likeCheck", likeCheck);
 
+        log.info("jsonObject.toString() : {}", jsonObject.toString());
+
+        return jsonObject.toString();
+    }
+
+    /**
+     * @Author MunKyoung
+     * 리뷰 수정 미완
+     * @param member
+     * @param id
+     * @param model
+     * @return
+     */
     @GetMapping("/modify")
     String modifyReview(@CurrentMember Member member,
                         Long id,
@@ -485,7 +537,7 @@ public class ReviewController {
         ReviewCategory reviewCategory = reviewCategoryRepository.findAllByReviewId(review.getId());
 
         model.addAttribute("review", review);
-        model.addAttribute("reviewCategory",reviewCategory);
+        model.addAttribute("reviewCategory", reviewCategory);
 
 
         return "/post/review/modify";

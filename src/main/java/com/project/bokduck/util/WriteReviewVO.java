@@ -45,6 +45,4 @@ public class WriteReviewVO  {
 
     private int stars;
 
-  /*  private MultipartFile[] image;*/
-
 }

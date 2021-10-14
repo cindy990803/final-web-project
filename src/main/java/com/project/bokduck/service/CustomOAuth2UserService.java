@@ -20,6 +20,12 @@ public class CustomOAuth2UserService implements OAuth2UserService {
     private final MemberService memberService;
 
 
+    /**
+     *@Author MunKyoung
+     * @param userRequest
+     * @return
+     * @throws OAuth2AuthenticationException
+     */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService service = new DefaultOAuth2UserService();
@@ -39,13 +45,19 @@ public class CustomOAuth2UserService implements OAuth2UserService {
         return new MemberOAuth2User(member, attributes);
     }
 
+    /**
+     * @Author MunKyoung
+     * 이메일을 통해서 기존 사용자와 신규 사용자를 구별하여 로그인 시킴
+     *
+     * @param attributes
+     * @return
+     */
     private Member saveOrUpdate(OAuth2Attributes attributes) {
         String email = attributes.getUsername();
         Member member = memberRepository.findByUsername(email).map(entity -> {
-            // 지금 oauth로 인증들어온 유저가 이미 DB에 있는 기존회원인 경우
             entity.setUsername(attributes.getUsername());
             return entity;
-        }).orElse(attributes.toMember()); // 신규회원인 경우
+        }).orElse(attributes.toMember());
 
         member = memberRepository.save(member);
         memberService.login(member);

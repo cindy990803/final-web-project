@@ -7,6 +7,11 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import java.util.List;
 
+/**
+ *
+ * @Author MunKyoung
+ *
+ */
 @Getter
 public class MemberOAuth2User extends DefaultOAuth2User {
 
