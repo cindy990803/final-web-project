@@ -33,7 +33,11 @@ public class MemberService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    @PostConstruct  // 임시 계정 만들어 두고 테스트
+    /**
+     * @author 미리
+     * 임의의 사용자 계정 만들기 (관리자, 일반유저)
+     */
+    @PostConstruct
     public void createTestMember() {
         memberRepository.save(Member.builder()
                 .username("admin@test.com")
@@ -59,6 +63,12 @@ public class MemberService implements UserDetailsService {
         List<Member> memberList = memberRepository.findAll();
     }
 
+    /**
+     * @author 미리
+     * @param username 사용자 이메일 주소
+     * @return 이메일 주소로 사용자 정보를 찾은 후 없으면 미등록계정 에러 발생
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Member> optional = memberRepository.findByUsername(username);
@@ -126,25 +136,6 @@ public class MemberService implements UserDetailsService {
         context.setAuthentication(token);
     }
 
-    public boolean containsTel(String tel) {
-        boolean result;
-
-        Optional<Member> member = memberRepository.findByTel(tel);
-        if(member.get() != null) {
-            result = true;
-        } else {
-            result = false;
-        }
-
-        return result;
-    }
-
-    public String getEmail(String tel) {
-        Optional<Member> member = memberRepository.findByTel(tel);
-        String email = member.get().getEmail();
-
-        return  email;
-    }
 
     /**
      * 닉네임 중복 여부

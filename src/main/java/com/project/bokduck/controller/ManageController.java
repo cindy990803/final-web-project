@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
@@ -28,9 +27,16 @@ public class ManageController {
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
 
+    /**
+     * @param member   로그인한 사용자 정보
+     * @param model
+     * @param pageable 리스트 페이징 처리
+     * @return 관리자페이지
+     * @author 미리
+     */
     @GetMapping("")
     public String ManagePage(@CurrentMember Member member, Model model,
-                             @PageableDefault(size = 10) Pageable pageable){
+                             @PageableDefault(size = 10) Pageable pageable) {
 
         Specification<Review> spec = ReviewSpecs.searchReviewStatus(ReviewStatus.WAIT);
         Page<Review> reviewList = reviewRepository.findAll(spec, pageable);
@@ -52,13 +58,15 @@ public class ManageController {
     }
 
 
-
+    /**
+     * @param id     해당 게시글의 id
+     * @param member 로그인한 사용자 정보
+     * @return 승인 버튼을 눌렀을 때의 AJAX
+     * @author 미리
+     */
     @GetMapping("/list/approval")
     @ResponseBody
     public String reviewApproval(Long id, @CurrentMember Member member) {
-        // 승인버튼 눌렀을 때 눌렀을 때
-        log.info("승인 아이디 : {}", id);
-
         String resultCode = "";
         String message = "";
 
@@ -86,18 +94,18 @@ public class ManageController {
         jsonObject.addProperty("resultCode", resultCode);
         jsonObject.addProperty("message", message);
 
-        log.info("jsonObject.toString() : {}", jsonObject.toString());
-
         return jsonObject.toString();
     }
 
-
+    /**
+     * @param id     해당 게시글의 id
+     * @param member 로그인한 사용자 정보
+     * @return 거부 버튼을 눌렀을 때의 AJAX
+     * @author 미리
+     */
     @GetMapping("/list/refusal")
     @ResponseBody
     public String reviewRefusal(Long id, @CurrentMember Member member) {
-        // 거부버튼 눌렀을 때 눌렀을 때
-        log.info("거부 아이디 : {}", id);
-
         String resultCode = "";
         String message = "";
 

@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * @author 미리
+ * 파라미터로 받은 필드들을 적용 시킬 Vo
+ */
 @Data
 public class ReviewListVo {
 

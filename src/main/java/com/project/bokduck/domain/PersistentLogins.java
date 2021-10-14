@@ -9,6 +9,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
+/**
+ * @author 미리
+ * 자동 로그인을 위한 클래스
+ */
 @Entity
 @Table(name = "persistent_logins")
 @Getter @Setter

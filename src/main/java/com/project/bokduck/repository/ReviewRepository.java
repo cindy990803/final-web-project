@@ -16,21 +16,15 @@ import java.util.Optional;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
 
-    // 리스트형으로 카테고리 받기
-    Page<Review> findAllByReviewCategoryIn(List<ReviewCategory> categoryList, Pageable pageable);
-
-
     /**
-     * @Author MunKyoung
-     *  review 에서 맴버형을 가지고 조회
-     *
      * @param writer
      * @param pageable
      * @return
+     * @Author MunKyoung
+     * review 에서 맴버형을 가지고 조회
      */
-    Page<Review> findAllByWriter(Member writer,Pageable pageable);
+    Page<Review> findAllByWriter(Member writer, Pageable pageable);
 
-
-     Review findAllById(Long id);
+    Review findAllById(Long id);
 }
 

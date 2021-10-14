@@ -35,8 +35,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-
 import java.util.*;
 
 
@@ -58,11 +56,12 @@ public class ReviewController {
     FileRepository fileRepository;
 
     /**
-     *  /write 요청시 리뷰 쓰기 뷰페이지로 리턴
-     * @author MunKyoung
+     * /write 요청시 리뷰 쓰기 뷰페이지로 리턴
+     *
      * @param model
      * @param member
      * @return "post/review/write" 글쓰기 뷰페이지로 리턴
+     * @author MunKyoung
      */
     @GetMapping("/write")
     public String write(Model model, @CurrentMember Member member) {
@@ -75,15 +74,16 @@ public class ReviewController {
 
     /**
      * 뷰페이지에서 받아온 파라미터를 db에 저장후 리턴
-     *@Author MunKyoung
-     * @param imageFile multipart[]형으로 받아온 이미지 파일
-     * @param pdfFile multipart[]형으로 받아온 pdf 파일
-     * @param member 현재 사용자 정보
-     * @param writeReviewVO  vo객체로 받아온 파라미터
+     *
+     * @param imageFile     multipart[]형으로 받아온 이미지 파일
+     * @param pdfFile       multipart[]형으로 받아온 pdf 파일
+     * @param member        현재 사용자 정보
+     * @param writeReviewVO vo객체로 받아온 파라미터
      * @param file
      * @param model
      * @return
      * @throws IOException
+     * @Author MunKyoung
      */
     @PostMapping("/write")
     @Transactional
@@ -103,8 +103,7 @@ public class ReviewController {
         ReviewCategory reviewCategory = new ReviewCategory();
         Image image;
 
-if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
-
+        if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
 
 
             for (int i = 0; i < imageFile.length; i++) {
@@ -118,8 +117,7 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
                 image = imageRepository.save(image);
 
 
-
-                    image.setImagePath("/review_images/" + image.getId() + "/" + imageName);
+                image.setImagePath("/review_images/" + image.getId() + "/" + imageName);
 
                 String imageUploadDest = "review_images/" + image.getId();
 
@@ -131,7 +129,7 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
 
             }
 
-}
+        }
 
         List<File> fileList = new ArrayList<>();
 
@@ -249,7 +247,7 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
-        if(!imageList.get(0).getImageName().equals("")){
+        if (!imageList.get(0).getImageName().equals("")) {
             review = Review.builder()
                     .uploadImage(imageList)
                     .build();
@@ -277,6 +275,13 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
     }
 
 
+    /**
+     * @param pageable 리스트 페이징 처리
+     * @param model
+     * @param member   로그인한 사용자의 정보
+     * @return 리뷰 리스트 페이지
+     * @author 미리
+     */
     @GetMapping("/list")
     public String reviewList(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                              Model model,
@@ -298,11 +303,17 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
-        log.info("reviewList : {}", reviewList);
         return "post/review/list";
     }
 
-
+    /**
+     * @param pageable 리뷰 리스트 페이징 처리
+     * @param model
+     * @param vo       넘겨받은 파라미터 VO
+     * @param member   로그인한 사용자의 정보
+     * @return 리뷰 리스트 페이지
+     * @author 미리
+     */
     @GetMapping("/search")
     public String reviewSearch(@PageableDefault(size = 5) Pageable pageable,
                                Model model,
@@ -310,9 +321,6 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
                                @CurrentMember Member member) {
 
         reviewService.createLikeCount();
-
-        log.info("vo 페이지 : {}", vo.getPage());
-        log.info("vo 룸사이즈 : {}", vo.getRoomSize());
 
         if (member != null) {
             member = memberRepository.findById(member.getId()).orElseThrow();
@@ -428,19 +436,21 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
         return "post/review/list";
     }
 
-
+    /**
+     * @param id     해당 글의 id
+     * @param member 로그인한 사용자의 정보
+     * @return 리뷰 리스트에서 좋아요 눌렀을 때 AJAX 처리
+     * @author 미리
+     */
     @GetMapping("/list/like")
     @ResponseBody
     public String reviewListLike(Long id, @CurrentMember Member member) {
-        // 좋아요 눌렀을 때
-        log.info("좋아요 아이디 : {}", id);
 
         String resultCode = "";
         String message = "";
 
         // 좋아요 개수
         int likeCheck = reviewService.findById(id).getLikers().size();
-
 
         switch (reviewService.addLike(member, id)) {
             case ERROR_AUTH:
@@ -467,8 +477,6 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
         jsonObject.addProperty("resultCode", resultCode);
         jsonObject.addProperty("message", message);
         jsonObject.addProperty("likeCheck", likeCheck);
-
-        log.info("jsonObject.toString() : {}", jsonObject.toString());
 
         return jsonObject.toString();
     }
@@ -512,18 +520,16 @@ if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
         jsonObject.addProperty("message", message);
         jsonObject.addProperty("likeCheck", likeCheck);
 
-        log.info("jsonObject.toString() : {}", jsonObject.toString());
-
         return jsonObject.toString();
     }
 
     /**
-     * @Author MunKyoung
-     * 리뷰 수정 미완
      * @param member
      * @param id
      * @param model
      * @return
+     * @Author MunKyoung
+     * 리뷰 수정 미완
      */
     @GetMapping("/modify")
     String modifyReview(@CurrentMember Member member,
