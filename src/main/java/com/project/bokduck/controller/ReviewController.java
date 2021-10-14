@@ -103,10 +103,15 @@ public class ReviewController {
         ReviewCategory reviewCategory = new ReviewCategory();
         Image image;
 
-        if (!StringUtils.cleanPath(imageFile[0].getOriginalFilename()).equals("")) {
+        if (imageFile==null){
+            image = new Image();
+            image.setImageName(null);
+            image.setImagePath(null);
+            model.addAttribute("image",image);
+        }else {
 
 
-            for (int i = 0; i < imageFile.length; i++) {
+            for (int i = 0; i < imageFile.length;i++) {
 
                 image = new Image();
 
@@ -116,8 +121,7 @@ public class ReviewController {
 
                 image = imageRepository.save(image);
 
-
-                image.setImagePath("/review_images/" + image.getId() + "/" + imageName);
+                image.setImagePath("/review_images/" + image.getId()+"/" + imageName);
 
                 String imageUploadDest = "review_images/" + image.getId();
 
@@ -131,6 +135,11 @@ public class ReviewController {
 
         }
 
+
+
+
+
+
         List<File> fileList = new ArrayList<>();
 
         String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
@@ -139,7 +148,7 @@ public class ReviewController {
 
         file = fileRepository.save(file);
 
-        file.setFilePath("/file/" + file.getId() + "/" + pdfName);
+        file.setFilePath("/file/" + file.getId()+"/"+ pdfName);
 
         String pdfUploadDest = "file/" + file.getId();
 
@@ -226,11 +235,12 @@ public class ReviewController {
         }
 
 
+
         Review review1;
         review1 = reviewRepository.getById(member.getId());
         reviewCategory = reviewCategoryRepository.save(reviewCategory);
 
-        Review review = Review.builder()
+        Review   review = Review.builder()
                 .writer(member)
                 .regdate(LocalDateTime.now())
                 .address(writeReviewVO.getAddress())
@@ -240,25 +250,20 @@ public class ReviewController {
                 .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
                 .reviewStatus(ReviewStatus.WAIT)
-                .uploadImage(imageList)
                 .star((writeReviewVO.getStars() / 2))
+                .uploadImage(imageList)
                 .postName(writeReviewVO.getTitle())
                 .tags(tagList)
                 .postContent(writeReviewVO.getReviewComment())
                 .build();
 
-        if (!imageList.get(0).getImageName().equals("")) {
-            review = Review.builder()
-                    .uploadImage(imageList)
-                    .build();
-        }
-
-        for (int i = 0; i < imageList.size(); i++) {
+        for(int i = 0; i<imageList.size();i++) {
             imageList.get(i).setImageToPost(review);
         }
-        for (int i = 0; i < fileList.size(); i++) {
+        for(int i = 0; i<fileList.size();i++) {
             fileList.get(i).setFileToPost(review);
         }
+
 
 
         reviewRepository.save(review);
@@ -269,6 +274,8 @@ public class ReviewController {
             }
             t.getTagToPost().add(review);
         }
+
+
 
 
         return "index";
