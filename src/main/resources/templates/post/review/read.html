@@ -190,7 +190,7 @@
         </div>
     </div>
 
-    <div class="images">
+    <div class="images" th:if="${#lists.size(review.uploadImage)} > 0" >
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
                 <div th:each="img: *{uploadImage}" class="swiper-slide">
