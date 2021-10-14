@@ -223,7 +223,7 @@
 }
 .review-map .inner {
     height: 780px;
-    padding-bottom: 20px;
+    padding-bottom: 40px;
     border-bottom: 1px solid #D9D9D9;
 
 }
@@ -239,7 +239,7 @@
     width: 100px;
     position: absolute;
     left: 500px;
-    bottom: 10px;
+    bottom: 20px;
 }
 
 

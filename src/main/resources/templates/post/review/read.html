@@ -163,7 +163,7 @@
             <div class="title-sub">
                 <div class = "changeReview" th:if="${currentMember.id == 1 ||currentMember.id == review.writer.id }">
                     <div class="edit">
-                        <a href="javascript:void(0)">수정</a>
+                        <a th:href="@{/review/modify(id=${review.id})}" >수정</a>
                     </div>
                     <div class="delete">
                         <a href="javascript:void(0)">삭제</a>
@@ -416,9 +416,9 @@
 
 
     <!-- 댓글 부분 -->
-    <div class="inner">
+    <div class="inner" style="margin-top: 10px">
+        <p style="font-size:12px; margin-bottom: 5px">댓글 <span th:text="${#lists.size(review.commentReview)}"></span>개</p>
         <div style="background-color:#EEEEEE; padding:20px; margin-bottom:50px;">
-            <p style="font-size:12px; margin:0px">댓글 <span th:text="${#lists.size(review.commentReview)}"></span>개</p>
 
             <!-- 댓글쓰기 텍스트박스 -->
             <div>
@@ -458,7 +458,7 @@
                             <span th:if="${! review.commentReview[i].nicknameOpen}" th:text="익명" style="margin:10px"></span>
                             <span th:text="${#temporals.format(review.commentReview[i].regdate, 'yyyy-MM-dd HH:mm')}" style="font-size:8px; color:#808080"></span>
                         </p>
-                        <p th:text="${review.commentReview[i].text}" style="font-size:12px; margin-left:32px"></p>
+                        <p th:text="${review.commentReview[i].text}" style="font-size:12px; margin-left:32px; margin-bottom: 15px"></p>
                         <button th:onclick="javascript:changeDisp( 'writeSubcomment' + [[${i}]] );" type="button" style="font-size:12px; background-color:black; border:0px; color:white; padding-left:10px; padding-right:10px; padding-top:3px; padding-bottom:3px; margin-left:32px">답글달기</button>
 
                     </div>
