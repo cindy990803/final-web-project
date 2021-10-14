@@ -67,10 +67,4 @@ public class Review extends Post implements Serializable {
         if (uploadFile == null) uploadFile = new ArrayList<>();
         if (uploadImage == null) uploadImage = new ArrayList<>();
     }
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
-    private List<CommentCommunity> commentCommunity;
-
-
 }

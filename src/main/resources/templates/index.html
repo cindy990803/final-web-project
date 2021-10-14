@@ -28,6 +28,7 @@
 </head>
 <body>
 
+
 <div layout:fragment="content">
     <!-- 메인 이미지 -->
     <div style="max-height:550px; overflow:hidden">
@@ -476,13 +477,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-
-
-    <div style="padding-top:250px;padding-bottom:250px;padding-left:30px;">
-         <div th:each="vo : ${reviewList}" th:object="${vo}">
-         <a th:href="@{/review/read(reviewId=*{id})}" class="btn btn-dark">리뷰상세보기</a>
-         </div>
     </div>
 
 </div>

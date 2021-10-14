@@ -26,14 +26,14 @@ public class CommentReview implements Serializable {
     private String text; // 댓글 내용
 
     @Column(nullable = false)
-    private String nickname; // 댓글 쓴 사람 닉네임 // TODO nickname(String) -> writer(Member) 로 바뀜
+    private String nickname; // 댓글 쓴 사람 닉네임
 
     @Column(nullable = false)
     private boolean nicknameOpen; // 댓글 쓴 사람 닉네임 공개여부
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private Review review; // 리뷰 게시판에씀? 이건뭐임..?
+    private Review review;
 
     private long parentId;
 

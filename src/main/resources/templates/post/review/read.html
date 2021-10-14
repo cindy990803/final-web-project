@@ -143,7 +143,7 @@
     <!-- SWIPER-->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
-<!--    <script defer src="/js/member/read.js"></script>-->
+    <!--    <script defer src="/js/member/read.js"></script>-->
     <!-- 지도   -->
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=176ocp7ltk&submodules=geocoder"></script>
 
@@ -157,30 +157,38 @@
         <!--  address 정해지면 가져오기  -->
         <div class="inner">
             <div class="title-main">
-                <p th:text="*{address}"></p>
                 <span th:text="*{postName}"></span>
                 <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"></span>
             </div>
             <div class="title-sub">
-                <span style="margin-right: 2px;">조회수 </span> <span th:text="*{hit}"></span>
+                <div class = "changeReview" th:if="${currentMember.id == 1 ||currentMember.id == review.writer.id }">
+                    <div class="edit">
+                        <a href="javascript:void(0)">수정</a>
+                    </div>
+                    <div class="delete">
+                        <a href="javascript:void(0)">삭제</a>
+                    </div>
+                </div>
+                <span style="margin-right: 3px; margin-left: 2px; margin-top: 5px;">조회수 </span> <span th:text="*{hit}" style="margin-top: 5px; margin-left: 2px; "></span>
                 <button type="button" class="like"
-                        style="border:0px; outline:0px;background-color:transparent; margin-right: 2px"
+                        style="border:0px; outline:0px;background-color:transparent; margin-right: 3px; "
                         th:id="like" th:value="*{id}">
                     <img th:src="@{ ${review.likers.contains(currentMember)} ? '/images/like_red.svg': '/images/like.svg'}"
                          th:id="*{id}" >
                 </button>
-                <span th:text="' '+ *{likers.size}" th:id="likeNum + *{id}"></span>
-=======
-                <span th:text="*{#temporals.format(regdate, 'yyyy-MM-dd')}"></span>
-                <p th:text="*{writer.nickname}"></p>
-            </div>
-            <div class="title-sub">
-                <img src="/images/like.svg" alt="like">
->>>>>>> 029cf2b (리뷰상세보기 가져오기 약간의 css 지도맵)
-                <img src="/images/alarm.png" alt="like">
+                <span th:text="' '+ *{likers.size}" th:id="likeNum + *{id}" style="padding-top: 5px; margin-left: 2px"></span>
             </div>
         </div>
     </section>
+
+
+    <div class="inner" style="text-align: center; margin-bottom: 20px">
+        <div th:if="${currentMember.id == 1}" class="adminZone">
+            <p class="contract" style="text-align: left">계약서 |</p>
+            <img style="width:940px; height: 1080px;" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxNzEyMDdfMzMg%2FMDAxNTEyNjEzMDg4MjMy.LeM7X9iym1BTXxOgg4p2q-KowV2Gq1GJOD_hoM1_Vi0g.qyi9SN7gFokPbEo7Zoy0k2i4cnDsviegrov_TqPXoVMg.GIF.indarak9688%2F%25BF%25F8%25B7%25EB%25B0%25E8%25BE%25E0%25BC%25AD_%25BB%25F9%25C7%25C3.gif&type=a340" alt="계약서">
+
+        </div>
+    </div>
 
     <div class="images">
         <div class="swiper mySwiper">
@@ -276,7 +284,7 @@
                     <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'AIRCONDITIONER ,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'에어컨'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
                     <span th:if="${#strings.equals(review.reviewCategory.electronicDevice,'BED,AIRCONDITIONER ,WASHINGMACHINE ,REFRIGERATOR')} " th:text="'침대'+'&nbsp&nbsp'+'에어컨'+'&nbsp&nbsp'+'세탁기'+'&nbsp&nbsp'+'냉장고'"></span>
                 </div>
-                
+
             </div>
         </div>
     </section>
@@ -298,42 +306,42 @@
                 <span>별점 |</span>
                 <div class="review-star">
                     <div class="stars" th:if="*{star} == 0" style="display: flex">
-                        <img th:src="@{~/images/star.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star.svg}" width="20px" height="20px" style="margin-left: 12px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
                     <div class="stars" th:if="*{star} == 1" style="display: flex">
-                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px" style="margin-left: 12px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
                     <div  class="stars" th:if="*{star} == 2" style="display: flex">
-                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px" style="margin-left: 12px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
                     <div class="stars" th:if="*{star} == 3" style="display: flex">
-                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px" style="margin-left: 12px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
                     <div class="stars" th:if="*{star} == 4" style="display: flex">
-                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px" style="margin-left: 12px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star.svg}" width="20px" height="20px">
                     </div>
                     <div class="stars" th:if="*{star} == 5" style="display: flex" >
-                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
+                        <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px" style="margin-left: 12px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
                         <img th:src="@{~/images/star_yellow.svg}" width="20px" height="20px">
@@ -348,27 +356,16 @@
     <section class="review-map">
         <div class="inner">
             <span>위치 |</span><span th:text="*{address}" style="margin-left: 20px; font-size: 16px; font-family: Arial, sans-serif; color: #808080; line-height: 2; font-weight: normal;"></span>
-            <div id="map" style="width:1000px;height:650px; margin: 0 auto;"></div>
-
-            <div th:if="${currentMember.id == 1}" class="adminZone">
-                <div th:each="file: *{uploadFile}" >
-                    <img th:src="${file.filePath}" alt="image">
-                </div>
-                <button type="button" class="badge badge-warning confirm" th:value="*{id}">승인 </button>
-                <button type="button" class="badge badge-danger no_confirm" th:value="*{id}"> 거부 </button>
+            <div id="map" style="width:1000px;height:650px; margin: 0 auto 10px;"></div>
+            <div th:if="${currentMember.id == 1}" class="adminZone" style="margin-top: 20px">
+                <button type="button" class="badge badge-warning confirm" th:value="*{id}" style="font-size: 16px">승인 </button>
+                <button type="button" class="badge badge-danger no_confirm" th:value="*{id}" style="font-size: 16px"> 거부 </button>
             </div>
 
-            <div class = "changeReview" th:if="${currentMember.id == review.writer.id}">
-                <div class="edit">
-                    <a href="javascript:void(0)">수정</a>
-                </div>
-                <div class="delete">
-                    <a href="javascript:void(0)">삭제</a>
-                </div>
-            </div>
         </div>
 
     </section>
+
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -417,8 +414,10 @@
     </script>
 
 
+
     <!-- 댓글 부분 -->
-        <div style="background-color:#EEEEEE; padding:20px; margin-bottom:50px; width: 1100px; margin: 0 auto; position: relative;">
+    <div class="inner">
+        <div style="background-color:#EEEEEE; padding:20px; margin-bottom:50px;">
             <p style="font-size:12px; margin:0px">댓글 <span th:text="${#lists.size(review.commentReview)}"></span>개</p>
 
             <!-- 댓글쓰기 텍스트박스 -->
@@ -445,9 +444,9 @@
             </div>
 
 
-        <!-- 댓글 -->
-        <th:block th:each="i : ${#numbers.sequence(review.commentReview.size() - 1, 0, -1)}">
-                <div th:if="${review.commentReveiw[i].parentId == -1l}">
+            <!-- 댓글 -->
+            <th:block th:each="i : ${#numbers.sequence(review.commentReview.size() - 1, 0, -1)}">
+                <div th:if="${review.commentReview[i].parentId == -1l}">
                     <hr style="margin = 10px;"/>
 
                     <div>
@@ -517,8 +516,8 @@
                     </div>
                 </div>
 
-        </th:block>
-
+            </th:block>
+        </div>
     </div>
 
 </div>

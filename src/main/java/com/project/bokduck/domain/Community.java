@@ -25,8 +25,7 @@ public class Community extends Post implements Serializable {
     @Enumerated(EnumType.STRING)
     private CommunityCategory communityCategory;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "community" , cascade = CascadeType.ALL)
     private List<CommentCommunity> commentCommunity;
 
 }

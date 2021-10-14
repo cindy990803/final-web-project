@@ -28,10 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .requestMatchers(
                         PathRequest.toStaticResources().atCommonLocations()
                 );
-
-
     }
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -68,22 +65,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService);
 
-
         http.cors().and();
         http.csrf().disable();
-
     }
 
     @Bean
     public PersistentTokenRepository tokenRepository(){
-
         JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
 
         jdbcTokenRepository.setDataSource(dataSource);
         return jdbcTokenRepository;
     }
-
-
-
-
 }

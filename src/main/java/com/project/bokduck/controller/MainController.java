@@ -2,7 +2,6 @@ package com.project.bokduck.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.project.bokduck.domain.*;
 import com.project.bokduck.repository.*;
@@ -12,27 +11,16 @@ import com.project.bokduck.service.MemberService;
 import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.specification.CommunitySpecs;
 import com.project.bokduck.util.CommunityFormVo;
-
 import com.project.bokduck.domain.Member;
 import com.project.bokduck.domain.Review;
 import com.project.bokduck.repository.MemberRepository;
-import com.project.bokduck.service.MemberService;
-import com.project.bokduck.service.PassEmailService;
 import com.project.bokduck.service.ReviewService;
 import com.project.bokduck.service.SmsService;
-
 import com.project.bokduck.util.CurrentMember;
-import com.project.bokduck.specification.ReviewSpecs;
-import com.project.bokduck.util.*;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +29,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -53,23 +40,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.PostConstruct;
-import javax.persistence.criteria.Order;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 public class MainController {
-
-
     private final MemberService memberService;
     private final SmsService smsService;
     private final ReviewService reviewService;
@@ -89,11 +70,9 @@ public class MainController {
     private final CommentCommunityRepository commentCommunityRepository;
     private final CommentReviewRepository commentReviewRepository;
 
-
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
      */
-
     @PostConstruct
     @DependsOn("memberRepository")
     @Transactional
@@ -105,7 +84,6 @@ public class MainController {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
 
                 Long[] array = {1l, 2l};
-
 
                 // 태그 만들어두기
                 List<Tag> tagList = new ArrayList<>(); // 임시태그 담아보자
@@ -119,11 +97,9 @@ public class MainController {
 
                 tagRepository.saveAll(tagList);
 
-
                 // 리뷰게시글을 만들어보자
                 List<Review> reviewList = new ArrayList<>();
                 ReviewCategory category = null;
-
 
                 for (int i = 0; i < 50; ++i) {
                     category = new ReviewCategory();
@@ -155,7 +131,6 @@ public class MainController {
                             .build();
                     review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
                     reviewList.add(review);
-
                 }
                 reviewRepository.saveAll(reviewList);
 
@@ -186,6 +161,7 @@ public class MainController {
                 for (Image i : image1) {
                     i.setImageToPost(post);
                 }
+
                 //계약서 만들어두기
                 List<File> fileList = new ArrayList<>();
                 String[] fileNameList = {"floating1.png", "floating2.png"};
@@ -287,7 +263,6 @@ public class MainController {
                 }
                 tagRepository.saveAll(tagList);
 
-
                 for (int i = 0; i < 300; i++) {
                     Member member = memberRepository.findById(arry[(int) (Math.random() * arry.length)]).orElseThrow();
                     communityList.add(Community.builder()
@@ -307,7 +282,6 @@ public class MainController {
                 for (Tag t : tag2) {
                     t.setTagToPost(tagPostList2);
                 }
-
 
                 //커뮤니티 댓글 만들어놓기
                 for (Community commu : communityList) {
@@ -356,17 +330,20 @@ public class MainController {
                     commentCommunityRepository.save(comment3);
                     commentCommunityRepository.save(comment4);
                 }
-
             }
         });
     }
-
 
     @InitBinder("joinFormVo")
     protected void initBinder(WebDataBinder dataBinder) {
         dataBinder.addValidators(new JoinFormValidator(memberRepository));
     }
 
+    /**
+     * "/" 요청을 받으면 메인페이지를 불러온다
+     * @param model
+     * @return index.html
+     */
     @RequestMapping("/")
     public String index(Model model) {
 
@@ -395,13 +372,23 @@ public class MainController {
         return "member/login";
     }
 
+    /**
+     * 회원가입 버튼이 눌리면(요청이 들어오면) 회원가입 폼 페이지를 불러온다
+     * @param model
+     * @return /member/signup.html
+     */
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("joinFormVo", new JoinFormVo());
         return "/member/signup";
     }
 
-
+    /**
+     * 회원가입 폼을 입력 후 가입 버튼을 눌렀을 때, DB에 사용자가 입력한 정보들을 저장하고 강제 로그인해준다
+     * @param joinFormVo
+     * @param errors
+     * @return 메인페이지로 되돌아간다
+     */
     @PostMapping("/signup")
     public String signupSubmit(@Valid JoinFormVo joinFormVo, Errors errors) {
         log.info("joinFormVo : {}", joinFormVo);
@@ -416,6 +403,7 @@ public class MainController {
 
         return "redirect:/";
     }
+
     @GetMapping("/id-search")
     public String idCheck() {
 
@@ -454,7 +442,8 @@ public class MainController {
 
             message = "성공.....";
         }
-        JSONObject jsonObject = new JSONObject();
+        JsonObject jsonObject = new JsonObject();
+        //JSONObject jsonObject = new JSONObject();
 //        jsonObject.put("message", message);
         return jsonObject.toString();
     }
@@ -488,6 +477,13 @@ public class MainController {
         return "member/id-search-result";
     }
 
+    /**
+     * 회원가입 완료 후 사용자가 입력한 이메일주소로 이메일을 보내 인증한다
+     * @param username
+     * @param token
+     * @param model
+     * @return member/email-check-result.html
+     */
     @Transactional
     @GetMapping("/email-check")
     public String emailCheck(String username, String token, Model model) {
@@ -512,7 +508,6 @@ public class MainController {
         return "member/email-check-result";
     }
 
-
     @GetMapping("/password")
     public String password() {
         return "member/password";
@@ -524,7 +519,6 @@ public class MainController {
         Optional<Member> optional = memberRepository.findByUsername(username);
         if (optional.isEmpty()) {
             message = "아이디가 없습니다. 다시 한번 시도하세요.";
-
         } else {
             message = "임시 비밀번호가 발송되었습니다. 이메일을 확인해주세요.";
             passEmailService.sendPassEmail(optional.orElseThrow());
@@ -532,18 +526,15 @@ public class MainController {
         model.addAttribute("message", message);
         return "member/password";
     }
+
     @GetMapping("/review/read")
-
     public String readReview(Model model,@RequestParam(name = "id") Long id, @CurrentMember Member member){
-
         Review review = reviewService.getReview(id);
 
         reviewService.increaseHit(id);
 
         model.addAttribute("review",review);
-
         model.addAttribute("currentMember", member);
-
 
         CommentReview comment = new CommentReview();
         model.addAttribute("comment", comment);
@@ -551,11 +542,10 @@ public class MainController {
         CommentReview subComment = new CommentReview();
         model.addAttribute("subComment", subComment);
 
-
         return "post/review/read";
     }
-    // 리뷰 컨트롤러
 
+    // 리뷰 컨트롤러
     @PostMapping("/read/like")
     @ResponseBody
     public String readLikeReview(Long id, @CurrentMember Member member) {
@@ -620,9 +610,7 @@ public class MainController {
         jsonObject.addProperty("message", message);
 
         return jsonObject.toString();
-
     }
-
 
     @PostMapping("/review/read/comment/{id}")
     public String reviewComment(CommentReview comment, @PathVariable long id, Model model, @CurrentMember Member member) {
@@ -642,7 +630,6 @@ public class MainController {
         return readReview(model, id, member);
     }
 
-
     @PostMapping("/review/read/subcomment/{id}")
     public String reviewSubComment(CommentReview subComment, @PathVariable long id, Model model, @CurrentMember Member member) {
 
@@ -661,16 +648,30 @@ public class MainController {
         return readReview(model, id, member);
     }
 
-
+    /**
+     * 커뮤니티 '글쓰기' 버튼을 눌렀을 때 글쓰기 폼 페이지를 불러온다
+     * @param model
+     *@return post/community/write.html
+     */
     @GetMapping("/community/write")
     public String communityWriteForm(Model model) {
         model.addAttribute("vo", new CommunityFormVo());
         return "post/community/write";
     }
 
+    /**
+     *글쓰기를 완료하고 '게시' 버튼을 눌렀을 때 DB에 사용자가 입력한 정보를 저장한다
+     * @param member
+     * @param vo
+     * @param model
+     * @return 글 상세보기 페이지로 이동
+     */
     @PostMapping("/community/write")
     @Transactional
     public String communityWriteSubmit(@CurrentMember Member member, CommunityFormVo vo, Model model) {
+
+        String strTags = vo.getTags();
+        log.info("string형 태그들 : " + strTags);
 
         //DB에 저장할 List<Tag>형 변수 설정
         List<Tag> tagList = new ArrayList<>();
@@ -689,7 +690,6 @@ public class MainController {
                 tagList.add(tag);
             }
         }
-
 
         //DB에 저장할 CommunityCategory형 변수 설정
         CommunityCategory category = CommunityCategory.TIP;
@@ -710,7 +710,6 @@ public class MainController {
             default:
         }
 
-
         //데이터를 DB에 저장
         Community community = Community.builder()
                 .postName(vo.getPostName())
@@ -721,7 +720,7 @@ public class MainController {
                 .communityCategory(category)
                 .build();
 
-        communityRepository.save(community);
+        Community savedCommu = communityRepository.save(community);
 
         //TAG_TAG_TO_POST 테이블에 데이터 넣기
         for (Tag t : tagList) {
@@ -731,9 +730,8 @@ public class MainController {
             t.getTagToPost().add(community);
         }
 
-        return "index";  //TODO 커뮤니티글 보기 기능 완성 후 "post/community/read"로 바꾸기
+        return getCommunityRead(model, savedCommu.getId(), member);
     }
-
 
     @GetMapping("/community/list")
     public String community(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -876,7 +874,6 @@ public class MainController {
         jsonObject.addProperty("likeCheck", likeCheck);
 
         return jsonObject.toString();
-
     }
 
     @RequestMapping("/password/change")
@@ -888,24 +885,39 @@ public class MainController {
         return "member/password-change";
     }
 
+    /**
+     * 커뮤니티 상세보기 페이지 요청이 들어왔을 때 페이지를 불러온다
+     * @param model
+     * @param id
+     * @param member
+     * @return 커뮤니티 상세보기 페이지로 이동
+     */
     @GetMapping("/community/read")
     @Transactional
     public String getCommunityRead(Model model, long id, @CurrentMember Member member) {
 
         Community community = communityRepository.findById(id).orElseThrow();
 
+        if (community.getVisitedMember()==null) {
+            community.setVisitedMember(new ArrayList<>());
+        }
+        if (community.getLikers()==null) {
+            community.setLikers(new ArrayList<>());
+        }
+        if (community.getCommentCommunity()==null) {
+            community.setCommentCommunity(new ArrayList<>());
+        }
+
         //조회수 올리기
-        if (!community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
-            community.setHit(community.getHit() + 1);
+        if (! community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
+            community.setHit(community.getHit()+1);
             List members = community.getVisitedMember();
             members.add(member);
             community.setVisitedMember(members);
         }
 
-
-        model.addAttribute("community", community);
-
-        model.addAttribute("currMem", member);
+        model.addAttribute("community",community);
+        model.addAttribute("currMem",member);
 
         CommentCommunity comment = new CommentCommunity();
         model.addAttribute("comment", comment);
@@ -916,14 +928,11 @@ public class MainController {
         return "post/community/read";
     }
 
-//    @GetMapping("/community/delete")
-//    public String communityDelete(@PageableDefault(size = 10,sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @CurrentMember Member member, Model model, long id) {
-//
-//        communityRepository.deleteById(id);
-//
-//        return community(pageable, member, model);  //PostConstruct로 생성한 글을 지우려고 하면 모든 글이 삭제됨. 왜?
-//    }
-
+    /**
+     * '삭제' 버튼을 눌렀을 때때 커뮤니티 게글을 DB에서 삭제해준다
+     * @param id
+     * @return jsonObject
+     */
     @GetMapping("/community/delete")
     @ResponseBody
     public String communityDelete(long id) {
@@ -931,9 +940,16 @@ public class MainController {
         communityRepository.deleteById(id);
 
         JsonObject jsonObject = new JsonObject();
+
         return jsonObject.toString();
     }
 
+    /**
+     * 커뮤니티 게시글 수정 페이지 요청이 들어왔을 때 수정 폼 페이지를 불러온다
+     * @param model
+     * @param id
+     * @return 글 수정 페이지
+     */
     @GetMapping("/community/modify")
     @Transactional
     public String getCommunityModify(Model model, long id) {
@@ -944,11 +960,8 @@ public class MainController {
         vo.setPostName(community.getPostName());
         vo.setPostContent(community.getPostContent());
 
-        //태그 작업
-        //[{"value":"태그"},{"value":"테스트"},{"value":"test"}]
-
         String strTags = "[";
-        for (int i = 0; i < community.getTags().size(); ++i) {
+        for (int i=0; i<community.getTags().size(); ++i) {
             strTags += "{\"value\":\"" + community.getTags().get(i).getTagName() + "\"}";
 
             if (i == community.getTags().size() - 1) break;
@@ -981,13 +994,20 @@ public class MainController {
 
         vo.setCommunityCategory(intCa);
 
-
         model.addAttribute("vo", vo);
         model.addAttribute("communityId", id);
 
         return "post/community/modify";
     }
 
+    /**
+     * 사용자가 폼 작성 후 '수정'을 누르면 DB에 수정된 정보를 저장한다
+     * @param id
+     * @param member
+     * @param vo
+     * @param model
+     * @return 수정된 글 상세보기 페이지
+     */
     @PostMapping("/community/modify/{id}")
     @Transactional
     public String communityModifySubmit(@PathVariable long id, @CurrentMember Member member, CommunityFormVo vo, Model model) {
@@ -1029,27 +1049,25 @@ public class MainController {
             default:
         }
 
-
         Community community = communityRepository.findById(id).orElseThrow();
         community.setPostName(vo.getPostName());
         community.setPostContent(vo.getPostContent());
         community.setCommunityCategory(category);
-
 
         //TODO TAG_TAG_TO_POST 테이블에 수정한 데이터 갱신하기
         List<Tag> previousTagList = community.getTags();
         community.setTags(tagList);
 
         //현재 게시물을 수정 시 지운 태그들의 tagToPost에서 제거
-        for (Tag t : previousTagList) {
+        for(Tag t : previousTagList){
             List<Post> postList = t.getTagToPost();
             postList.remove(communityRepository.findById(id).orElseThrow());
             t.setTagToPost(postList);
         }
 
         //수정 시 추가한 태그들의 tagToPost에 현재 게시물 추가
-        for (Tag t : tagList) {
-            if (t.getTagToPost() == null) {
+        for(Tag t : tagList){
+            if (t.getTagToPost()==null) {
                 t.setTagToPost(new ArrayList<Post>());
             }
             t.getTagToPost().add(community);
@@ -1058,6 +1076,14 @@ public class MainController {
         return getCommunityRead(model, id, member);
     }
 
+    /**
+     * 댓글을 쓴 후 댓글쓰기 버튼을 누르면 댓글 정보를 DB에 저장한다
+     * @param comment
+     * @param id
+     * @param model
+     * @param member
+     * @return 댓글 정보가 업데이트된 상세보기 페이지
+     */
     @PostMapping("/community/read/comment/{id}")
     public String submitComment(CommentCommunity comment, @PathVariable long id, Model model, @CurrentMember Member member) {
 
@@ -1076,6 +1102,14 @@ public class MainController {
         return getCommunityRead(model, id, member);
     }
 
+    /**
+     * 답글을 쓴 후 답글쓰기 버튼을 누르면 답글 정보를 DB에 저장한다
+     * @param subComment
+     * @param id
+     * @param model
+     * @param member
+     * @return 답글 정보가 업데이트된 상세보기 페이지
+     */
     @PostMapping("/community/read/subcomment/{id}")
     public String submitSubComment(CommentCommunity subComment, @PathVariable long id, Model model, @CurrentMember Member member) {
 
@@ -1094,6 +1128,12 @@ public class MainController {
         return getCommunityRead(model, id, member);
     }
 
+    /**
+     * 좋아요(하트)를 누르면 DB의 정보를 업데이트한다
+     * @param id
+     * @param member
+     * @return jsonObject
+     */
     @GetMapping("/community/read/like")
     @ResponseBody
     public String communitReadLike(Long id, @CurrentMember Member member) {
@@ -1138,16 +1178,6 @@ public class MainController {
         return jsonObject.toString();
     }
 
-    @PostMapping("/community/read/comment")
-    public String writeCommunityComment() {
-
-
-        return "";
-    }
-
-    @RequestMapping("/mypage")
-
-
     @GetMapping("/mypage")
     public String mypage(Model model,
                          @CurrentMember Member member,
@@ -1186,7 +1216,6 @@ public class MainController {
         return "/member/mypage";
     }
 
-
     @ResponseBody
     @GetMapping("/password/change/result")
     public String passwordChangeResult(@CurrentMember Member member, String oldpass, String pass, String repass) {
@@ -1194,7 +1223,6 @@ public class MainController {
         if (member == null) {
             message = "로그인 되어있지 않습니다. 다시 로그인해주세요.";
         }
-
 
         if (!oldpass.isEmpty() && !pass.isEmpty() && !repass.isEmpty()) { // 빈칸 모두 없어야 함
             if (passwordEncoder.matches(oldpass, member.getPassword())) {
@@ -1206,14 +1234,12 @@ public class MainController {
                     } else {
                         message = "새로운 비밀번호가 서로 다릅니다. 다시 시도해주세요.";
                     }
-
                 } else {
                     message = "패스워드는 영문자, 숫자, 특수기호를 조합하여 최소 8자 이상을 입력하셔야 합니다";
                 }
             } else { //지금 비밀번호랑 다를때 !
                 message = "현재 비밀번호가 다릅니다.";
             }
-
         } else { //빈칸 하나라도 있을때
             message = "모두 입력하셔야 합니다.";
         }
@@ -1222,7 +1248,6 @@ public class MainController {
 
         return jsonObject.toString();
     }
-
 
     @GetMapping("/memberDelete") //회원 탈퇴
     @ResponseBody
@@ -1233,14 +1258,12 @@ public class MainController {
         return jsonObject.toString();
     }
 
-
     @GetMapping("/mypage/change") //회원 수정
     @ResponseBody
     public String mypageChange(String postcode, String address, String detailAddress, String newnickname,
                                String newtel, String nicknameOpen, @CurrentMember Member member) {
 
         String message = "변경할 정보가 없습니다";
-
 
         if (!newnickname.isEmpty()) {
             if (member.getNickname() == null || !member.getNickname().equals(newnickname)) { //닉네임 변경 할 시
@@ -1263,7 +1286,6 @@ public class MainController {
             message = "변경 완료 되었습니다.";
         }
 
-
         if (member.getUserAddress() == null || !member.getUserAddress().getPostcode().equals(postcode) //주소 변경
                 || !member.getUserAddress().getBaseAddress().equals(address)
                 || !member.getUserAddress().getDetailAddress().equals(detailAddress)) {
@@ -1279,9 +1301,7 @@ public class MainController {
             if (postcode == null || address == null || detailAddress == null) {
                 message = "주소를 모두 입력해주세요";
             }
-
         }
-
 
         if (!String.valueOf(member.isNicknameOpen()).equals(nicknameOpen)) {//닉네임 공개 유무 설정
             if (member.isNicknameOpen() == true) {
@@ -1298,7 +1318,6 @@ public class MainController {
                     message = "변경 완료 되었습니다.";
                 }
             }
-
         }
 
         JsonObject jsonObject = new JsonObject();
@@ -1306,7 +1325,6 @@ public class MainController {
 
         return jsonObject.toString();
     }
-
 
     @RequestMapping("/idsearch")
     public String idSearchResult(String tel, Model model) {
@@ -1335,9 +1353,4 @@ public class MainController {
 
         return "member/idsearch";
     }
-
-
-
-
 }
-
