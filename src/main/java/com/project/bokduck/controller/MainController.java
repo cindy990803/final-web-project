@@ -126,7 +126,7 @@ public class MainController {
                             .address("서울특별시 마포구 월드컵로34길 14")
                             .detailAddress("XX빌라")
                             .extraAddress("연희동")
-                            .reviewStatus(i % 2 == 0 ? ReviewStatus.WAIT : ReviewStatus.COMPLETE)
+                            .reviewStatus(ReviewStatus.COMPLETE)
 //                            .reviewCategory(category)
                             .build();
                     review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());

@@ -14,6 +14,11 @@
             border: 0;
             outline: 0;
         }
+
+        .no_content{
+            filter: invert(55%) sepia(4%) saturate(417%) hue-rotate(131deg) brightness(98%) contrast(91%);
+        }
+
     </style>
 
     <script th:inline="javascript">
@@ -85,12 +90,12 @@
                 <div class="container" th:text="'총 게시물 수 : '+${reviewList.totalElements}"></div>
 
                 <div th:if="${reviewList.isEmpty()}" style="text-align: center;">
-                    <img th:src="@{/images/no_content.svg}" style="width: 300px; height: 300px;"
+                    <img th:src="@{/images/no_content.svg}" style="width: 300px; height: 500px;"
                          class="no_content" id="no_content"/>
                     <h1 class="no_content">승인 대기중인 게시물이 없습니다</h1>
                 </div>
 
-                <div id="review_table">
+                <div id="review_table" th:unless="${reviewList.isEmpty()}" style="height: 500px;" >
                     <table class="table wd-100">
                         <thead>
                             <tr>
@@ -120,35 +125,35 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    <!-- 페이징 -->
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${1 == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/manage(page=${reviewList.pageable.pageNumber - 1})}"
+                                       tabindex="-1" aria-disabled="true"> &lt; </a>
+                                </li>
+                                <li class="page-item" th:classappend="${i == reviewList.pageable.pageNumber+1} ? 'active'"
+                                    th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/manage(page=${i - 1})}"
+                                       th:text="${i}">1</a>
+                                </li>
+                                <li class="page-item"
+                                    th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
+                                    <a class="page-link" href="#"
+                                       th:href="@{/manage(page=${reviewList.pageable.pageNumber + 1})}">
+                                        &gt; </a>
+                                </li>
+                            </ul>
+                        </nav>
                 </div>
 
 
             </form>
 
-            <!-- 페이징 -->
-            <div th:unless="${reviewList.isEmpty()}">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${1 == reviewList.pageable.pageNumber + 1} ? 'disabled'">
-                            <a class="page-link" href="#"
-                               th:href="@{/manage(page=${reviewList.pageable.pageNumber - 1})}"
-                               tabindex="-1" aria-disabled="true"> &lt; </a>
-                        </li>
-                        <li class="page-item" th:classappend="${i == reviewList.pageable.pageNumber+1} ? 'active'"
-                            th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                            <a class="page-link" href="#"
-                               th:href="@{/manage(page=${i - 1})}"
-                               th:text="${i}">1</a>
-                        </li>
-                        <li class="page-item"
-                            th:classappend="${reviewList.totalPages == reviewList.pageable.pageNumber + 1} ? 'disabled'">
-                            <a class="page-link" href="#"
-                               th:href="@{/manage(page=${reviewList.pageable.pageNumber + 1})}">
-                                &gt; </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+
         </main>
     </div>
 </div>
