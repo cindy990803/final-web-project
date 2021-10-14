@@ -15,7 +15,6 @@ import com.project.bokduck.domain.Member;
 import com.project.bokduck.domain.Review;
 import com.project.bokduck.repository.MemberRepository;
 import com.project.bokduck.service.ReviewService;
-import com.project.bokduck.service.SmsService;
 import com.project.bokduck.util.CurrentMember;
 import com.project.bokduck.validation.JoinFormValidator;
 import com.project.bokduck.validation.JoinFormVo;
@@ -44,7 +43,6 @@ import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -52,14 +50,13 @@ import java.util.List;
 @Slf4j
 public class MainController {
     private final MemberService memberService;
-    private final SmsService smsService;
-    private final ReviewService reviewService;
     private final MemberRepository memberRepository;
     private final CommunityRepository communityRepository;
     private final PassEmailService passEmailService;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
     private final ReviewCategoryRepository reviewCategoryRepository;
     private final PlatformTransactionManager transactionManager;
     private final CommunityService communityService;
@@ -404,78 +401,6 @@ public class MainController {
         return "redirect:/";
     }
 
-    @GetMapping("/id-search")
-    public String idCheck() {
-
-        return "member/id-search";
-    }
-
-    @PostMapping("/id/search")
-    @ResponseBody
-    public String sendSms(@RequestParam String tel, HttpServletRequest request) {
-        // 인증번호 발송하고
-        // "인증번호가 발송되었습니다." 를 response
-        Member member = memberRepository.findByTel(tel).get();
-        String message;
-        if(member == null){
-            message = "미등록..";
-        }
-        else {
-            Random rand = new Random();
-            String cerNum = "";
-            for (int i = 0; i < 6; i++) {
-                if (i == 0) {
-                    String ran = Integer.toString(rand.nextInt(9) + 1);
-                    cerNum += ran;
-                    continue;
-                }
-                String ran = Integer.toString(rand.nextInt(10));
-                cerNum += ran;
-            }
-
-            System.out.println("수신자 번호 : " + tel);
-            System.out.println("인증번호 : " + cerNum);
-            smsService.certifiedPhoneNumber(tel, cerNum);
-
-            // 인증번호를 세션객체에 담는다.
-            request.getSession().setAttribute("cerNum", cerNum);
-
-            message = "성공.....";
-        }
-        JsonObject jsonObject = new JsonObject();
-        //JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("message", message);
-        return jsonObject.toString();
-    }
-
-    @PostMapping("/id-search-result")
-    public String checkSms(@RequestParam String name, @RequestParam String tel,
-                           @RequestParam String num, HttpServletRequest request, Model model){
-        // 진짜 인증번호와 num 파라미터 비교
-        String message;
-        String realCerNum =(String)request.getSession().getAttribute("cerNum");
-
-        // 맞으면 ==>
-        if(num.equals(realCerNum)) {
-
-            //    가입된 연락처면  ==> model.addAttribute("message", "aaa@a.a") 로 회원 이메일 담음
-           if(memberService.containsTel(tel)) {
-               message = memberService.getEmail(tel);
-           } else {
-               message = "복덕복덕에 가입한 번호가 아닙니다.";
-           }
-        } else {
-
-            // 틀리면 ==>model.addAttribute("message", "인증번호가 잘못되었습니다.") 로 회원 이메일 담음
-            message = "인증번호가 잘못 되었습니다.";
-            model.addAttribute("message", message);
-        }
-
-
-        //    가입된 연락처면  ==> model.addAttribute("message", "aaa@a.a") 로 회원 이메일 담음
-        // 틀리면 ==>model.addAttribute("message", "인증번호가 잘못되었습니다.") 로 회원 이메일 담음
-        return "member/id-search-result";
-    }
 
     /**
      * 회원가입 완료 후 사용자가 입력한 이메일주소로 이메일을 보내 인증한다
@@ -526,7 +451,13 @@ public class MainController {
         model.addAttribute("message", message);
         return "member/password";
     }
-
+    /**
+     * 리뷰 상세보기 리뷰글 연결
+     * @param model
+     * @param id 리뷰글 id
+     * @param member
+     * @return post/review/read.html
+     */
     @GetMapping("/review/read")
     public String readReview(Model model,@RequestParam(name = "id") Long id, @CurrentMember Member member){
         Review review = reviewService.getReview(id);
@@ -545,6 +476,12 @@ public class MainController {
         return "post/review/read";
     }
 
+    /**
+     * 리뷰글 좋아요 누를시 특정글 좋아요 증가
+     * @param id
+     * @param member
+     * @return
+     */
     // 리뷰 컨트롤러
     @PostMapping("/read/like")
     @ResponseBody
@@ -597,13 +534,13 @@ public class MainController {
         String resultCode = "";
         String message = "";
 
-       if( reviewService.deleteById(id)) {
-           resultCode = "200";
-           message = "삭세 성공";
-       } else {
-           resultCode = "400";
-           message = "실패 되었습니다.";
-       }
+        if( reviewService.deleteById(id)) {
+            resultCode = "200";
+            message = "삭세 성공";
+        } else {
+            resultCode = "400";
+            message = "실패 되었습니다.";
+        }
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("resultCode", resultCode);
@@ -612,6 +549,14 @@ public class MainController {
         return jsonObject.toString();
     }
 
+    /**
+     * 리뷰 댓글 작성후 DB에 저장후 화면 전달
+     * @param comment
+     * @param id
+     * @param model
+     * @param member
+     * @return 리뷰글
+     */
     @PostMapping("/review/read/comment/{id}")
     public String reviewComment(CommentReview comment, @PathVariable long id, Model model, @CurrentMember Member member) {
 
@@ -630,6 +575,14 @@ public class MainController {
         return readReview(model, id, member);
     }
 
+    /**
+     * 리뷰 댓글 대댓글일 경우 DB에 저장
+     * @param subComment
+     * @param id
+     * @param model
+     * @param member
+     * @return 리뷰 상세보기
+     */
     @PostMapping("/review/read/subcomment/{id}")
     public String reviewSubComment(CommentReview subComment, @PathVariable long id, Model model, @CurrentMember Member member) {
 

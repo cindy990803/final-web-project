@@ -64,8 +64,6 @@ public class ReviewController {
     @Autowired
     FileRepository fileRepository;
 
-    /*@RequestMapping(value = {"/upload"}, method = {RequestMethod.POST}, consumes = MediaType.MULTIPART_FOR_DATA_VALUE)*/
-
 
     @GetMapping("/write")
     public String write(Model model, @CurrentMember Member member) {
@@ -274,6 +272,7 @@ public class ReviewController {
     }
 
 
+
     @GetMapping("/list")
     public String reviewList(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                              Model model,
@@ -470,49 +469,7 @@ public class ReviewController {
         return jsonObject.toString();
     }
 
-    @PostMapping("/read/like")
-    @ResponseBody
-    public String readLikeReview(Long id, @CurrentMember Member member) {
-        // 좋아요 눌렀을 때
-        log.info("좋아요 아이디 : {}", id);
 
-        String resultCode = "";
-        String message = "";
-
-        // 좋아요 개수
-        int likeCheck = reviewService.findById(id).getLikers().size();
-
-
-        switch (reviewService.addLike(member, id)) {
-            case ERROR_AUTH:
-                resultCode = "error.auth";
-                message = "로그인이 필요한 서비스입니다.";
-                break;
-            case ERROR_INVALID:
-                resultCode = "error.invalid";
-                message = "삭제된 게시물 입니다.";
-                break;
-            case DUPLICATE:
-                resultCode = "duplicate";
-                message = "좋아요 취소 완료!";
-                likeCheck -= 1;
-                break;
-            case OK:
-                resultCode = "ok";
-                message = "좋아요 완료!";
-                likeCheck += 1;
-                break;
-        }
-
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("resultCode", resultCode);
-        jsonObject.addProperty("message", message);
-        jsonObject.addProperty("likeCheck", likeCheck);
-
-        log.info("jsonObject.toString() : {}", jsonObject.toString());
-
-        return jsonObject.toString();
-    }
 
 
 

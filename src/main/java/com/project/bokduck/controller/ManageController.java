@@ -27,7 +27,6 @@ public class ManageController {
 
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
-    private final MemberRepository memberRepository;
 
     @GetMapping("")
     public String ManagePage(@CurrentMember Member member, Model model,

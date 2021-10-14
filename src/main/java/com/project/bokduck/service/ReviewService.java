@@ -15,13 +15,8 @@ import java.util.*;
 @Slf4j @RequiredArgsConstructor
 public class ReviewService {
     private final MemberRepository memberRepository;
-    private final MemberService memberService;
     private final ReviewRepository reviewRepository;
-    private final TagRepository tagRepository;
-    private final PostRepository postRepository;
-    private final CommentReviewRepository commentReviewRepository;
-    private final ReviewCategoryRepository reviewCategoryRepository;
-    private final PlatformTransactionManager transactionManager;
+   ;
 
 
     public void createLikeCount(){
@@ -32,10 +27,6 @@ public class ReviewService {
         reviewRepository.saveAll(reviewList);
 
         log.info("라이크 카운트 잘 나오니 ? : {}", findById(103l).getLikeCount());
-    }
-
-    public List<Review> findAll() {
-        return reviewRepository.findAll();
     }
 
     public Review findById(Long id){
@@ -68,7 +59,10 @@ public class ReviewService {
         return FlagLike.OK;
     }
 
-
+    /**
+     * 리뷰 조회수 DB에 리뷰글 볼떄마다 1씩 더해짐
+     * @param id
+     */
     public void increaseHit(Long id) {
        Review review = reviewRepository.findById(id).orElseThrow();
        int hit = review.getHit();
@@ -142,10 +136,6 @@ public class ReviewService {
 //    댓글
     public Review getReview(Long id) { return reviewRepository.findById(id).orElseThrow(); }
 
-
-    public List<Review> getReviewList() {
-        return reviewRepository.findAll();
-    }
 
 
 }
