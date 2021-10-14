@@ -237,7 +237,7 @@ public class ReviewController {
                 .regdate(LocalDateTime.now())
                 .address(writeReviewVO.getAddress())
                 .detailAddress(writeReviewVO.getDetailAddress())
-                .postCode(writeReviewVO.getPostCode())
+              .postCode(writeReviewVO.getPostCode())
                 .extraAddress(writeReviewVO.getExtraAddress())
                 .comment(writeReviewVO.getShortComment())
                 .reviewCategory(reviewCategory)
@@ -514,6 +514,25 @@ public class ReviewController {
         return jsonObject.toString();
     }
 
+
+
+    @GetMapping("/modify")
+    String modifyReview(@CurrentMember Member member,
+                        Long id,
+                        Model model) {
+
+        id = 56l;
+
+
+        Review review = reviewRepository.findAllById(id);
+        ReviewCategory reviewCategory = reviewCategoryRepository.findAllByReviewId(review.getId());
+
+        model.addAttribute("review", review);
+        model.addAttribute("reviewCategory",reviewCategory);
+
+
+        return "/post/review/modify";
+    }
 
 
 }

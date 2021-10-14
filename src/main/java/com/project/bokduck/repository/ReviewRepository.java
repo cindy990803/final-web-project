@@ -25,5 +25,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
     Page<Review> findAllByWriter(Member writer,Pageable pageable);
    /*List<Review> findAllByWriter(Member writer);*/
 
+
+     Review findAllById(Long id);
 }
 

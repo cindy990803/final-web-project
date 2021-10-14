@@ -433,6 +433,7 @@
                     </table>
 
                     <hr class="col-12 my-4">
+
                 </div>
 
                 <div class="page-num"
@@ -446,11 +447,11 @@
                         <li class="page-item" th:if="${start > 1}">
                             <a class="page-link" th:href="@{/mypage?(page=${start - reviewMaxPage})}" th:text="'<'"></a>
                         </li>
-                        <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}">
+                        <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:class="${page == reviewList.number + 1} ? 'active'" >
                             <a class="page-link" th:href="@{/mypage?(page=${page-1})}" th:text="${page}"></a></li>
                         </li>
 
-                        <li class="page-item" th:if="${end < reviewList.totalPages}">
+                        <li class="page-item" th:if="${end < reviewList.totalPages}" >
                             <a class="page-link" th:href="@{/mypage?(page=${start + reviewMaxPage})}" th:text="'>'"></a>
                         </li>
 

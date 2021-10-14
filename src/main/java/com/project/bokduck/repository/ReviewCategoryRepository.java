@@ -13,4 +13,5 @@ import java.util.List;
 
 @Repository
 public interface ReviewCategoryRepository extends JpaRepository<ReviewCategory, Long>, JpaSpecificationExecutor<ReviewCategory> {
+ReviewCategory findAllByReviewId(Long reviewId);
 }
