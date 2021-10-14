@@ -95,37 +95,37 @@ public class ReviewController {
         ReviewCategory reviewCategory = new ReviewCategory();
         Image image;
 
-if (imageFile==null){
-    image = new Image();
-    image.setImageName(null);
-    image.setImagePath(null);
-    model.addAttribute("image",image);
-}else {
-
-
-        for (int i = 0; i < imageFile.length;i++) {
-
+        if (imageFile==null){
             image = new Image();
+            image.setImageName(null);
+            image.setImagePath(null);
+            model.addAttribute("image",image);
+        }else {
 
-            String imageName = StringUtils.cleanPath(imageFile[i].getOriginalFilename());
 
-            image.setImageName(imageName);
+            for (int i = 0; i < imageFile.length;i++) {
 
-            image = imageRepository.save(image);
+                image = new Image();
 
-            image.setImagePath("/review_images/" + image.getId()+"/" + imageName);
+                String imageName = StringUtils.cleanPath(imageFile[i].getOriginalFilename());
 
-            String imageUploadDest = "review_images/" + image.getId();
+                image.setImageName(imageName);
 
-            fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile[i]);
+                image = imageRepository.save(image);
 
-            imageList.add(image);
+                image.setImagePath("/review_images/" + image.getId()+"/" + imageName);
 
-            model.addAttribute("image", image);
+                String imageUploadDest = "review_images/" + image.getId();
+
+                fileUpLoadUtil.saveFile(imageUploadDest, imageName, imageFile[i]);
+
+                imageList.add(image);
+
+                model.addAttribute("image", image);
+
+            }
 
         }
-
-}
 
 
 
@@ -136,7 +136,7 @@ if (imageFile==null){
 
         String pdfName = StringUtils.cleanPath(pdfFile.getOriginalFilename());
 
-        file.setFilePath(pdfName);
+        file.setFileName(pdfName);
 
         file = fileRepository.save(file);
 
@@ -251,6 +251,9 @@ if (imageFile==null){
 
         for(int i = 0; i<imageList.size();i++) {
             imageList.get(i).setImageToPost(review);
+        }
+        for(int i = 0; i<fileList.size();i++) {
+            fileList.get(i).setFileToPost(review);
         }
 
 
