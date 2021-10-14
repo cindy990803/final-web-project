@@ -67,14 +67,12 @@
 
             <form class="justify-content-center" method="get" th:action="@{/community/list/category}">
 
-                <!-- 검색창 -->
-                <div class="form-group d-flex justify-content-center row" >
+                <div class="form-group d-flex justify-content-center row">
                     <input type="text" class="form-control form-control-lg col-6" th:value="${searchText}"
                            id="searchText" name="searchText" placeholder="키워드 및 태그 검색">
                     <button type="submit" class="btn btn-info col-1">검색</button>
                 </div>
 
-                <!-- 글쓰기 -->
                 <div id="community_write" class="d-flex flex-row-reverse bd-highlight">
                     <div class="p-2 bd-highlight">
                         <a class="btn btn-outline-info" th:href="@{/community/write}">글쓰기</a>
@@ -82,12 +80,12 @@
                 </div>
 
 
-                <!-- 정렬 -->
-                <div class="form-group d-flex justify-content-end"  style="float: right" th:if="${!state.toString.equals('search')}">
+                <div class="form-group d-flex justify-content-end" style="float: right"
+                     th:if="${!state.toString.equals('search')}">
                     <a th:id="sort" th:href="@{/community/list/category(community= ${param.community},check=new)}">
                         <span th:if="${check} != 'like'" style="color: #28BBD4; font-size: 20px">최신순</span>
                         <span th:unless="${check} != 'like'" style="color: black; font-size: 20px">최신순</span>
-                    <span>&nbsp;&nbsp; | &nbsp;&nbsp;</span></a>
+                        <span>&nbsp;&nbsp; | &nbsp;&nbsp;</span></a>
 
                     <a th:id="sort"
                        th:href="@{/community/list/category(community=${param.community},check=like, sort='likeCount,id,desc')}">
@@ -107,10 +105,6 @@
                 </div>
 
 
-
-                <!-- 카테고리-->
-
-                <!--검색 했을때 -->
                 <div th:if="${state.toString.equals('search')}">
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
@@ -120,42 +114,48 @@
                     </ul>
                 </div>
 
-                <!--검색 안 했을때 -->
+
                 <div th:unless="${state.toString.equals('search')}">
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('all')?  'nav-link active'  : 'nav-link' }"
                                th:href="@{/community/list/category(community=all)}" th:value="all" th:id="category">
-                                <span th:if="${state} == all" style="font-size: 20px; color: #28BBD4; font-weight: bold" >전체글</span>
-                                <span th:unless="${state} == all" style="font-size: 20px; color: black" >전체글</span>
+                                <span th:if="${state} == all"
+                                      style="font-size: 20px; color: #28BBD4; font-weight: bold">전체글</span>
+                                <span th:unless="${state} == all" style="font-size: 20px; color: black">전체글</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.equals('tip')?  'nav-link active' : 'nav-link'  }"
                                th:href="@{/community/list/category(community=tip)}">
-                                <span th:if="${state} == tip" style="font-size: 20px; color: #28BBD4; font-weight: bold">자취방 꿀팁</span>
-                                <span th:unless="${state} == tip" style="font-size: 20px; color: black" >자취방 꿀팁</span>
+                                <span th:if="${state} == tip"
+                                      style="font-size: 20px; color: #28BBD4; font-weight: bold">자취방 꿀팁</span>
+                                <span th:unless="${state} == tip" style="font-size: 20px; color: black">자취방 꿀팁</span>
 
                             </a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('interior')? 'nav-link active' : 'nav-link' }"
                                th:href="@{/community/list/category(community=interior)}">
-                                <span th:if="${state} == interior" style="font-size: 20px; color: #28BBD4; font-weight: bold">자취방 인테리어</span>
-                                <span th:unless="${state} == interior" style="font-size: 20px; color: black">자취방 인테리어</span>
+                                <span th:if="${state} == interior"
+                                      style="font-size: 20px; color: #28BBD4; font-weight: bold">자취방 인테리어</span>
+                                <span th:unless="${state} == interior"
+                                      style="font-size: 20px; color: black">자취방 인테리어</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('eat')?  'nav-link active' : 'nav-link' }"
                                th:href="@{/community/list/category(community=eat)}">
-                                <span th:if="${state} == eat" style="font-size: 20px; color: #28BBD4; font-weight: bold" >동네 맛집</span>
-                                <span th:unless="${state} == eat" style="font-size: 20px; color: black" >동네 맛집</span>
+                                <span th:if="${state} == eat"
+                                      style="font-size: 20px; color: #28BBD4; font-weight: bold">동네 맛집</span>
+                                <span th:unless="${state} == eat" style="font-size: 20px; color: black">동네 맛집</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a th:class="${state.toString.equals('board')?  'nav-link active' : 'nav-link' }"
                                th:href="@{/community/list/category(community=board)}">
-                                <span th:if="${state} == board" style="font-size: 20px; color: #28BBD4; font-weight: bold">자유 게시판</span>
+                                <span th:if="${state} == board"
+                                      style="font-size: 20px; color: #28BBD4; font-weight: bold">자유 게시판</span>
                                 <span th:unless="${state} == board" style="font-size: 20px; color: black">자유 게시판</span>
                             </a>
                         </li>
@@ -164,7 +164,6 @@
                 </div>
 
 
-                <!--리스트 -->
                 <div th:if="${communityList.isEmpty()}" style="text-align: center;">
                     <img th:src="@{/images/no_content.svg}" style="width: 300px; height: 300px;"
                          class="no_content" id="no_content"/>
@@ -175,12 +174,16 @@
                     <table class="table table-borderless wd-250" th:each="product : ${communityList}"
                            style="table-layout: fixed">
                         <tr>
-                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('EAT')}"><span style="color: #303F4F">동네 맛집</span></td>
-                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('TIP')}"><span style="color: #303F4F">자취방 꿀팁</span></td>
-                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('INTERIOR')}"><span style="color: #303F4F">자취방
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('EAT')}"><span
+                                    style="color: #303F4F">동네 맛집</span></td>
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('TIP')}"><span
+                                    style="color: #303F4F">자취방 꿀팁</span></td>
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('INTERIOR')}"><span
+                                    style="color: #303F4F">자취방
                                 인테리어</span>
                             </td>
-                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('BOARD')}"><span style="color: #303F4F">자유 게시판</span></td>
+                            <td th:colspan="7" th:if="${product.communityCategory.toString().equals('BOARD')}"><span
+                                    style="color: #303F4F">자유 게시판</span></td>
                         </tr>
 
                         <tr>

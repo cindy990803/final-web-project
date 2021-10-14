@@ -17,10 +17,13 @@ import java.security.SecureRandom;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+/**
+ * @author 민경
+ *  임시 비밀번호를 랜덤으로 조합하여 이메일로 임시 비밀번호를 보내준다.
+ */
 public class PassEmailService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender javaMailSender;
-
 
     @Transactional
     public void sendPassEmail(Member member) {
@@ -50,7 +53,6 @@ public class PassEmailService {
                 "<p style=\"background:white\">링크 : <a href=\"http://localhost:8080/login"
                 + "\">로그인 원하시는 경우 이곳을 클릭하세요.</a></p>" +
                 "</body></html>";
-        //html 페이지를 보낼 때는 일반 메
         try{
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,false,"UTF-8");

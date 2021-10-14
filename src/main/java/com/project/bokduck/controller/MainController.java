@@ -39,6 +39,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -126,7 +127,7 @@ public class MainController {
                             .reviewStatus(ReviewStatus.COMPLETE)
 //                            .reviewCategory(category)
                             .build();
-                    review.setReviewCategory(reviewCategoryRepository.findById((long)(i + 6)).get());
+                    review.setReviewCategory(reviewCategoryRepository.findById((long) (i + 6)).get());
                     reviewList.add(review);
                 }
                 reviewRepository.saveAll(reviewList);
@@ -143,7 +144,7 @@ public class MainController {
                 String[] imageNameList = {"photo_1.jpg", "photo_2.jpg"};
                 String[] imagePathList = {"/images/photo_1.jpg", "/images/photo_2.jpg"};
 
-                for(int i = 0; i < 2; ++i){
+                for (int i = 0; i < 2; ++i) {
                     Image image = new Image();
                     image.setImageName(imageNameList[i]);
                     image.setImagePath(imagePathList[i]);
@@ -164,7 +165,7 @@ public class MainController {
                 String[] fileNameList = {"floating1.png", "floating2.png"};
                 String[] filePathList = {"/images/floating1.png", "/images/floating3.png"};
 
-                for(int i = 0; i < 2; ++i){
+                for (int i = 0; i < 2; ++i) {
                     File file = new File();
                     file.setFilePath(filePathList[i]);
                     fileList.add(file);
@@ -174,7 +175,7 @@ public class MainController {
 
                 // 계약서 포스트에 넣기
                 List<File> file1 = fileRepository.findAll();
-                for(File f : file1){
+                for (File f : file1) {
                     f.setFileToPost(post);
                 }
 
@@ -400,6 +401,10 @@ public class MainController {
         return "redirect:/";
     }
 
+    @GetMapping("/id-search")
+    public String idCheck() {
+        return "member/id-search";
+    }
 
     /**
      * 회원가입 완료 후 사용자가 입력한 이메일주소로 이메일을 보내 인증한다
@@ -433,14 +438,26 @@ public class MainController {
         return "member/email-check-result";
     }
 
+    /**
+     * 비밀번호 찾기 버튼 누르면 비밀번호 찾기 페이지를 불러온다.
+     * @author 민경
+     * @return member/password.html
+     */
     @GetMapping("/password")
     public String password() {
         return "member/password";
     }
 
+    /**
+     * DB상에 id를 확인하고 id 확인 후 일치하면 해당 id로 임시 비밀번호를 발송한다.
+     * @author 민경
+     * @param username db 에서 비교 하는 값
+     * @param model
+     * @return 성공  -> 메일 발송, 성공 메세지 출력 , 실패 - 실패 메세지 출력 으로 member/password 뷰 변경
+     */
     @PostMapping("/password")
     public String passwordSubmit(String username, Model model) {
-        String message = "아이디 : ";
+        String message = " ";
         Optional<Member> optional = memberRepository.findByUsername(username);
         if (optional.isEmpty()) {
             message = "아이디가 없습니다. 다시 한번 시도하세요.";
@@ -459,12 +476,12 @@ public class MainController {
      * @return post/review/read.html
      */
     @GetMapping("/review/read")
-    public String readReview(Model model,@RequestParam(name = "id") Long id, @CurrentMember Member member){
+    public String readReview(Model model, @RequestParam(name = "id") Long id, @CurrentMember Member member) {
         Review review = reviewService.getReview(id);
 
         reviewService.increaseHit(id);
 
-        model.addAttribute("review",review);
+        model.addAttribute("review", review);
         model.addAttribute("currentMember", member);
 
         CommentReview comment = new CommentReview();
@@ -533,8 +550,8 @@ public class MainController {
 
         String resultCode = "";
         String message = "";
+        if (reviewService.deleteById(id)) {
 
-        if( reviewService.deleteById(id)) {
             resultCode = "200";
             message = "삭세 성공";
         } else {
@@ -687,6 +704,15 @@ public class MainController {
         return getCommunityRead(model, savedCommu.getId(), member);
     }
 
+    /**
+     * 커뮤니티 탭을 클릭하면 커뮤니티 리스트 화면페이지를 불러온다.
+     * @author 민경
+     * @param pageable 한 페이지당 보여줄 개수
+     * @param member 현재 로그인한 회원
+     * @param model
+     * @param check 정렬 기준
+     * @return 커뮤니티 리스트 화면
+     */
     @GetMapping("/community/list")
     public String community(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                             @CurrentMember Member member, Model model,
@@ -708,7 +734,18 @@ public class MainController {
         return "post/community/list";
     }
 
-    @GetMapping("/community/list/category") //커뮤니티 카테고리, 페이지, 검색
+    /**
+     * 커뮤니티 리스트 화면에서 카테고리, 정렬, 페이징, 검색 한 기준에 따라서 변경된 값으로 list 출력
+     * @author 민경
+     * @param pageable 한 페이지당 글 게수
+     * @param model
+     * @param community 카테고리 종류
+     * @param check 최신순, 좋아요 순 정렬 기준
+     * @param member 현재 로그인한 멤버
+     * @param searchText 검색할 키워드
+     * @return post/community/list.html
+     */
+    @GetMapping("/community/list/category")
     public String communityList(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                 Model model,
                                 @RequestParam(required = false, defaultValue = "all") String community,
@@ -753,13 +790,12 @@ public class MainController {
             model.addAttribute("member", member);
         }
 
-        if (searchText != null) { //검색 했을때
+        if (searchText != null) {
             if (!searchText.isEmpty()) {
                 state = "search";
                 String[] search = {"postName", "postContent"};
                 Specification<Community> searchSpec = null;
 
-                //제목 내용 검색
                 for (String s : search) {
                     Map<String, Object> searchMap = new HashMap<>();
                     searchMap.put(s, searchText);
@@ -769,7 +805,7 @@ public class MainController {
 
                 }
 
-                //태그 검색
+
                 Specification<Tag> tagSpec = CommunitySpecs.searchTagDetails(searchText);
                 List<Tag> tagList = tagRepository.findAll(tagSpec);
                 searchSpec = searchSpec.or(CommunitySpecs.searchTag(tagList));
@@ -792,13 +828,19 @@ public class MainController {
         return "post/community/list";
     }
 
+    /**
+     * 커뮤니티 리스트에서서 '좋아요' 버튼 눌렀을때 실패시 메세지를 출력하고 성공시 하트의 사진이 변경, db 변경
+     * author 민경
+     * @param member 좋아요 누른 멤버
+     * @return 실패 -> 메세지 출력, 성공 -> 하트의 사진 변경 + db에 좋아요 한 게시물이 생성
+     */
     @GetMapping("/community/list/like") //카테고리 리스트 좋아요
     @ResponseBody
     public String like(Long id, @CurrentMember Member member) {
         String resultCode = "";
         String message = "";
 
-        int likeCheck = communityService.findCommunityId(id).getLikers().size();// 좋아요 개수
+        int likeCheck = communityService.findCommunityId(id).getLikers().size();
 
         switch (communityService.addLike(member, id)) {
             case ERROR_AUTH:
@@ -821,7 +863,6 @@ public class MainController {
                 break;
         }
 
-        //gson의존성으로 수정
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("resultCode", resultCode);
         jsonObject.addProperty("message", message);
@@ -830,6 +871,13 @@ public class MainController {
         return jsonObject.toString();
     }
 
+    /**
+     * 비밀번호 변경 버튼을 클릭 했을때 보여주는 뷰
+     * @author 민경
+     * @param model
+     * @param member 현재 로그인한 회원 정보
+     * @return 성공 -> /.html 이동 실패 -> member/password-change.html
+     */
     @RequestMapping("/password/change")
     public String passwordChange(Model model, @CurrentMember Member member) {
         if (member == null) {
@@ -853,26 +901,26 @@ public class MainController {
 
         Community community = communityRepository.findById(id).orElseThrow();
 
-        if (community.getVisitedMember()==null) {
+        if (community.getVisitedMember() == null) {
             community.setVisitedMember(new ArrayList<>());
         }
-        if (community.getLikers()==null) {
+        if (community.getLikers() == null) {
             community.setLikers(new ArrayList<>());
         }
-        if (community.getCommentCommunity()==null) {
+        if (community.getCommentCommunity() == null) {
             community.setCommentCommunity(new ArrayList<>());
         }
 
         //조회수 올리기
-        if (! community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
-            community.setHit(community.getHit()+1);
+        if (!community.getVisitedMember().contains(memberRepository.getById(member.getId()))) { //아직 조회 안했으면
+            community.setHit(community.getHit() + 1);
             List members = community.getVisitedMember();
             members.add(member);
             community.setVisitedMember(members);
         }
 
-        model.addAttribute("community",community);
-        model.addAttribute("currMem",member);
+        model.addAttribute("community", community);
+        model.addAttribute("currMem", member);
 
         CommentCommunity comment = new CommentCommunity();
         model.addAttribute("comment", comment);
@@ -918,7 +966,7 @@ public class MainController {
         vo.setPostContent(community.getPostContent());
 
         String strTags = "[";
-        for (int i=0; i<community.getTags().size(); ++i) {
+        for (int i = 0; i < community.getTags().size(); ++i) {
             strTags += "{\"value\":\"" + community.getTags().get(i).getTagName() + "\"}";
 
             if (i == community.getTags().size() - 1) break;
@@ -1012,15 +1060,15 @@ public class MainController {
         community.setTags(tagList);
 
         //현재 게시물을 수정 시 지운 태그들의 tagToPost에서 제거
-        for(Tag t : previousTagList){
+        for (Tag t : previousTagList) {
             List<Post> postList = t.getTagToPost();
             postList.remove(communityRepository.findById(id).orElseThrow());
             t.setTagToPost(postList);
         }
 
         //수정 시 추가한 태그들의 tagToPost에 현재 게시물 추가
-        for(Tag t : tagList){
-            if (t.getTagToPost()==null) {
+        for (Tag t : tagList) {
+            if (t.getTagToPost() == null) {
                 t.setTagToPost(new ArrayList<Post>());
             }
             t.getTagToPost().add(community);
@@ -1128,6 +1176,16 @@ public class MainController {
         return jsonObject.toString();
     }
 
+    /**
+     * 마이페이지를 클릭하면 마이페이지 이동
+     * @author 민경
+     * @param model
+     * @param member 현재 로그인한 회원
+     * @param pageable
+     * @param check
+     * @param page
+     * @return /member/mypage.html
+     */
     @GetMapping("/mypage")
     public String mypage(Model model,
                          @CurrentMember Member member,
@@ -1137,34 +1195,32 @@ public class MainController {
     ) {
         Review review;
 
-        if (member == null) { //로그인 확인
+        if (member == null) {
             return "redirect:/";
         } else {
             member = memberRepository.findById(member.getId()).orElseThrow();
         }
-
         review = reviewRepository.getById(member.getId());
-
         model.addAttribute("member", member);
-        //커뮤니티
         Page<Community> communityList = communityRepository.findAllByWriter(member, pageable);
-        /*List<Community> communityList = communityRepository.findAllByWriter(member);*/
-        //리뷰
-
         Page<Review> reviewList = reviewRepository.findAllByWriter(member, pageable);
-        /*List<Review> reviewList = reviewRepository.findAllByWriter(member);*/
-
-
         model.addAttribute("communityMaxPage", communityList.getSize());
         model.addAttribute("reviewMaxPage", reviewList.getSize());
         model.addAttribute("check", check);
         model.addAttribute("state", "all");
         model.addAttribute("communityList", communityList);
         model.addAttribute("reviewList", reviewList);
-
-
         return "/member/mypage";
     }
+
+    /** 현재 비밀번호, 새로운 비밀번호를 입력받아 비밀번호 변경한다.
+     * @author 민경
+     * @param member 현재 로그인한 회원
+     * @param oldpass 현재 비밀번호
+     * @param pass 새로운 비밀번호
+     * @param repass 새로운 비밀번호 확인
+     * @return 실패 -> 실패 메세지를 띄어준다, 성공 -> db상에 비밀번호 변경한다.
+     */
 
     @ResponseBody
     @GetMapping("/password/change/result")
@@ -1173,8 +1229,7 @@ public class MainController {
         if (member == null) {
             message = "로그인 되어있지 않습니다. 다시 로그인해주세요.";
         }
-
-        if (!oldpass.isEmpty() && !pass.isEmpty() && !repass.isEmpty()) { // 빈칸 모두 없어야 함
+        if (!oldpass.isEmpty() && !pass.isEmpty() && !repass.isEmpty()) {
             if (passwordEncoder.matches(oldpass, member.getPassword())) {
                 if (pass.matches("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$")) {
                     if (pass.equals(repass)) {
@@ -1187,19 +1242,24 @@ public class MainController {
                 } else {
                     message = "패스워드는 영문자, 숫자, 특수기호를 조합하여 최소 8자 이상을 입력하셔야 합니다";
                 }
-            } else { //지금 비밀번호랑 다를때 !
+            } else {
                 message = "현재 비밀번호가 다릅니다.";
             }
-        } else { //빈칸 하나라도 있을때
+        } else {
             message = "모두 입력하셔야 합니다.";
         }
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("message", message);
-
         return jsonObject.toString();
     }
 
-    @GetMapping("/memberDelete") //회원 탈퇴
+    /**
+     * 작성한 글, 댓글, 회원 정보를 모두 db상에서 삭제한다.
+     * @author 민경
+     * @param member 현재 로그인한 회원
+     * @return 성공 -> db상에서 모두 삭제 후 idnex.html로 이동한다. 실패 -> member/mypage.html
+     */
+    @GetMapping("/memberDelete")
     @ResponseBody
     public String memberdelete(@CurrentMember Member member) {
         memberRepository.delete(member);
@@ -1208,7 +1268,18 @@ public class MainController {
         return jsonObject.toString();
     }
 
-    @GetMapping("/mypage/change") //회원 수정
+    /** 회원의 주소, 닉네임, 닉네임 공개 유무, 핸드폰 번호 정보를 변경한다.
+     * @author 민경
+     * @param postcode 변경할 우편번호
+     * @param address 변경할 기본주소
+     * @param detailAddress 변경할 상세주소
+     * @param newnickname 변경할 닉네임
+     * @param newtel 변경할 핸드폰 번호
+     * @param nicknameOpen 변경할 닉네임 공개 유무
+     * @param member 현재 로그인한 회원
+     * @return 실패 -> alrt로 실패 이유를 띄어 준다 성공 -> db상에 변경후 변경한 값으로 화면 변경
+     */
+    @GetMapping("/mypage/change")
     @ResponseBody
     public String mypageChange(String postcode, String address, String detailAddress, String newnickname,
                                String newtel, String nicknameOpen, @CurrentMember Member member) {
@@ -1216,11 +1287,11 @@ public class MainController {
         String message = "변경할 정보가 없습니다";
 
         if (!newnickname.isEmpty()) {
-            if (member.getNickname() == null || !member.getNickname().equals(newnickname)) { //닉네임 변경 할 시
+            if (member.getNickname() == null || !member.getNickname().equals(newnickname)) {
                 boolean nickname = memberService.checkNickname(newnickname);
-                if (newnickname != null && nickname == true) { //닉네임 중복 체크
+                if (newnickname != null && nickname == true) {
                     message = "중복된 닉네임 입니다";
-                } else if (newnickname.length() > 10 || newnickname.length() < 2) { //길이체크
+                } else if (newnickname.length() > 10 || newnickname.length() < 2) {
                     message = "닉네임의 길이는 2자이상 10자 이하여야 합니다.";
                 } else {
                     member.setNickname(newnickname);
@@ -1229,14 +1300,12 @@ public class MainController {
                 }
             }
         }
-
-        if (!member.getTel().equals(newtel)) { //핸드폰 번호 변경시
+        if (!member.getTel().equals(newtel)) {
             member.setTel(newtel);
             memberRepository.save(member);
             message = "변경 완료 되었습니다.";
         }
-
-        if (member.getUserAddress() == null || !member.getUserAddress().getPostcode().equals(postcode) //주소 변경
+        if (member.getUserAddress() == null || !member.getUserAddress().getPostcode().equals(postcode)
                 || !member.getUserAddress().getBaseAddress().equals(address)
                 || !member.getUserAddress().getDetailAddress().equals(detailAddress)) {
             if (!postcode.isEmpty() && !address.isEmpty() && !detailAddress.isEmpty()) {
@@ -1269,12 +1338,11 @@ public class MainController {
                 }
             }
         }
-
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("message", message);
-
         return jsonObject.toString();
     }
+
 
     @RequestMapping("/idsearch")
     public String idSearchResult(String tel, Model model) {

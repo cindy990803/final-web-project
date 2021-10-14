@@ -146,7 +146,12 @@ public class MemberService implements UserDetailsService {
         return  email;
     }
 
-
+    /**
+     * 닉네임 중복 여부
+     * @author 민경
+     * @param newnickname 새로운 닉네임
+     * @return 중복 유무에 따른 true, false 반환
+     */
     public boolean checkNickname(String newnickname) {
        return memberRepository.existsBynickname(newnickname);
     }
