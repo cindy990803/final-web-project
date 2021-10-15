@@ -70,11 +70,8 @@ public class MainController {
 
     /**
      * 임의의 리뷰글 및 커뮤니티글 생성
-<<<<<<< Updated upstream
      * @author miri
-=======
-     * @author 미리
->>>>>>> Stashed changes
+     * @author 미리, 이선주
      */
     @PostConstruct
     @DependsOn("memberRepository")
@@ -372,11 +369,8 @@ public class MainController {
 
 
     /**
-<<<<<<< Updated upstream
      * @author miri
-=======
      * @author 미리
->>>>>>> Stashed changes
      * @return 로그인 페이지
      */
     @GetMapping("/login")
@@ -1364,11 +1358,8 @@ public class MainController {
      * @param tel   사용자로부터 입력받은 전화번호
      * @param model
      * @return 아이디찾기 페이지
-<<<<<<< Updated upstream
      * @author miri
-=======
      * @author 미리
->>>>>>> Stashed changes
      */
     @RequestMapping("/idsearch")
     public String idSearchResult(String tel, Model model) {

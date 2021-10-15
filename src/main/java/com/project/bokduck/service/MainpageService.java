@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 메인페이지 서비스
+ * @author 이선주
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
